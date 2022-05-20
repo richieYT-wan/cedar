@@ -7,18 +7,19 @@ source activate phd
 DIR="/home/projects/vaccine/people/yatwan/cedar/"
 OUTDIR="${DIR}output/"
 DATADIR="${DIR}test_data/"
-
+SCRIPTDIR="${DIR}scripts/"
 
 # Kmers extraction script
-cd $DIR/scripts
 for k in 8 9 10
 do
+  cd SCRIPTDIR
   python generate_kmers.py -filepath $DATADIR -k $k -outdir $OUTDIR -description_verbose "false" -drop_sequence "true"
+  cd OUTDIR
   # concatenate all kmers split
-  cat $OUTDIR*${k}mers*.txt > "${OUTDIR}${k}mers_merged.txt"
+  cat *${k}mers*.txt > "${k}mers_merged.txt"
   # Remove all the other split files
   rm $OUTDIR*$split*.txt
-  awk -F ',' 'NR>1 {print $1}' $OUTDIR${k}mers_merged.txt  >> $OUTDIR${k}mers_${1}.pep
+  awk -F ',' 'NR>1 {print $1}' ${k}mers_merged.txt  >> ${k}mers_${1}.pep
 done
 
 
