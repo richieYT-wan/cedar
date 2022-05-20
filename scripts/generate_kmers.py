@@ -31,7 +31,6 @@ def main():
     args['outdir'], args['filepath'] = convert_path(args['outdir']), convert_path(args['filepath'])
     mkdirs(args['outdir'])
     fn = args['filepath']
-
     # If provided filepath is a directory, will take all fasta files inside
     if os.path.isdir(fn):
         files = [os.path.join(fn, x) for x in os.listdir(fn) if '.fa' in x]
