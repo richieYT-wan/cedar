@@ -10,7 +10,8 @@ DATADIR= "${DIR}test_data/"
 
 
 # Kmers extraction script
-python $DIR/scripts/generate_kmers.py -filepath $DATADIR/$1/ -k $1 -outdir $OUTDIR -description_verbose "false" -drop_sequence "true"
+cd $DIR/scripts
+python generate_kmers.py -filepath $DATADIR/$1/ -k $1 -outdir $OUTDIR -description_verbose "false" -drop_sequence "true"
 
 # concatenate all called k-mers into a merged_file
 cat $OUTDIR*${1}mers*.txt > "${OUTDIR}${1}mers_$1_merged.txt"
