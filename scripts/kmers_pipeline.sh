@@ -6,7 +6,6 @@ source activate phd
 
 # $1 should be the input directory or filepath, relative to DIR
 # ex, if dir is ./cedar/data/human_split/, then $1 should be "data/human_split/"
-
 # $2 should be the target filename: i.e. "human" if running for human
 # TODO: $3 should be the split number when implementing with splitting from a total file
 
@@ -22,7 +21,6 @@ do
   cd $SCRIPTDIR
   # TMP dir for file splitting; TODO
   # mkdir "${SCRIPTDIR}tmp/"
-
   python generate_kmers.py -filepath $DATADIR -k $k -outdir $OUTDIR -description_verbose "false" -drop_sequence "true"
   cd $OUTDIR
   # concatenate the splits
@@ -30,9 +28,10 @@ do
   # Remove all the other split
   rm *split*.txt
   awk -F ',' 'NR>1 {print $1}' ${k}mers_${2}.txt  >> ${k}mers_${2}.pep
-  netMHCpan4-1 -BA -xls -a HLANAMES HERE -xlsfile ${k}mers_netmhcpan_out.xls -p ${k}mers_${2}.pep
+  netMHCpan4-1 -BA -xls -a HLA-A02:01,HLA-B07:02,HLA-A03:01,HLA-A24:02,HLA-A11:01,HLA-B15:01,HLA-B35:01,HLA-A02:06,HLA-B27:05,HLA-A01:01 -xlsfile ./${k}mers_netmhcpan_out.xls -p ${k}mers_${2}.pep
+
   cd $SCRIPTDIR
-  python score_kmers.py -filepath $OUTDIR${k}mers_${2}.pep -resultspath
+  python score_kmers.py -filepath $OUTDIR${k}mers_${2}.pep -resultspath $OUTDIR${k}mers_netmhcpan_out.xls -rank_thr 2
 done
 
 

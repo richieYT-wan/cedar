@@ -21,8 +21,10 @@ def args_parser():
     parser.add_argument('-filepath', type=str, help='path to pep file')
     parser.add_argument('-resultspath', type=str, help='path to the NetMHCpan output (.xls format)')
     parser.add_argument('-outdir', type=str, default='./output/')
-    parser.add_argument('-rank_filter', type=str, help='Which rank to filter by; Takes value (BA_Rank or EL_Rank), '
-                                                       'case insensitive')
+    parser.add_argument('-rank_filter', type=str, default='el_rank',
+                        help='Which rank to filter by; Takes value (BA_Rank or EL_Rank), '
+                             'case insensitive')
+    parser.add_argument('-rank_thr', type=float, default=2.0, help='Threshold for rank filtering')
     return parser.parse_args()
 
 
@@ -33,7 +35,7 @@ def main():
     mkdirs(args['outdir'])
     fn_pep = args['filepath']
     fn_mhc = args['resultspath']
-    savename = f"{args['filepath'][args['filepath'].rfind('/')+1:args['filepath'].find('.pep')]}_scored.csv"
+    savename = f"{args['filepath'][args['filepath'].rfind('/') + 1:args['filepath'].find('.pep')]}_scored.csv"
     # read csvs and parse columns/index
     peptides = pd.read_csv(fn_pep, header=None)
     peptides['columns'] = 'Peptide'
@@ -48,6 +50,7 @@ def main():
     print('xd all gud')
     print(os.path.join(args['outdir'], savename))
     df_output.to_csv(os.path.join(args['outdir'], savename))
+
 
 if __name__ == '__main__':
     main()
