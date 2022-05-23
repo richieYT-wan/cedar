@@ -17,6 +17,8 @@ SCRIPTDIR="${DIR}scripts/"
 
 for k in 8 9 10 11 15
 do
+  # Do CD here because somehow the relative imports don't work properly in the .py script
+  # when running the script as python ./scripts/generate_kmers.py
   cd $SCRIPTDIR
   # TMP dir for file splitting; TODO
   # mkdir "${SCRIPTDIR}tmp/"
@@ -29,6 +31,8 @@ do
   rm *split*.txt
   awk -F ',' 'NR>1 {print $1}' ${k}mers_${2}.txt  >> ${k}mers_${2}.pep
   netMHCpan4-1 -BA -xls -a HLANAMES HERE -xlsfile ${k}mers_netmhcpan_out.xls -p ${k}mers_${2}.pep
+  cd $SCRIPTDIR
+  python score_kmers.py -filepath $OUTDIR${k}mers_${2}.pep -resultspath
 done
 
 
