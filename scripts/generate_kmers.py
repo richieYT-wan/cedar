@@ -33,17 +33,19 @@ def main():
     fn = args['filepath']
     # If provided filepath is a directory, will take all fasta files inside
     if os.path.isdir(fn):
-        files = [os.path.join(fn, x) for x in os.listdir(fn) if '.fa' in x]
+        files = sorted([os.path.join(fn, x) for x in os.listdir(fn) if '.fa' in x])
     # Else if it's a direct filepath, will try to read it
     elif os.path.isfile(fn):
         if '.fa' not in fn:
             raise ValueError(f'{fn} file provided is not in a fasta format.')
-        files = [fn]
+        files = sorted([fn])
 
     header = True
-    for f in tqdm.tqdm(files, desc = 'File', leave=True):
+    for i, f in enumerate(tqdm.tqdm(files, desc = 'File', leave=True)):
         output_kmers = get_fasta_kmers(f, args['k'], args['description_verbose'], args['drop_sequence'])
         outname = f'{args["k"]}mers_{f[f.rfind("/") + 1:f.find(".fasta")]}.txt'
+        if i == 0:
+            header=True
         output_kmers.to_csv(os.path.join(args['outdir'], outname), index=False, header=header)
         # Header fix to bypass saving the header multiple times if more than 1 file,
         # Helps bypass the slow version of remove the header in UNIX with sed or else
