@@ -4,7 +4,7 @@ Keep only the ones that score above a given threshold
 """
 
 import os, sys
-import pandas as pd
+import modin.pandas as pd
 import argparse
 import tqdm
 

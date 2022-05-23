@@ -1,7 +1,7 @@
 import argparse
 import os
 import pickle
-import pandas as pd
+import modin.pandas as pd
 
 
 def str2bool(v):
