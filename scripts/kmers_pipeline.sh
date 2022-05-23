@@ -32,7 +32,7 @@ do
   python remove_duplicates.py -filepath ${k}mers_${2}.txt
   # awk -F ',' 'NR>1 {print $1}' ${k}mers_${2}.txt  >> ${k}mers_${2}.pep
 
-  netMHCpan4.1 -BA -xls -a HLA-A02:01,HLA-B07:02,HLA-A03:01,HLA-A24:02,HLA-A11:01,HLA-B15:01,HLA-B35:01,HLA-A02:06,HLA-B27:05,HLA-A01:01 -xlsfile ./${k}mers_netmhcpan_out.xls -thr 0.5 -p ${k}mers_${2}.pep
+  netMHCpan-4.1 -BA -xls -a HLA-A02:01,HLA-B07:02,HLA-A03:01,HLA-A24:02,HLA-A11:01,HLA-B15:01,HLA-B35:01,HLA-A02:06,HLA-B27:05,HLA-A01:01 -xlsfile ./${k}mers_netmhcpan_out.xls -thr 0.5 -p ${k}mers_${2}.pep
 
   cd $SCRIPTDIR
   python score_kmers.py -filepath $OUTDIR${k}mers_${2}.pep -resultspath $OUTDIR${k}mers_netmhcpan_out.xls -rank_thr $3

@@ -16,7 +16,7 @@ from src.utils import str2bool, mkdirs, convert_path
 def args_parser():
     parser = argparse.ArgumentParser(description='K-mers extraction script')
     parser.add_argument('-filepath', type=str, help='path to fasta-file or directory containing fastafiles')
-    parser.add_argument('-outdir', type=str, default='./output/')
+    parser.add_argument('-outdir', type=str, default='../output/')
     parser.add_argument('-k', type=int, help='Extracts k-mers of length k')
     parser.add_argument('-description_verbose', type=str2bool, default=False,
                         help='Keep additional description information; By default, will only keep the UniProt ID')
