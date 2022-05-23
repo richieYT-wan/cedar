@@ -41,7 +41,6 @@ def main():
         files = [fn]
 
     header = True
-
     for f in tqdm.tqdm(files, desc = 'File', leave=True):
         output_kmers = get_fasta_kmers(f, args['k'], args['description_verbose'], args['drop_sequence'])
         outname = f'{args["k"]}mers_{f[f.rfind("/") + 1:f.find(".fasta")]}.txt'

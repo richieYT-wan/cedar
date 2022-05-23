@@ -20,11 +20,11 @@ def args_parser():
     parser = argparse.ArgumentParser(description='K-mers extraction script')
     parser.add_argument('-filepath', type=str, help='path to pep file')
     parser.add_argument('-resultspath', type=str, help='path to the NetMHCpan output (.xls format)')
-    parser.add_argument('-outdir', type=str, default='./output/')
+    parser.add_argument('-outdir', type=str, default='../output/')
     parser.add_argument('-rank_filter', type=str, default='el_rank',
                         help='Which rank to filter by; Takes value (BA_Rank or EL_Rank), '
                              'case insensitive')
-    parser.add_argument('-rank_thr', type=float, default=2.0, help='Threshold for rank filtering')
+    parser.add_argument('-rank_thr', type=float, default=99.0, help='Threshold for rank filtering')
     return parser.parse_args()
 
 
@@ -43,12 +43,13 @@ def main():
     df_netmhcpan.columns = parse_netmhcpan_header(df_netmhcpan.columns)
     df_netmhcpan.set_index(('base', 'Peptide'), inplace=True)
     df_netmhcpan.index.name = 'Peptide'
-    # Get the df containing the sequence and its "best binding" HLA
+    # Get the df containing the sequence and its "best binding" HLA and filter by rank%
     df_output = filter_rank(df_netmhcpan, args['rank_filter'])
+    threshold = float(args['rank_thr'])
+    df_output = df_output.query('tmp<@threshold')
     # Get the final output DF merging the best HLA with its features (BA, EL score and ranks)
     df_output = get_filtered_df(df_output, df_netmhcpan)
-    print('xd all gud')
-    print(os.path.join(args['outdir'], savename))
+    print('Saving scored pep file at: ', os.path.join(args['outdir'], savename))
     df_output.to_csv(os.path.join(args['outdir'], savename))
 
 
