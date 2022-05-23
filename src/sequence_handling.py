@@ -1,4 +1,4 @@
-import modin.pandas as pd
+import pandas as pd
 from Bio import SeqIO
 from joblib import Parallel, delayed
 from functools import partial

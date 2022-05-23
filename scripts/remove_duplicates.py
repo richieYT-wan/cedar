@@ -2,7 +2,7 @@
 Reads all kmers txt files and dedupes, save to .txt and .pep
 """
 import os, sys
-import modin.pandas as pd
+import pandas as pd
 import argparse
 
 module_path = os.path.abspath(os.path.join('..'))
