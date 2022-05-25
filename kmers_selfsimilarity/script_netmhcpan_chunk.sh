@@ -11,6 +11,10 @@ DATADIR="${DIR}data/human_split/"
 SCRIPTDIR="${DIR}kmers_selfsimilarity/"
 TMPDIR="${SCRIPTDIR}tmp/"
 
+PBS -N "${1}_${2}_${3}"
+PBS -e "${TMPDIR}${1}_${2}_${3}".err
+PBS -o "${TMPDIR}${1}_${2}_${3}".log
+
 mkdir ${TMPDIR}
 
 for hla in 'HLA-A02:01' 'HLA-B07:02' 'HLA-A03:01' 'HLA-A24:02' 'HLA-A11:01' 'HLA-B15:01' 'HLA-B35:01' 'HLA-A02:06' 'HLA-B27:05' 'HLA-A01:01'
