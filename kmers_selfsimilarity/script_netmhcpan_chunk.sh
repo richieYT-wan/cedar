@@ -8,7 +8,7 @@
 DIR="/home/projects/vaccine/people/yatwan/cedar/"
 OUTDIR="${DIR}output/"
 DATADIR="${DIR}data/human_split/"
-SCRIPTDIR="${DIR}scripts/"
+SCRIPTDIR="${DIR}kmers_selfsimilarity/"
 TMPDIR="${SCRIPTDIR}tmp/"
 
 mkdir ${TMPDIR}

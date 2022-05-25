@@ -19,7 +19,7 @@ for k in 8 9 10 11 12 15
 do
   cd $SCRIPTDIR
   # This will save the output files as OUTDIR/kmers_NAME_chunk_X
-  sh kmer_chunk.sh ${k} 4 ${NAME}
+  sh kmers_chunk.sh ${k} 4 ${NAME}
   for chunk in 0 1 2 3
   do
     sh script_netmhcpan_chunk.sh ${k} ${chunk} ${NAME} "${OUTDIR}${k}mers_${NAME}_chunk_${chunk}.pep"
