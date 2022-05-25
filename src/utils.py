@@ -55,38 +55,70 @@ def parse_netmhcpan_header(df_columns: pd.core.indexes.multi.MultiIndex):
     return pd.MultiIndex.from_tuples([(x, y) for x, y in zip(level_0, level_1)])
 
 
-def return_columns(row, df):
-    """
-    Returns the columns with HLA in it for multi indexing of netmhcpan xls df
-    """
-    return [x for x in df.columns if x[0] == row['HLA']]
+def read_netmhcpan_results(filepath):
+    df = pd.read_csv(filepath, header = [0,1], sep = '\t')
+    df.columns = parse_netmhcpan_header(df.columns)
+    return df
 
 
-def filter_rank(df_netmhcpan, which_rank):
+def set_hla(df):
     """
-    From the df_netmhcpan, filter the df using the rank given by `which_rank`,
-    Finds the minimum rank for the given `which_rank` and its corresponding HLA among all HLA results
-
+    Assumes the DF is in the output format by NetMHCpan
+    sets the HLA and drops multilevel column
     """
-    hlas = set([x for x in df_netmhcpan.columns.get_level_values(0) if 'hla' in x.lower()])
-    ranks = [x for x in df_netmhcpan.columns if x[0] in hlas and x[1].lower() == which_rank.lower()]
-    df_out = pd.merge(df_netmhcpan[ranks].idxmin(axis=1).apply(lambda x: x[0]).rename('HLA'),
-                      df_netmhcpan[ranks].min(axis=1).rename('tmp'),
-                      left_index=True, right_index=True)
-    return df_out
+    hla = [x for x in df.columns.get_level_values(0).unique() if 'hla' in x.lower()][0]
+    df.columns = df.columns.get_level_values(1)
+    df['HLA'] = hla
+    return df
 
 
-def get_filtered_df(df_out, df_netmhcpan):
+def query_melt_threshold(df, which='EL_Rank', threshold=2.0):
     """
-    From the output df returned by filter_rank, filters the original NetMHCpan xls df and
-    keep only the values for the best-binding HLA.
+    Query and melts the NetMHCpan results df to allow for concatenation
+    when merging results for multiple alleles
+    :param which:
+    :param threshold:
+    :return:
     """
-    # Filters the original df values filtered
-    filtered = df_out.apply(lambda x: df_netmhcpan.loc[x.name, return_columns(x, df_netmhcpan)].values, axis=1)
-    # reshapes the filtered df
-    df_values = pd.DataFrame.from_dict(dict(zip(filtered.index, filtered.values))).T
-    df_values.index.name = 'Peptide'
-    df_values.columns = ['core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']
-    # Returns the output merged with the filtered values
-    return df_out.drop(columns = ['tmp']).merge(df_values, left_index=True, right_index=True)
+    assert which in ['EL_Rank', 'BA_Rank'], f'{which} should be EL_Rank or BA_rank!'
+    if df.index.name == 'Peptide':
+        df.reset_index(inplace=True)
+    return df.query(f'{which}<@threshold').melt(id_vars=['Peptide','HLA'])
+
+
+
+# def return_columns(row, df):
+#     """
+#     Returns the columns with HLA in it for multi indexing of netmhcpan xls df
+#     """
+#     return [x for x in df.columns if x[0] == row['HLA']]
+#
+#
+# def filter_rank(df_netmhcpan, which_rank):
+#     """
+#     From the df_netmhcpan, filter the df using the rank given by `which_rank`,
+#     Finds the minimum rank for the given `which_rank` and its corresponding HLA among all HLA results
+#
+#     """
+#     hlas = set([x for x in df_netmhcpan.columns.get_level_values(0) if 'hla' in x.lower()])
+#     ranks = [x for x in df_netmhcpan.columns if x[0] in hlas and x[1].lower() == which_rank.lower()]
+#     df_out = pd.merge(df_netmhcpan[ranks].idxmin(axis=1).apply(lambda x: x[0]).rename('HLA'),
+#                       df_netmhcpan[ranks].min(axis=1).rename('tmp'),
+#                       left_index=True, right_index=True)
+#     return df_out
+#
+#
+# def get_filtered_df(df_out, df_netmhcpan):
+#     """
+#     From the output df returned by filter_rank, filters the original NetMHCpan xls df and
+#     keep only the values for the best-binding HLA.
+#     """
+#     # Filters the original df values filtered
+#     filtered = df_out.apply(lambda x: df_netmhcpan.loc[x.name, return_columns(x, df_netmhcpan)].values, axis=1)
+#     # reshapes the filtered df
+#     df_values = pd.DataFrame.from_dict(dict(zip(filtered.index, filtered.values))).T
+#     df_values.index.name = 'Peptide'
+#     df_values.columns = ['core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']
+#     # Returns the output merged with the filtered values
+#     return df_out.drop(columns = ['tmp']).merge(df_values, left_index=True, right_index=True)
 

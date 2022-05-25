@@ -161,3 +161,5 @@ cython_debug/
 
 imm_bin/
 imm_data/
+mhc_out/hla_b0702.xls
+mhc_out/hla_a0201.xls

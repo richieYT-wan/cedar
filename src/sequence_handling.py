@@ -26,7 +26,7 @@ def kmerize_dict(seq: str, k: int = 9):
     if len(seq) < k:
         raise Exception(f'Provided K {k} is shorter than sequence length {len(seq)}')
     else:
-        return [{'peptide': seq[i:i + k],
+        return [{'Peptide': seq[i:i + k],
                  'start_pos': i} for i in range(len(seq) - k + 1)]
 
 
@@ -87,12 +87,12 @@ def remove_dupe_kmers(df):
     tmp = df.copy()
     tmp['id_position'] = tmp['uniprot_id'] + '_' + tmp['start_pos'].astype(str)
     # Find all duplicates and first duplicates index
-    total_index = tmp.loc[tmp['peptide'].duplicated(keep=False)].index
-    first_index = total_index.difference(tmp.loc[tmp.duplicated('peptide', keep='first')].index)
+    total_index = tmp.loc[tmp['Peptide'].duplicated(keep=False)].index
+    first_index = total_index.difference(tmp.loc[tmp.duplicated('Peptide', keep='first')].index)
     # Merge ID for total, set_index as first_index
-    merged_tmp = tmp.loc[total_index].groupby('peptide')['id_position'].agg(','.join) \
-        .reset_index().set_index(first_index)  # resets peptides from index and set as first_index for querying
-    tmp.drop_duplicates('peptide', keep='first', inplace=True)
+    merged_tmp = tmp.loc[total_index].groupby('Peptide')['id_position'].agg(','.join) \
+        .reset_index().set_index(first_index)  # resets Peptides from index and set as first_index for querying
+    tmp.drop_duplicates('Peptide', keep='first', inplace=True)
     tmp.loc[first_index, 'id_position'] = merged_tmp['id_position']
     return tmp
 
