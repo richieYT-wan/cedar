@@ -28,7 +28,7 @@ do
 	echo "#\! /usr/bin/bash" >> "${TMPDIR}${hlaname}_${filename}.sh"
 	echo netMHCpan-4.1 -a ${hla} -p ${4} -t 2.0 -BA -xls -xlsfile "${OUTDIR}${filename}.xls" > "${TMPDIR}${hlaname}_${filename}.sh"
 	echo "# EOF" >> "${TMPDIR}${hlaname}_${filename}.sh"
-	#qsub -d "${DIR}" -W group_list=vaccine -A vaccine -l nodes=1:ppn=1:thinnode,mem=12gb,walltime=3:00:00 "${TMPDIR}${hlaname}_${filename}.sh"
+	qsub -d "${DIR}" -W group_list=vaccine -A vaccine -l nodes=1:ppn=1:thinnode,mem=6gb,walltime=3:00:00 "${TMPDIR}${hlaname}_${filename}.sh"
 done
 
 
