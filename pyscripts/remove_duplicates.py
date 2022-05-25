@@ -26,7 +26,10 @@ def main():
     # set args
     args = vars(args_parser())
     args['filepath'] = convert_path(args['filepath'])
+    # This should be the concatenated df
     df = pd.read_csv(args['filepath'])
+    # drops the duplicated header rows
+    df.drop(index=df.query('Peptide=="Peptide"').index, inplace=True)
     print('Removing duplicates')
     df = remove_dupe_kmers(df)
 

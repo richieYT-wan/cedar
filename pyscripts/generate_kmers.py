@@ -40,18 +40,11 @@ def main():
             raise ValueError(f'{fn} file provided is not in a fasta format.')
         files = sorted([fn])
 
-    header = True
     for i, f in enumerate(tqdm.tqdm(files, desc = 'File', leave=True)):
         output_kmers = get_fasta_kmers(f, args['k'], args['description_verbose'], args['drop_sequence'])
         outname = f'{args["k"]}mers_{f[f.rfind("/") + 1:f.find(".fasta")]}.txt'
-        if i == 0:
-            header=True
-        output_kmers.to_csv(os.path.join(args['outdir'], outname), index=False, header=header)
-        # Header fix to bypass saving the header multiple times if more than 1 file,
-        # Helps bypass the slow version of remove the header in UNIX with sed or else
-        # after concatenating all output files with cat *kmers*.txt > kmers_merged.txt
-        # so it only keeps the first occurence; Terrible fix but this will do for now
-        header = False
+        # Keep all headers and simply remove them when concatenating in remove dupe...
+        output_kmers.to_csv(os.path.join(args['outdir'], outname), index=False, header=True)
 
 
 if __name__ == '__main__':

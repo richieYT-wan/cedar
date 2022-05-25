@@ -1,0 +1,15 @@
+Peptide,uniprot_id,start_pos
+MSSHEGGKK,id_0,12
+SSHEGGKKK,id_1,13
+SHEGGKKKA,id_2,14
+HEGGKKKAL,id_3,15
+EGGKKKALK,id_4,16
+GGKKKALKQ,id_5,17
+Peptide,uniprot_id,start_pos
+GKKKALKQP,id_6,18
+Peptide,uniprot_id,start_pos
+KKKALKQPK,id_7,19
+Peptide,uniprot_id,start_pos
+KKALKQPKK,id_8,20
+KALKQPKKQ,id_9,21
+ALKQPKKQA,id_10,22

@@ -21,6 +21,7 @@ cat $(find . -name "*${1}mers*.txt" -and -name "*split*") > "${1}mers_${3}.txt"
 # Remove the splits after concatenation
 rm $(find . -name "*${1}mers*.txt" -and -name "*split*")
 # Dedupe here + saving merged to .txt and .pep, split output into ${2} chunks
+echo "Running de-duper"
 python "${PYDIR}remove_duplicates.py" -filepath "${OUTDIR}${1}mers_${3}.txt" -split "True" -n ${2}
 
 # output files will be named ${OUTDIR}${1}mers_${3}_chunk_X.pep and .txt
