@@ -15,7 +15,7 @@ OUTDIR="${DIR}output/"
 DATADIR="${DIR}data/human_split/"
 SCRIPTDIR="${DIR}kmers_selfsimilarity/"
 NAME="humanproteome"
-pwd
+
 for k in 8 9 10 11 12 1 5
 do
   cd ${SCRIPTDIR}

@@ -1,7 +1,7 @@
 #! /usr/bin/bash
-# Activates conda environment
-source /home/projects/vaccine/people/yatwan/anaconda3/etc/profile.d/conda.sh
-source activate phd
+## Activates conda environment
+#source /home/projects/vaccine/people/yatwan/anaconda3/etc/profile.d/conda.sh
+#source activate phd
 
 # generates kmers for a length K given by $1
 # Splits the results into ${2} chunks
