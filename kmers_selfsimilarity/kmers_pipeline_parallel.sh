@@ -15,9 +15,10 @@ OUTDIR="${DIR}output/"
 DATADIR="${DIR}data/human_split/"
 SCRIPTDIR="${DIR}kmers_selfsimilarity/"
 NAME="humanproteome"
-for k in 8 9 10 11 12 15
+pwd
+for k in 8 9 10 11 12 1 5
 do
-  cd $SCRIPTDIR
+  cd ${SCRIPTDIR}
   # This will save the output files as OUTDIR/kmers_NAME_chunk_X
   sh kmers_chunk.sh ${k} 4 ${NAME}
   wait
