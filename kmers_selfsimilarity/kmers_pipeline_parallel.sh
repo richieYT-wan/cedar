@@ -20,6 +20,7 @@ do
   cd $SCRIPTDIR
   # This will save the output files as OUTDIR/kmers_NAME_chunk_X
   sh kmers_chunk.sh ${k} 4 ${NAME}
+  wait
   for chunk in 0 1 2 3
   do
     sh script_netmhcpan_chunk.sh ${k} ${chunk} ${NAME} "${OUTDIR}${k}mers_${NAME}_chunk_${chunk}.pep"
