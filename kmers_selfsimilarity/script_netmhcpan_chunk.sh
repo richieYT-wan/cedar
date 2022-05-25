@@ -11,9 +11,7 @@ DATADIR="${DIR}data/human_split/"
 SCRIPTDIR="${DIR}kmers_selfsimilarity/"
 TMPDIR="${SCRIPTDIR}tmp/"
 
-PBS -N "${1}_${2}_${3}"
-PBS -e "${TMPDIR}${1}_${2}_${3}".err
-PBS -o "${TMPDIR}${1}_${2}_${3}".log
+
 
 if [[ ! -d "${TMPDIR}" ]]
 then
@@ -26,6 +24,9 @@ do
 	filename="${1}mer_${3}_chunk_${2}"
 	touch "${TMPDIR}${hlaname}_${filename}.sh"
 	echo "#\! /usr/bin/bash" >> "${TMPDIR}${hlaname}_${filename}.sh"
+	echo PBS -N "${1}_${2}_${3}" > "${TMPDIR}${hlaname}_${filename}.sh"
+  echo PBS -e "${TMPDIR}${1}_${2}_${3}".err > "${TMPDIR}${hlaname}_${filename}.sh"
+  echo PBS -o "${TMPDIR}${1}_${2}_${3}".log > "${TMPDIR}${hlaname}_${filename}.sh"
 	echo netMHCpan-4.1 -a ${hla} -p ${4} -t 2.0 -BA -xls -xlsfile "${OUTDIR}${filename}.xls" > "${TMPDIR}${hlaname}_${filename}.sh"
 	echo "# EOF" >> "${TMPDIR}${hlaname}_${filename}.sh"
 	qsub -d "${DIR}" -W group_list=vaccine -A vaccine -l nodes=1:ppn=1:thinnode,mem=6gb,walltime=3:00:00 "${TMPDIR}${hlaname}_${filename}.sh"
