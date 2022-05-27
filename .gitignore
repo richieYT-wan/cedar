@@ -163,3 +163,9 @@ imm_bin/
 imm_data/
 mhc_out/hla_b0702.xls
 mhc_out/hla_a0201.xls
+output/10mers_humanproteome.txt
+output/11mers_humanproteome.txt
+output/12mers_humanproteome.txt
+output/15mers_humanproteome.txt
+output/8mers_humanproteome.txt
+output/9mers_humanproteome.txt

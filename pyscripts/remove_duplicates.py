@@ -39,7 +39,7 @@ def main():
         for i, idx in enumerate(indices):
             savename = f'{args["filepath"].replace(".txt", f"_chunk_{i}")}'
             df.loc[idx].to_csv(f'{savename}.txt', index=False)
-            df.loc[idx][['peptide']].to_csv(f'{savename}.pep', header=None, index=False)
+            df.loc[idx][['Peptide']].to_csv(f'{savename}.pep', header=None, index=False)
 
     else:
         print('Saving to .txt and .pep')
