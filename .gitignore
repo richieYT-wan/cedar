@@ -171,3 +171,4 @@ output/8mers_humanproteome.txt
 output/9mers_humanproteome.txt
 output_xls/
 output/*scored*.txt
+output/whole_proteome/
