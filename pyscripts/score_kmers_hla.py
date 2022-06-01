@@ -6,7 +6,7 @@ Keep only the ones that score above a given threshold
 import os, sys
 import pandas as pd
 import argparse
-import tqdm
+from tqdm import tqdm
 
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
@@ -42,10 +42,10 @@ def main():
     dirname = os.path.dirname(fn_txt)+'/' if args['resultspath'] is None else args['resultspath']
     # there should be 10 xls here for a given chunk
     xls = [os.path.join(dirname,x) for x in os.listdir(dirname) if os.path.basename(args['filepath']).replace('.txt','') in x and 'xls' in x]
-    print(xls)
     dfs = []
     # read all files, query threshold, melt&append
-    for fn in xls:
+
+    for fn in tqdm(xls):
         df = read_netmhcpan_results(fn)
         df = set_hla(df)
         dfs.append(df.query(f'{args["rank"]}<@threshold').melt(id_vars = ['Peptide', 'HLA']))

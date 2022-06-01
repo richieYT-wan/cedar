@@ -3,11 +3,12 @@
 source /home/projects/vaccine/people/yatwan/anaconda3/etc/profile.d/conda.sh
 source activate phd
 
-cd ../pyscripts/
-for k in 12
+HOMEDIR="/home/projects/vaccine/people/yatwan/cedar/"
+PYDIR="${HOMEDIR}pyscripts/"
+DATADIR="${HOMEDIR}output/"
+
+for ch in 0 1 2 3
 do
-	for chunk in 0 1 2 3
-	do
-		python score_kmers_hla.py -filepath "../output/${k}mers_humanproteome_chunk_${chunk}.txt" -resultspath "../output_xls/" -threshold 20.0
-	done
+	echo "CHUNK: ${ch}"
+	python score_kmers_hla.py -filepath "${DATADIR}12mers_humanproteome_chunk_${ch}.txt" -resultspath "${DATADIR}12mers/" -threshold 20.0 &
 done
