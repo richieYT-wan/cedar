@@ -17,7 +17,7 @@ then
   mkdir ${TMPDIR}
 fi
 
-for k in 8 9 10 11 12 15
+for k in 12 15
 do
   for chunk in 0 1 2 3
   do
@@ -28,10 +28,9 @@ do
     	pepname="${OUTDIR}${k}mers_humanproteome_chunk_${chunk}.pep"
     	touch "${TMPDIR}${filename}.sh"
     	echo "#\! /usr/bin/bash" >> "${TMPDIR}${filename}.sh"
-    	echo PBS -N ${filename} >> "${TMPDIR}${filename}.sh"
-    	echo netMHCpan-4.1 -a ${hla} -p ${pepname} -t 2.0 -BA -xls -xlsfile "${OUTDIR}${filename}.xls" > "${TMPDIR}${filename}.sh"
+    	echo "netMHCpan-4.1 -a ${hla} -p ${pepname} -BA -xls -xlsfile "${OUTDIR}${filename}.xls" > "${OUTDIR}${filename}_LOG.out"" >> "${TMPDIR}${filename}.sh"
     	echo "# EOF" >> "${TMPDIR}${filename}.sh"
-#    	qsub -d "${DIR}" -W group_list=vaccine -A vaccine -l nodes=1:ppn=1:thinnode,mem=12gb,walltime=3:00:00 "${TMPDIR}${filename}.sh"
+    	qsub -d "${DIR}" -W group_list=vaccine -A vaccine -l nodes=1:ppn=8:thinnode,mem=16gb,walltime=30:00:00 "${TMPDIR}${filename}.sh"
     done
   done
 done
