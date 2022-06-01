@@ -24,6 +24,11 @@ def pkl_dump(obj, dirname, filename):
     with open(os.path.join(dirname, filename), 'wb') as f:
         pickle.dump(obj, f)
 
+def flatten_level_columns(df:pd.DataFrame, levels=[0,1]):
+    df.columns = [f'{x.lower()}_{y.lower()}'
+                  for x,y in zip(df.columns.get_level_values(levels[0]),
+                                 df.columns.get_level_values(levels[1]))]
+    return df 
 
 def pkl_load(dirname, filename):
     try:
