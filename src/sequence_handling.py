@@ -6,6 +6,7 @@ from functools import partial
 import multiprocessing
 import math
 
+#### ==== CONST (blosum, multiprocessing, keys, etc) ==== ####
 VAL = math.floor(4 + (multiprocessing.cpu_count() / 1.5))
 N_CORES = VAL if VAL <= multiprocessing.cpu_count() else int(multiprocessing.cpu_count() - 2)
 
@@ -14,10 +15,8 @@ AA_KEYS = [x for x in 'ARNDCQEGHILKMFPSTWYV']
 CHAR_TO_INT = dict((c,i) for i,c in enumerate(AA_KEYS))
 INT_TO_CHAR = dict((i,c) for i,c in enumerate(AA_KEYS))
 
-CHAR_TO_INT = dict((c,i) for i,c in enumerate(AA_KEYS))
-INT_TO_CHAR = dict((i,c) for i,c in enumerate(AA_KEYS))
 
-
+#### ====    KMERs extraction & fasta reading    ==== ####
 def kmerize(seq: str, k: int):
     if len(seq) < k:
         raise Exception(f'Provided K {k} is shorter than sequence length {len(seq)}')
@@ -116,57 +115,3 @@ def get_fasta_kmers(fn, k: int = 9, description_verbose=False, drop_sequence=Tru
     output = Parallel(n_jobs=N_CORES)(delayed(get_sequence_kmers_)(seq) for seq in sequences)
     return remove_dupe_kmers(pd.concat(output, ignore_index=True)).reset_index(drop=True)
 
-
-def onehot_encode(sequence):
-    int_encoded = [CHAR_TO_INT[char] for char in sequence]
-    onehot_encoded = list()
-    for value in int_encoded:
-        letter = [0 for _ in range(len(AA_KEYS))]
-        letter[value] = 1
-        onehot_encoded.append(letter)
-    return np.array(onehot_encoded)
-
-
-def onehot_decode(onehot_sequence):
-    return ''.join([INT_TO_CHAR[k.item()] for k in onehot_sequence.argmax(axis=1)])
-
-
-def onehot_batch_encode(sequences):
-    return np.stack([onehot_encode(x) for x in sequences])
-
-
-def onehot_batch_decode(onehot_sequences):
-    return np.stack([onehot_decode(x) for x in onehot_sequences])
-
-
-def compute_pfm(sequences):
-    """
-    Computes the position frequency matrix given a list of sequences
-    """
-    N = len(sequences)
-    onehot_seqs = onehot_batch_encode(sequences)
-    return onehot_seqs.sum(axis=0) / N
-
-
-def compute_ic_position(matrix, position):
-    """
-    Computes the information content at a given position for a given position-frequency matrix
-    :param matrix:
-    :param position:
-    :return:
-    """
-    row = matrix[position]
-    row_log20 = np.nan_to_num(np.log(row) / np.log(20), neginf=0)
-    IC = 1 + np.sum(row * row_log20)
-    return IC
-
-
-def compute_ic_sequence(matrix):
-    """
-    returns the IC for sequences of a given length based on the frequency matrix
-    """
-    return np.array([compute_ic_position(matrix, pos) for pos in range(matrix.shape[0])])
-
-
-def get_mia(IC_array, threshold=0.3):
-    return np.where(IC_array<threshold)[0]

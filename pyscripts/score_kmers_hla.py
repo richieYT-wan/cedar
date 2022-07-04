@@ -30,16 +30,17 @@ def args_parser():
 def main():
     # set args & asserting errs
     args = vars(args_parser())
-    # assert args["rank_filter"] in ['EL_Rank', 'BA_Rank'], f'{args["rank_filter"]} should be EL_Rank or BA_rank!'
     args['outdir'], args['filepath'],args['resultspath'] = convert_path(args['outdir']), convert_path(args['filepath']),convert_path(args['resultspath'])
-    mkdirs(args['outdir'])
+    # mkdirs(args['outdir'])
     threshold = args['threshold']
     # Reading df_pep
     fn_txt = args['filepath']
     df_pep = pd.read_csv(fn_txt)#, header=None)
+    print(df_pep.columns, len(df_pep))
     #df_pep.columns = ['Peptide']
     # listing/reading XLS
     dirname = os.path.dirname(fn_txt)+'/' if args['resultspath'] is None else args['resultspath']
+    print(dirname)
     # there should be 10 xls here for a given chunk
     xls = [os.path.join(dirname,x) for x in os.listdir(dirname) if os.path.basename(args['filepath']).replace('.txt','') in x and 'xls' in x]
     dfs = []
