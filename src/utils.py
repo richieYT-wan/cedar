@@ -2,6 +2,21 @@ import argparse
 import os
 import pickle
 import pandas as pd
+from IPython.display import display_html
+from itertools import chain, cycle
+
+
+def display_side(*args, titles=cycle([''])):
+    """
+    small util to display pd frames side by side
+    """
+    html_str = ''
+    for df, title in zip(args, chain(titles, cycle(['</br>']))):
+        html_str += '<th style="text-align:center"><td style="vertical-align:top">'
+        html_str += f'<h2>{title}</h2>'
+        html_str += df.to_html().replace('table', 'table style="display:inline"')
+        html_str += '</td></th>'
+    display_html(html_str, raw=True)
 
 
 def str2bool(v):
@@ -23,7 +38,7 @@ def pkl_dump(obj, filename, dirname=None):
     if dirname is not None:
         mkdirs(dirname)
         filename = os.path.join(dirname, filename)
-        
+
     with open(filename, 'wb') as f:
         pickle.dump(obj, f)
         print(f'{filename} saved.')
@@ -39,12 +54,12 @@ def pkl_load(filename, dirname=None):
     except:
         raise ValueError(f'Unable to load or find {os.path.join(dirname, filename)}!')
 
-        
-def flatten_level_columns(df:pd.DataFrame, levels=[0,1]):
+
+def flatten_level_columns(df: pd.DataFrame, levels=[0, 1]):
     df.columns = [f'{x.lower()}_{y.lower()}'
-                  for x,y in zip(df.columns.get_level_values(levels[0]),
-                                 df.columns.get_level_values(levels[1]))]
-    return df 
+                  for x, y in zip(df.columns.get_level_values(levels[0]),
+                                  df.columns.get_level_values(levels[1]))]
+    return df
 
 
 def convert_path(path):
@@ -69,7 +84,7 @@ def parse_netmhcpan_header(df_columns: pd.core.indexes.multi.MultiIndex):
 
 
 def read_netmhcpan_results(filepath):
-    df = pd.read_csv(filepath, header = [0,1], sep = '\t')
+    df = pd.read_csv(filepath, header=[0, 1], sep='\t')
     df.columns = parse_netmhcpan_header(df.columns)
     return df
 
@@ -96,8 +111,7 @@ def query_melt_threshold(df, which='EL_Rank', threshold=2.0):
     assert which in ['EL_Rank', 'BA_Rank'], f'{which} should be EL_Rank or BA_rank!'
     if df.index.name == 'Peptide':
         df.reset_index(inplace=True)
-    return df.query(f'{which}<@threshold').melt(id_vars=['Peptide','HLA'])
-
+    return df.query(f'{which}<@threshold').melt(id_vars=['Peptide', 'HLA'])
 
 
 def return_columns(row, df):
@@ -105,6 +119,7 @@ def return_columns(row, df):
     Returns the columns with HLA in it for multi indexing of netmhcpan xls df
     """
     return [x for x in df.columns if x[0] == row['HLA']]
+
 
 def filter_rank(df_netmhcpan, which_rank):
     """
@@ -117,6 +132,8 @@ def filter_rank(df_netmhcpan, which_rank):
                       df_netmhcpan[ranks].min(axis=1).rename('tmp'),
                       left_index=True, right_index=True)
     return df_out
+
+
 def get_filtered_df(df_out, df_netmhcpan):
     """
     From the output df returned by filter_rank, filters the original NetMHCpan xls df and
@@ -129,5 +146,4 @@ def get_filtered_df(df_out, df_netmhcpan):
     df_values.index.name = 'Peptide'
     df_values.columns = ['core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']
     # Returns the output merged with the filtered values
-    return df_out.drop(columns = ['tmp']).merge(df_values, left_index=True, right_index=True)
-
+    return df_out.drop(columns=['tmp']).merge(df_values, left_index=True, right_index=True)
