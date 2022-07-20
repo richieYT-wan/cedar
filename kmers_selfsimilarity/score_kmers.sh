@@ -9,6 +9,9 @@ DATADIR="${HOMEDIR}output/"
 
 for ch in 0 1 2 3
 do
-	echo "CHUNK: ${ch}"
-	python score_kmers_hla.py -filepath "${DATADIR}12mers_humanproteome_chunk_${ch}.txt" -resultspath "${DATADIR}12mers/" -threshold 20.0 &
+  for k in 8 9 10 11 12
+	do
+	  echo "CHUNK: ${ch}"
+	  python score_kmers_hla.py -filepath "${DATADIR}12mers_humanproteome_chunk_${ch}.txt" -resultspath "${DATADIR}12mers/" -threshold 20.0 &
+	  done
 done

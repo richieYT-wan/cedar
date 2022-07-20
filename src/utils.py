@@ -145,5 +145,7 @@ def get_filtered_df(df_out, df_netmhcpan):
     df_values = pd.DataFrame.from_dict(dict(zip(filtered.index, filtered.values))).T
     df_values.index.name = 'Peptide'
     df_values.columns = ['core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']
+    df_values['Peptide'] = df_netmhcpan[('base', 'Peptide')]
     # Returns the output merged with the filtered values
-    return df_out.drop(columns=['tmp']).merge(df_values, left_index=True, right_index=True)
+    return df_out.drop(columns=['tmp']).merge(df_values[['Peptide', 'core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']],
+                                              left_index=True, right_index=True)

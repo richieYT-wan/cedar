@@ -80,11 +80,70 @@ def encode_batch(sequences, max_len=None, how='onehot', blosum_matrix=None):
 
 
 def onehot_decode(onehot_sequence):
-    return ''.join([INT_TO_CHAR[k.item()] for k in onehot_sequence.argmax(axis=1)])
+    if type(onehot_sequence) == np.ndarray:
+        return ''.join([INT_TO_CHAR[x.item()] for x in onehot_sequence.nonzero()[1]])
+    elif type(onehot_sequence) == torch.Tensor:
+        return ''.join([INT_TO_CHAR[x.item()] for x in onehot_sequence.nonzero()[:, 1]])
 
 
 def onehot_batch_decode(onehot_sequences):
     return np.stack([onehot_decode(x) for x in onehot_sequences])
+
+
+def encode_batch_weighted(df, ics_dict, max_len=None, how='onehot', blosum_matrix=None,
+                          seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
+    if 'len' not in df.columns:
+        df['len'] = df[seq_col].apply(len)
+    if max_len is not None:
+        df = df.query('len<=@max_len')
+    else:
+        max_len = df['len'].max()
+
+    # Encoding the sequences
+    encoded_sequences = encode_batch(df[seq_col].values, max_len, how, blosum_matrix)
+
+    # Weighting the encoding wrt len and HLA
+    lens = df['len'].values
+    pads = [max_len - x for x in lens]
+    hlas = df[hla_col].str.replace('*', '').str.replace(':', '').values
+    weights = 1 - np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
+                            for l, hla, pad in zip(lens, hlas, pads)])
+    weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
+
+    weighted_sequences = torch.from_numpy(weights) * encoded_sequences
+    return weighted_sequences
+
+
+def compute_frequency(onehot_sequence):
+    # counts == onehot, use nonzero to get true length (and not padded length)
+    non_zero = onehot_sequence.nonzero()
+    true_len = len(non_zero[:, 0]) if type(onehot_sequence) == torch.Tensor else len(non_zero[0])
+    # Weighted Frequencies for each amino acid = sum of column (aa) divided by true_len
+    # If onehot is not weighted, then it's just the true frequency
+    frequencies = onehot_sequence.sum(axis=0) / true_len
+    return frequencies
+
+
+def batch_compute_frequency(onehot_sequences):
+    """
+    currently this stack thing is suboptimal, should probly use the true len
+    with bincount and just do it in a vectorized manner
+
+    :param onehot_sequences:
+    :return:
+    """
+    # old stuff
+    # if type(onehot_sequences) == np.ndarray:
+    #     return np.stack([compute_frequency(x) for x in onehot_sequences])
+    # elif type(onehot_sequences) == torch.Tensor:
+    #     return torch.stack([compute_frequency(x) for x in onehot_sequences])
+
+    # new manner that doesn't use the compute_frequency fct
+    non_zeros = onehot_sequences.nonzero()
+    true_lens = np.expand_dims(np.bincount(non_zeros[0]), 1) if type(onehot_sequences) == np.ndarray \
+                else torch.bincount(non_zeros[:, 0]).unsqueeze(1)
+    frequencies = onehot_sequences.sum(axis=1) / true_lens
+    return frequencies
 
 
 def standardize(x_train, x_eval, x_test=None):
@@ -103,15 +162,50 @@ def standardize(x_train, x_eval, x_test=None):
 
 
 #### ==== PSSM, pfm etc ==== ####
-
-def compute_pfm(sequences):
+def get_weights(onehot_seqs):
     """
-    Computes the position frequency matrix given a list of sequences
+    Compute the sequences weights using heuristics (1/rs)
+    :param onehot_seqs:
+    :param counts:
+    :return:
+    """
+    # Get counts
+    counts = onehot_seqs.sum(axis=0)
+    # Get absolute counts (i.e. # of diff AA in position K --> r)
+    abs_counts = counts.copy()
+    abs_counts[abs_counts > 0] = 1
+    rs = abs_counts.sum(axis=1)
+    # Get total count of each aa per position --> s
+    ss = (onehot_seqs * counts).sum(axis=2)
+    # weights = 1/sum(r*s)
+    weights = (1 / (np.multiply(rs, ss))).sum(axis=1)
+    n_eff = rs.sum() / onehot_seqs.shape[1]
+    # Reshaping to fit the right shape to allow pointwise mul with onehot
+    weights = np.expand_dims(np.tile(weights, (onehot_seqs.shape[1], 1)).T, axis=2).repeat(20, axis=2)
+    return weights, n_eff
+
+
+def compute_pfm(sequences, how='shannon', seq_weighting=False, beta=50):
+    """
+    Computes the position frequency matrix or pseudofrequency given a list of sequences
     """
     max_len = max([len(x) for x in sequences])
     N = len(sequences)
     onehot_seqs = encode_batch(sequences, max_len, how='onehot', blosum_matrix=None).numpy()
-    return onehot_seqs.sum(axis=0) / N
+
+    if how == 'shannon':
+        freq_matrix = onehot_seqs.sum(axis=0) / N
+        return freq_matrix
+
+    elif how == 'kl':
+        weights, neff = get_weights(onehot_seqs) if seq_weighting else (1, len(sequences))
+        # return weights, neff
+        onehot_seqs = weights * onehot_seqs
+        alpha = neff - 1
+        freq_matrix = onehot_seqs.sum(axis=0) / N
+        g_matrix = np.matmul(_blosum62, freq_matrix.T).T
+        p_matrix = (alpha * freq_matrix + beta * g_matrix) / (alpha + beta)
+        return p_matrix
 
 
 def compute_ic_position(matrix, position):
@@ -127,20 +221,21 @@ def compute_ic_position(matrix, position):
     return ic
 
 
-def compute_ic(sequences):
+def compute_ic(sequences, how='shannon', seq_weighting=True, beta=50):
     """
     returns the IC for sequences of a given length based on the frequency matrix
     Args:
         sequences (list) : list of strings (sequences) from which to compute the IC
+        how (str): 'shannon' or 'kl' for either shannon or kullback leibler PFM
     Returns:
         ic_array (np.ndarray) : A Numpy array of the information content at each position (of shape max([len(seq) for seq in sequences]), 1)
     """
     # if type(sequences) == np.ndarray:
     #     return np.array([compute_ic_position(sequences, pos) for pos in range(sequences.shape[0])])
-    pfm = compute_pfm(sequences)
+    pfm = compute_pfm(sequences, how, seq_weighting, beta)
     ic_array = np.array([compute_ic_position(pfm, pos) for pos in range(pfm.shape[0])])
     return ic_array
-    
-    
+
+
 def get_mia(ic_array, threshold=0.3):
     return np.where(ic_array < threshold)[0]
