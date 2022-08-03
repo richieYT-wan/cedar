@@ -52,6 +52,7 @@ def encode(sequence, max_len=None, how='onehot', blosum_matrix=None):
             letter[value] = 1
             onehot_encoded.append(letter)
         tmp = np.array(onehot_encoded)
+
     # BLOSUM encode
     if how == 'blosum':
         if blosum_matrix is None or not isinstance(blosum_matrix, dict):
@@ -61,11 +62,17 @@ def encode(sequence, max_len=None, how='onehot', blosum_matrix=None):
         for idx in range(size):
             tmp[idx, :] = blosum_matrix[sequence[idx]]
 
-    # Paddding if max_len is provided
+    # Padding if max_len is provided
     if max_len is not None and max_len > size:
-        diff = max_len - size
-        tmp = np.concatenate([tmp, np.zeros([diff, len(AA_KEYS)], dtype=np.float32)],
-                             axis=0)
+        diff = int(max_len) - int(size)
+        try:
+            # print()
+            tmp = np.concatenate([tmp, np.zeros([diff, len(AA_KEYS)], dtype=np.float32)],
+                                 axis=0)
+        except:
+            print(type(tmp), tmp.shape, len(AA_KEYS), type(diff), type(max_len), type(size), sequence)
+            #     return tmp, diff, len(AA_KEYS)
+            raise Exception
     return torch.from_numpy(tmp).float()
 
 
@@ -90,8 +97,53 @@ def onehot_batch_decode(onehot_sequences):
     return np.stack([onehot_decode(x) for x in onehot_sequences])
 
 
-def encode_batch_weighted(df, ics_dict, max_len=None, how='onehot', blosum_matrix=None,
+def get_ic_weights(df, ics_dict:dict, max_len=None, seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
+    """
+
+    Args:
+        df:
+        ics_dict:
+        max_len:
+        seq_col:
+        hla_col:
+        rank_thr:
+
+    Returns:
+
+    """
+    if 'len' not in df.columns:
+        df['len'] = df[seq_col].apply(len)
+    if max_len is not None:
+        df = df.query('len<=@max_len')
+    else:
+        max_len = df['len'].max()
+    # Weighting the encoding wrt len and HLA
+    lens = df['len'].values
+    pads = [max_len - x for x in lens]
+    hlas = df[hla_col].str.replace('*', '').str.replace(':', '').values
+    weights = 1 - np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
+                            for l, hla, pad in zip(lens, hlas, pads)])
+    weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
+    return weights
+
+
+def encode_batch_weighted(df, ics_dict, max_len=None,
                           seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
+    """
+    Takes as input a df containing sequence, len, HLA;
+    Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
+
+    Args:
+        df (pandas.DataFrame): DF containing pep sequence, HLA, optionally 'len'
+        ics_dict (dict): Dictionary containing the ICs
+        max_len (int): Maximum length to consider
+        seq_col (str): Name of the column containing the Peptide sequences (default = 'Peptide')
+        hla_col (str): Name of the column containing the HLA alleles (default = 'HLA')
+        rank_thr (float): %Rank threshold for the IC selection [0.25, 0.5] (default = 0.25)
+
+    Returns:
+
+    """
     if 'len' not in df.columns:
         df['len'] = df[seq_col].apply(len)
     if max_len is not None:
@@ -100,21 +152,23 @@ def encode_batch_weighted(df, ics_dict, max_len=None, how='onehot', blosum_matri
         max_len = df['len'].max()
 
     # Encoding the sequences
-    encoded_sequences = encode_batch(df[seq_col].values, max_len, how, blosum_matrix)
+    encoded_sequences = encode_batch(df[seq_col].values, max_len, how='onehot', blosum_matrix=None)
 
-    # Weighting the encoding wrt len and HLA
-    lens = df['len'].values
-    pads = [max_len - x for x in lens]
-    hlas = df[hla_col].str.replace('*', '').str.replace(':', '').values
-    weights = 1 - np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
-                            for l, hla, pad in zip(lens, hlas, pads)])
-    weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
+    weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, rank_thr)
 
     weighted_sequences = torch.from_numpy(weights) * encoded_sequences
-    return weighted_sequences
+    return weighted_sequences.float()
 
 
 def compute_frequency(onehot_sequence):
+    """
+
+    Args:
+        onehot_sequence:
+
+    Returns:
+
+    """
     # counts == onehot, use nonzero to get true length (and not padded length)
     non_zero = onehot_sequence.nonzero()
     true_len = len(non_zero[:, 0]) if type(onehot_sequence) == torch.Tensor else len(non_zero[0])
@@ -126,11 +180,15 @@ def compute_frequency(onehot_sequence):
 
 def batch_compute_frequency(onehot_sequences):
     """
+
     currently this stack thing is suboptimal, should probly use the true len
     with bincount and just do it in a vectorized manner
 
-    :param onehot_sequences:
-    :return:
+    Args:
+        onehot_sequences: (
+
+    Returns:
+
     """
     # old stuff
     # if type(onehot_sequences) == np.ndarray:
@@ -141,7 +199,7 @@ def batch_compute_frequency(onehot_sequences):
     # new manner that doesn't use the compute_frequency fct
     non_zeros = onehot_sequences.nonzero()
     true_lens = np.expand_dims(np.bincount(non_zeros[0]), 1) if type(onehot_sequences) == np.ndarray \
-                else torch.bincount(non_zeros[:, 0]).unsqueeze(1)
+        else torch.bincount(non_zeros[:, 0]).unsqueeze(1)
     frequencies = onehot_sequences.sum(axis=1) / true_lens
     return frequencies
 
@@ -210,10 +268,13 @@ def compute_pfm(sequences, how='shannon', seq_weighting=False, beta=50):
 
 def compute_ic_position(matrix, position):
     """
-    Computes the information content at a given position for a given position-frequency matrix
-    :param matrix:
-    :param position:
-    :return:
+
+    Args:
+        matrix:
+        position:
+
+    Returns:
+
     """
     row = matrix[position]
     row_log20 = np.nan_to_num(np.log(row) / np.log(20), neginf=0)

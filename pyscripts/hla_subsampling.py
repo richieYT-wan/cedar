@@ -54,6 +54,7 @@ def weight_peps(k, hla, args):
 
     tmp = pd.concat([pd.read_csv(os.path.join(args['datadir'],x), sep='\t', skiprows=1) \
                      for x in os.listdir(args['datadir']) if hla in x and f'{k}mer' in x])
+    tmp['HLA']=hla
     # Here first does a downsampling wrt. len proportions
     if args['rw']:
         tmp['wt'] = 1 / tmp['EL_Rank']

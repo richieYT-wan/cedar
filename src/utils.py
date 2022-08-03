@@ -147,5 +147,23 @@ def get_filtered_df(df_out, df_netmhcpan):
     df_values.columns = ['core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']
     df_values['Peptide'] = df_netmhcpan[('base', 'Peptide')]
     # Returns the output merged with the filtered values
-    return df_out.drop(columns=['tmp']).merge(df_values[['Peptide', 'core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']],
-                                              left_index=True, right_index=True)
+    return df_out.drop(columns=['tmp']).merge(
+        df_values[['Peptide', 'core', 'icore', 'EL_score', 'EL_rank', 'BA_score', 'BA_rank']],
+        left_index=True, right_index=True)
+
+
+def find_rank_HLA(row, df_xls, dummy=None):
+    hla = row['HLA']
+    pep = row['Peptide']
+    colpp = ('base', 'Peptide')
+    colhl = (f'{hla}', 'EL_Rank')
+    tmp = df_xls.iloc[row.name]
+    assert tmp[colpp] == pep, f'{tmp[colpp]},{pep}'
+    return tmp[colhl]
+
+
+def get_trueHLA_EL_rank(input_df, df_xls):
+    df = input_df.copy()
+    df.reset_index(inplace=True, drop=True)
+    df['trueHLA_EL_rank'] = df.apply(find_rank_HLA, args=(df_xls, None), axis=1)
+    return df
