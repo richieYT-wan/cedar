@@ -3,35 +3,45 @@ import numpy as np
 import torch
 import multiprocessing
 import math
+from torch.utils.data import TensorDataset
+import os
+import warnings
+warnings.filterwarnings('ignore')
 
-#### ==== CONST (blosum, multiprocessing, keys, etc) ==== ####
-VAL = math.floor(4 + (multiprocessing.cpu_count() / 1.5))
-N_CORES = VAL if VAL <= multiprocessing.cpu_count() else int(multiprocessing.cpu_count() - 2)
+DATADIR = '../data/' if os.path.exists('../data/') else './data/'
+def _init(DATADIR):
+    #### ==== CONST (blosum, multiprocessing, keys, etc) ==== ####
+    VAL = math.floor(4 + (multiprocessing.cpu_count() / 1.5))
+    N_CORES = VAL if VAL <= multiprocessing.cpu_count() else int(multiprocessing.cpu_count() - 2)
 
-DATADIR = '../data/Matrices/'
-AA_KEYS = [x for x in 'ARNDCQEGHILKMFPSTWYV']
+    DATADIR = f'{DATADIR}/Matrices/'
+    AA_KEYS = [x for x in 'ARNDCQEGHILKMFPSTWYV']
 
-CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
-INT_TO_CHAR = dict((i, c) for i, c in enumerate(AA_KEYS))
+    CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
+    INT_TO_CHAR = dict((i, c) for i, c in enumerate(AA_KEYS))
 
-BG = np.loadtxt(f'{DATADIR}bg.freq.fmt', dtype=float)
-BG = dict((k, v) for k, v in zip(AA_KEYS, BG))
-# BLOSUMS 62 FREQS
-_blosum62 = np.loadtxt(f'{DATADIR}blosum62.freq_rownorm', dtype=float).T
-BL62FREQ = {}
-for i, letter_1 in enumerate(AA_KEYS):
-    BL62FREQ[letter_1] = {}
-    for j, letter_2 in enumerate(AA_KEYS):
-        BL62FREQ[letter_1][letter_2] = _blosum62[i, j]
-# BLOSUMS 50 
-BL50 = {}
-_blosum50 = np.loadtxt(f'{DATADIR}BLOSUM50', dtype=float).T
-for i, letter_1 in enumerate(AA_KEYS):
-    BL50[letter_1] = {}
-    for j, letter_2 in enumerate(AA_KEYS):
-        BL50[letter_1][letter_2] = _blosum50[i, j]
-# BLOSUMS 62
-BL62 = pd.read_csv(f'{DATADIR}BLOSUM62', sep='\s+', comment='#', index_col=0).to_dict()
+    BG = np.loadtxt(f'{DATADIR}bg.freq.fmt', dtype=float)
+    BG = dict((k, v) for k, v in zip(AA_KEYS, BG))
+    # BLOSUMS 62 FREQS
+    _blosum62 = np.loadtxt(f'{DATADIR}blosum62.freq_rownorm', dtype=float).T
+    BL62FREQ = {}
+    for i, letter_1 in enumerate(AA_KEYS):
+        BL62FREQ[letter_1] = {}
+        for j, letter_2 in enumerate(AA_KEYS):
+            BL62FREQ[letter_1][letter_2] = _blosum62[i, j]
+    # BLOSUMS 50
+    BL50 = {}
+    _blosum50 = np.loadtxt(f'{DATADIR}BLOSUM50', dtype=float).T
+    for i, letter_1 in enumerate(AA_KEYS):
+        BL50[letter_1] = {}
+        for j, letter_2 in enumerate(AA_KEYS):
+            BL50[letter_1][letter_2] = _blosum50[i, j]
+    # BLOSUMS 62
+    BL62 = pd.read_csv(f'{DATADIR}BLOSUM62', sep='\s+', comment='#', index_col=0).to_dict()
+    return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL50, BL62
+
+
+VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL50, BL62 = _init(DATADIR)
 
 
 #### ==== SEQUENCES ENCODING ==== ####
@@ -97,7 +107,7 @@ def onehot_batch_decode(onehot_sequences):
     return np.stack([onehot_decode(x) for x in onehot_sequences])
 
 
-def get_ic_weights(df, ics_dict:dict, max_len=None, seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
+def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
     """
 
     Args:
@@ -127,7 +137,7 @@ def get_ic_weights(df, ics_dict:dict, max_len=None, seq_col='Peptide', hla_col='
     return weights
 
 
-def encode_batch_weighted(df, ics_dict, max_len=None,
+def encode_batch_weighted(df, ics_dict, device=None, max_len=None,
                           seq_col='Peptide', hla_col='HLA', rank_thr=0.25):
     """
     Takes as input a df containing sequence, len, HLA;
@@ -142,7 +152,7 @@ def encode_batch_weighted(df, ics_dict, max_len=None,
         rank_thr (float): %Rank threshold for the IC selection [0.25, 0.5] (default = 0.25)
 
     Returns:
-
+        weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
     if 'len' not in df.columns:
         df['len'] = df[seq_col].apply(len)
@@ -155,9 +165,38 @@ def encode_batch_weighted(df, ics_dict, max_len=None,
     encoded_sequences = encode_batch(df[seq_col].values, max_len, how='onehot', blosum_matrix=None)
 
     weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, rank_thr)
-
     weighted_sequences = torch.from_numpy(weights) * encoded_sequences
-    return weighted_sequences.float()
+
+    if device is None:
+        return weighted_sequences.float()
+    else:
+        return weighted_sequences.to(device).float()
+
+
+def get_tensor_dataset(df, ics_dict, device, max_len=None,
+               seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_thr=0.25):
+    """
+        Takes as input a df containing sequence, len, HLA;
+        Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
+        Stacks it with the targets in another dimension
+
+    Args:
+        df:
+        ics_dict:
+        device:
+        max_len:
+        seq_col:
+        hla_col:
+        target_col:
+        rank_thr:
+
+    Returns:
+        tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
+    """
+    x = encode_batch_weighted(df, ics_dict, device, max_len, seq_col, hla_col, rank_thr)
+    y = torch.from_numpy(df[target_col].values).float().unsqueeze(1).to(device)
+    dataset = TensorDataset(x,y)
+    return dataset
 
 
 def compute_frequency(onehot_sequence):

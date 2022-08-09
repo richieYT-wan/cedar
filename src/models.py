@@ -16,80 +16,71 @@ class NetParent(nn.Module):
     def forward(self):
         raise NotImplementedError
 
+    def weights_init(m):
+        if isinstance(m, nn.Conv2d):
+            torch.nn.init.xavier_uniform(m.weight.data)
+
+    def reset_weight(self, layer):
+        if hasattr(layer, 'reset_parameters'):
+            layer.reset_parameters()
+
     def reset_parameters(self, seed=None):
         if seed is not None:
             torch.manual_seed(seed)
-        for layer in self.children():
-            layer.zero_grad()
-            if isinstance(layer, torch.nn.BatchNorm1d):
-                layer.reset_parameters()
-                continue
-            if hasattr(layer, 'weight'):
-                # re-init
-                torch.nn.init.xavier_uniform(layer.weight)
-            if hasattr(layer, 'bias'):
-                torch.nn.init.zeros_(layer.bias)
+        for child in self.children():
+            if hasattr(child, 'children'):
+                for sublayer in child.children():
+                    self.reset_weight(sublayer)
+            else:
+                self.reset_weight(child)
 
 
-################ ARCHITECTURES #####################
-class CNN_1(NetParent):
-    def __init__(self, input_length, n_filters, n_hidden, k, act=nn.ReLU(), p_drop=0.33, drop_bn=False):
-        super(CNN_1, self).__init__()
-        if input_length + 1 - k <= 0:
-            raise ValueError(f"The kernel size {k} provided won't work!\n"
-                             f"input_length+1-k = {input_length - k + 1}. "
-                             "Please ensure that input_length+1-k > 0.")
-        self.conv_1 = nn.Conv1d(in_channels=21,
-                                out_channels=n_filters,
-                                kernel_size=k, stride=1, padding=0)
-        self.fc1 = nn.Linear(n_filters, n_hidden)
-        self.maxpool = nn.MaxPool1d(kernel_size=input_length - k + 1,
-                                    stride=None)
-        self.fc_out = nn.Linear(n_hidden, 1)
-        self.bn = nn.BatchNorm1d(n_hidden)
-        self.drop = nn.Dropout(p=p_drop)
-        self.drop_bn = drop_bn
-        self.act = act
-        self.act_out = nn.Sigmoid()
+class ConvBlock(NetParent):
+    def __init__(self, n_filters=12, act=nn.Sigmoid()):
+        super(ConvBlock, self).__init__()
+        self.conv3 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=3, padding='same')
+        self.conv5 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=5, padding='same')
+        self.conv7 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=7, padding='same')
+        self.activation = act
 
-    def forward(self, x):
-        x = x.permute(0, 2, 1)
-        x = self.act(self.conv_1(x))
-        x, _ = torch.max(x, axis=2)
-        x = torch.squeeze(x)
-        # FC(x) -> activation -> batchnorm -> dropout
-        if self.drop_bn == True:
-            x = self.drop(self.bn(self.act(self.fc1(x))))
-        else:
-            x = self.act(self.fc1(x))
-        out = self.act_out(self.fc_out(x))
-
+    def forward(self, x, ics=None):
+        conv3 = torch.max(self.conv3(x), 2)[0]
+        conv5 = torch.max(self.conv5(x), 2)[0]
+        conv7 = torch.max(self.conv7(x), 2)[0]
+        out = torch.cat([conv3, conv5, conv7], 1)
         return out
 
 
-class FFN_1(NetParent):
-    def __init__(self, nh_1, n_layers, act=nn.ReLU(), p_drop=0.33):
-        super(FFN_1, self).__init__()
-
-        self.drop = nn.Dropout(p_drop)
-        self.fc_in = nn.Linear(9 * 21, nh_1)
-        self.bn_in = nn.BatchNorm1d(nh_1)
-        layers = []
-        nh = nh_1
-        self.act = act
-        for n in range(n_layers):
-            layers.extend([nn.Linear(nh, nh // 2), self.act, nn.BatchNorm1d(nh // 2), self.drop])
-            nh = nh // 2
-        self.layers = nn.Sequential(*layers)
-        self.fc_out = nn.Linear(nh, 1)
-        self.act_out = nn.Sigmoid()
+class LinearBlock(NetParent):
+    def __init__(self, n_in, n_hidden, hidden_act=nn.SELU()):
+        super(LinearBlock, self).__init__()
+        self.linear = nn.Linear(n_in, n_hidden)
+        self.act = hidden_act
+        self.out = nn.Linear(n_hidden, 1)
+        self.bn1 = nn.BatchNorm1d(n_hidden)
+        self.drop = nn.Dropout(0.3)
 
     def forward(self, x):
-        # Reshape from [N, 21, 9] to [N, 189] for input layer
-        x = x.flatten(start_dim=1, end_dim=2)
-        x = self.drop(self.bn_in(self.act(self.fc_in(x))))
-        # nn sequential layers
-        x = self.layers(x)
-        # output
-        x = self.act_out(self.fc_out(x))
+        x = self.drop(self.bn1(self.act(self.linear(x))))
+        x = F.sigmoid(self.out(x))
+        return x
+
+
+"""
+Could introduce a IC weight block here that uses some linear layer
+Then in Net could multiply output of Convblock with output of IC_linear block
+"""
+
+
+class Net(NetParent):
+    def __init__(self, n_filters, n_hidden, act_cnn=nn.Sigmoid(), act_lin=nn.Sigmoid()):
+        super(Net, self).__init__()
+        self.conv_block = ConvBlock(n_filters, act=act_cnn)
+        self.lin_block = LinearBlock(n_in=3 * n_filters, n_hidden=n_hidden, hidden_act=act_lin)
+
+    def forward(self, x):
+        x = x.permute(0, 2, 1)
+        x = self.conv_block(x)
+        x = self.lin_block(x)
+
         return x

@@ -1,0 +1,5514 @@
+# ../../morni/bin/hobohm1_pepkernel -kmin 4 -kmax 8 -t 0.8 -st 1 cedar_peps.pep
+# Thu Aug  4 11:48:04 2022
+# User: yatwan
+# PWD : /home/projects/vaccine/people/yatwan/kern_dist
+# Host: Linux g-12-l0002 3.10.0-1062.4.1.el7.x86_64 x86_64
+# -kmin    4                    Min value of k for k-mers
+# -kmax    8                    Max value of k for k-mers
+# -t       0.800000             Threshold for similarity
+# -st      1                    Scoring function [0] bl(a,b)/sqrt(bl(a,a)*bl(b,b)), [1] Kernel
+# Command line parameters set to:
+#	[-v]                 0                    Verbose mode
+#	[-beta float]        0.113870             Hadamard power of blosum matrix
+#	[-kmin int]          4                    Min value of k for k-mers
+#	[-kmax int]          8                    Max value of k for k-mers
+#	[-alp string]        ARNDCQEGHILKMFPSTWYV Amino acid alphabet
+#	[-blf filename]      /home/projects/vaccine/people/morni/matrices/blosum62.qij Blosum matrix filename
+#	[-t float]           0.800000             Threshold for similarity
+#	[-st int]            1                    Scoring function [0] bl(a,b)/sqrt(bl(a,a)*bl(b,b)), [1] Kernel
+#	[-bl filename]       /home/projects/vaccine/people/morni/matrices/BLOSUM50 Blosum matrix filename
+# Read_realblosum done. Alphabet ARNDCQEGHILKMFPSTWYV
+# Read 3480 elements on seqlist cedar_peps.pep
+# Unique. 0 AAAAAAQQIQV
+# Not unique. 1 AAAAQQIQV is similar to AAAAAAQQIQV 0.953292
+# Not unique. 2 AAAAQQIQV is similar to AAAAAAQQIQV 0.953292
+# Unique. 3 AAFIWIISM
+# Unique. 4 AAHFTVLLY
+# Not unique. 5 AAIAASRSV is similar to AAAAAAQQIQV 0.819728
+# Unique. 6 AALHTPRPGPL
+# Unique. 7 AALLQVTLLL
+# Unique. 8 AAMHGRKIM
+# Unique. 9 AAPAHSHAV
+# Unique. 10 AAQARLQPV
+# Unique. 11 AAQFSSDVL
+# Unique. 12 AAQSVIKAL
+# Unique. 13 AASRSVVM
+# Unique. 14 AATPVGSLY
+# Unique. 15 AAYQRLTSEK
+# Unique. 16 AEAERLDVKAI
+# Unique. 17 AEETPPFSNY
+# Unique. 18 AEHSLQVAY
+# Not unique. 19 AEHSLQVAY is similar to AEHSLQVAY 1.000000
+# Unique. 20 AEPINIQTW
+# Not unique. 21 AERLDVKAI is similar to AEAERLDVKAI 0.935764
+# Unique. 22 AEVDQDGVVM
+# Unique. 23 AEVPENVFL
+# Unique. 24 AEWRNGSTSSL
+# Unique. 25 AFLSTHLKLFL
+# Unique. 26 AFPVHSWYNF
+# Unique. 27 AFQTSEKKFYI
+# Unique. 28 AFVEFYHF
+# Unique. 29 AFWLFWGLTYI
+# Unique. 30 AGFHVTRNGK
+# Unique. 31 AGQHIAKSLF
+# Unique. 32 AHFQLQML
+# Not unique. 33 AHFQLQML is similar to AHFQLQML 1.000000
+# Unique. 34 AIAKFNFNA
+# Unique. 35 AIDAALTFV
+# Unique. 36 AIKESPKANK
+# Not unique. 37 AIKTSPKANK is similar to AIKESPKANK 0.931606
+# Not unique. 38 AIKTSPKANK is similar to AIKESPKANK 0.931606
+# Unique. 39 AILLGAEEK
+# Unique. 40 AILPFTPEF
+# Not unique. 41 AILPFTPEFL is similar to AILPFTPEF 0.948167
+# Not unique. 42 AILPFTPEFLV is similar to AILPFTPEF 0.915232
+# Not unique. 43 AISLLSLPL is similar to AALLQVTLLL 0.814772
+# Unique. 44 AISPGGVQEAL
+# Not unique. 45 AITSPKANK is similar to AIKESPKANK 0.867257
+# Unique. 46 AIVEFPVPA
+# Unique. 47 AIVVILMSMV
+# Unique. 48 AIYHTLNLFNI
+# Unique. 49 AIYKQSQR
+# Unique. 50 AKNCGIAIPV
+# Unique. 51 AKTYETTLEK
+# Unique. 52 ALAAGSCLV
+# Unique. 53 ALADLAGFK
+# Not unique. 54 ALADLAGFKEL is similar to ALADLAGFK 0.925369
+# Unique. 55 ALAFTPVEQV
+# Not unique. 56 ALAFTPVEQVV is similar to ALAFTPVEQV 0.969364
+# Unique. 57 ALAKETQFW
+# Unique. 58 ALALAQKGV
+# Not unique. 59 ALALAQKGVQL is similar to AAAAAAQQIQV 0.817769
+# Unique. 60 ALAQERWRCLV
+# Not unique. 61 ALAQKGVQL is similar to ALALAQKGV 0.831809
+# Not unique. 62 ALAQKGVQL is similar to ALALAQKGV 0.831809
+# Not unique. 63 ALAQKGVQLGL is similar to ALALAQKGV 0.829213
+# Not unique. 64 ALAQKGVQLGL is similar to ALALAQKGV 0.829213
+# Unique. 65 ALAVIELYNA
+# Not unique. 66 ALAVKALYPV is similar to ALAVIELYNA 0.828881
+# Unique. 67 ALCGQCVRI
+# Unique. 68 ALCRHEYPL
+# Unique. 69 ALCVQPHYITV
+# Unique. 70 ALDGYNGTV
+# Unique. 71 ALDPHSGHF
+# Not unique. 72 ALDPHSGHFV is similar to ALDPHSGHF 0.945149
+# Not unique. 73 ALDPHSGHFVA is similar to ALDPHSGHF 0.908930
+# Unique. 74 ALDQEAALAK
+# Unique. 75 ALESIAWFSV
+# Unique. 76 ALFAGSMQL
+# Not unique. 77 ALFALLEIL is similar to AALLQVTLLL 0.813091
+# Unique. 78 ALFASRPRF
+# Unique. 79 ALFLVFGRTRK
+# Unique. 80 ALFNLIGTFPL
+# Unique. 81 ALFTADSAQTK
+# Unique. 82 ALFTWTNL
+# Not unique. 83 ALFTWTNLL is similar to ALFTWTNL 0.931152
+# Not unique. 84 ALFTWTNLLV is similar to ALFTWTNL 0.886221
+# Not unique. 85 ALFTWTNLLVV is similar to ALFTWTNL 0.851579
+# Unique. 86 ALGCSNNEK
+# Unique. 87 ALGGVFMML
+# Unique. 88 ALGYICKL
+# Unique. 89 ALHGGWTTK
+# Unique. 90 ALHSPRCYR
+# Unique. 91 ALHSSSSYH
+# Unique. 92 ALHWEQVAV
+# Unique. 93 ALHWVAVR
+# Not unique. 94 ALHWVAVRL is similar to ALHWVAVR 0.932777
+# Unique. 95 ALIEAYVDI
+# Unique. 96 ALIHHNTYL
+# Unique. 97 ALLETPSLL
+# Not unique. 98 ALLETPSLLL is similar to AALLQVTLLL 0.804564
+# Unique. 99 ALLFLESEL
+# Unique. 100 ALLGSSCAPPL
+# Unique. 101 ALLPTPHCESL
+# Unique. 102 ALLQEEAHV
+# Not unique. 103 ALLQEEAHVPL is similar to ALDQEAALAK 0.820856
+# Not unique. 104 ALLQVTLLL is similar to AALLQVTLLL 0.970186
+# Unique. 105 ALNPTSGSL
+# Not unique. 106 ALNSEALSV is similar to ALDQEAALAK 0.823231
+# Not unique. 107 ALNSEALSVV is similar to ALDQEAALAK 0.824226
+# Unique. 108 ALNSSEEYNL
+# Unique. 109 ALNVVVVM
+# Unique. 110 ALPILGEQV
+# Unique. 111 ALPQHLIRV
+# Unique. 112 ALQEQWLQAV
+# Unique. 113 ALQHFELENSL
+# Not unique. 114 ALQKVKIAV is similar to AAQSVIKAL 0.812903
+# Unique. 115 ALQNFDNKLV
+# Not unique. 116 ALQNYYNKLV is similar to ALQNFDNKLV 0.820673
+# Unique. 117 ALQQCLQGA
+# Not unique. 118 ALQSAYVKI is similar to AAQSVIKAL 0.804864
+# Unique. 119 ALQSQSISL
+# Not unique. 120 ALQSQSISLV is similar to AAQSVIKAL 0.810385
+# Unique. 121 ALRMLEVPL
+# Not unique. 122 ALRMLEVPL is similar to ALRMLEVPL 1.000000
+# Unique. 123 ALSDQVRDV
+# Unique. 124 ALSIGTSYRY
+# Unique. 125 ALSPDGSIRK
+# Unique. 126 ALSPGLTRT
+# Unique. 127 ALSPSALSPA
+# Unique. 128 ALSPVIPHI
+# Unique. 129 ALSVEFSEM
+# Unique. 130 ALSYLVSFQR
+# Not unique. 131 ALSYTPAEV is similar to ALAFTPVEQV 0.828533
+# Unique. 132 ALTASTVPL
+# Unique. 133 ALVNKLYSL
+# Unique. 134 ALVRGVCMKV
+# Unique. 135 ALVVPVFEI
+# Unique. 136 ALWDRVVDL
+# Unique. 137 ALWSLSRHASL
+# Unique. 138 ALYGFVPVL
+# Not unique. 139 ALYLLSKSFRK is similar to ALSYLVSFQR 0.827580
+# Unique. 140 AMAGSLVFL
+# Not unique. 141 AMAGSLVFL is similar to AMAGSLVFL 1.000000
+# Not unique. 142 AMAGSLVFL is similar to AMAGSLVFL 1.000000
+# Not unique. 143 AMAVLYLAL is similar to AALLQVTLLL 0.812748
+# Unique. 144 AMFWSVPTV
+# Not unique. 145 AMHGRKIMGK is similar to AAMHGRKIM 0.859599
+# Unique. 146 AMHNQLTDMEK
+# Not unique. 147 AMLSKVVIL is similar to AALLQVTLLL 0.818931
+# Unique. 148 AMPFSIFYPM
+# Unique. 149 AMQCLQNENL
+# Unique. 150 AMQKRRLHLSV
+# Unique. 151 AMRLWVIRV
+# Not unique. 152 AMRLWVIRVQK is similar to AMRLWVIRV 0.928190
+# Unique. 153 AMVHYLMIL
+# Not unique. 154 AMVLAVRGV is similar to ALALAQKGV 0.817669
+# Unique. 155 AMYLNYFRGL
+# Unique. 156 AMYQRAKLK
+# Unique. 157 AMYSNADIYLF
+# Not unique. 158 APAASPTVVV is similar to ALTASTVPL 0.800705
+# Not unique. 159 APAKSVKKRI is similar to AAQSVIKAL 0.803709
+# Unique. 160 APAPPAPAF
+# Unique. 161 APARLERRHSA
+# Unique. 162 APCLESGTCIL
+# Unique. 163 APESRERVPSV
+# Unique. 164 APFPLGDSAL
+# Unique. 165 APGLMGTEQLF
+# Unique. 166 APGLPGFSGL
+# Unique. 167 APGPLPRSL
+# Unique. 168 APKKKSIKL
+# Unique. 169 APLLQENLRL
+# Unique. 170 APLPQQFHLKI
+# Unique. 171 APNLQNQMSSL
+# Unique. 172 APPLHRRAA
+# Unique. 173 APPSAEYESL
+# Not unique. 174 APPSAEYESLV is similar to APPSAEYESL 0.973373
+# Unique. 175 APQVTESIEF
+# Unique. 176 APSLKGKQKQM
+# Unique. 177 APSPGQPPAL
+# Unique. 178 APTPLPAPQQY
+# Unique. 179 APTRTVKII
+# Not unique. 180 APTRTVKIINV is similar to APTRTVKII 0.941440
+# Unique. 181 APTWRALAR
+# Unique. 182 APVFLDCLEL
+# Unique. 183 APYPHSNEL
+# Not unique. 184 APYPHSNEL is similar to APYPHSNEL 1.000000
+# Unique. 185 AQAAWLENFPL
+# Not unique. 186 AQALADLAGFK is similar to ALADLAGFK 0.941974
+# Unique. 187 AQAPNNYRCF
+# Not unique. 188 AQAPNNYRCFL is similar to AQAPNNYRCF 0.957149
+# Unique. 189 AQAPSLWGA
+# Unique. 190 AQCPDVLV
+# Unique. 191 AQDIYRASY
+# Not unique. 192 AQDIYRASYY is similar to AQDIYRASY 0.951830
+# Unique. 193 AQFCDVRLQV
+# Unique. 194 AQFKGAWIL
+# Not unique. 195 AQFSSDVLNLV is similar to AAQFSSDVL 0.863135
+# Unique. 196 AQGTGVLGSK
+# Unique. 197 AQILHFQNPGY
+# Unique. 198 AQMCISGF
+# Unique. 199 AQPAVQSAF
+# Unique. 200 AQSWAFEQV
+# Not unique. 201 AQVELNLML is similar to AALLQVTLLL 0.800196
+# Unique. 202 AQYTLMSQAV
+# Not unique. 203 AQYTLMVQAV is similar to AALLQVTLLL 0.802067
+# Unique. 204 ARFAVNLRL
+# Unique. 205 ARLFLGLAI
+# Unique. 206 ARLPVGAYEV
+# Unique. 207 ARLQFSCYSSL
+# Unique. 208 ARMWMTLTF
+# Unique. 209 ARRASKARL
+# Unique. 210 ARVSFTRGL
+# Unique. 211 ARWKHKTRK
+# Unique. 212 ARWTAFFGV
+# Unique. 213 ARYVPLTPWF
+# Unique. 214 ASADGTVKLW
+# Unique. 215 ASAWRNIAAR
+# Unique. 216 ASCYSSSCY
+# Unique. 217 ASFCGAVFCKY
+# Unique. 218 ASGSCGTRK
+# Unique. 219 ASISSFLLV
+# Not unique. 220 ASISSFLLVR is similar to AFLSTHLKLFL 0.800608
+# Unique. 221 ASLAPECGFGR
+# Unique. 222 ASMPSSPPL
+# Unique. 223 ASMSGRWK
+# Not unique. 224 ASMSGRWKR is similar to ASMSGRWK 0.922877
+# Not unique. 225 ASMSGRWKRK is similar to ASMSGRWK 0.879874
+# Unique. 226 ASMTGIVYSL
+# Not unique. 227 ASMTGIVYSLF is similar to ASMTGIVYSL 0.968803
+# Unique. 228 ASNASSAAK
+# Unique. 229 ASSVPTGHATF
+# Unique. 230 ASSYIILAM
+# Unique. 231 ASVTHSVDK
+# Unique. 232 ASWVVPIDIK
+# Unique. 233 ASWYRIYSK
+# Not unique. 234 ASWYRIYSKI is similar to ASWYRIYSK 0.955922
+# Not unique. 235 ATAERSRHHR is similar to APARLERRHSA 0.812553
+# Unique. 236 ATFLCPANV
+# Unique. 237 ATFRNNQMK
+# Unique. 238 ATHPIICFR
+# Unique. 239 ATIVPELNEI
+# Unique. 240 ATKNNKVIMA
+# Unique. 241 ATKPAQNALEK
+# Unique. 242 ATLDWSKNAV
+# Unique. 243 ATLNSFIHVR
+# Not unique. 244 ATNAKDSSSR is similar to ALFTADSAQTK 0.806671
+# Unique. 245 ATNLPSVEWNK
+# Unique. 246 ATPGRFLDIIK
+# Unique. 247 ATPKYSNSLK
+# Unique. 248 ATPSLHTSV
+# Not unique. 249 ATPSRATVAPR is similar to ALSPSALSPA 0.811873
+# Not unique. 250 ATSPASASK is similar to ALSPSALSPA 0.844047
+# Unique. 251 ATTLKAFFK
+# Not unique. 252 ATVQKLSRFSL is similar to AAYQRLTSEK 0.803577
+# Unique. 253 AVAAGAGK
+# Unique. 254 AVADMQVGAV
+# Unique. 255 AVAGIIPPSV
+# Not unique. 256 AVAGVQVGV is similar to AVADMQVGAV 0.829375
+# Not unique. 257 AVARLSQRFPK is similar to APARLERRHSA 0.808792
+# Unique. 258 AVCPWTWLR
+# Unique. 259 AVDDIFVKA
+# Unique. 260 AVFDVGRITEV
+# Unique. 261 AVFSDLHPF
+# Unique. 262 AVFYTILTPV
+# Not unique. 263 AVFYTILTPVL is similar to AVFYTILTPV 0.972834
+# Unique. 264 AVGSYVYSV
+# Not unique. 265 AVGSYVYSVAK is similar to ALSYLVSFQR 0.800797
+# Not unique. 266 AVIDAYTEI is similar to ALIEAYVDI 0.841739
+# Unique. 267 AVKRVNHK
+# Unique. 268 AVLSPQEKREL
+# Not unique. 269 AVMGAGSSGTA is similar to AQGTGVLGSK 0.800631
+# Unique. 270 AVMKFKNPL
+# Not unique. 271 AVMKFKNPL is similar to AVMKFKNPL 1.000000
+# Not unique. 272 AVMKFKNPLV is similar to AVMKFKNPL 0.950937
+# Unique. 273 AVMRWGMPL
+# Unique. 274 AVRWFFAHF
+# Unique. 275 AVRYDPESDTL
+# Unique. 276 AVSKPGLDYEL
+# Unique. 277 AVSLGRLKL
+# Unique. 278 AVSSCILAK
+# Not unique. 279 AVSSCILAKV is similar to AAQSVIKAL 0.803743
+# Unique. 280 AVYHEIHIGYL
+# Unique. 281 AYFLPRPPL
+# Not unique. 282 AYFLPRPPL is similar to AYFLPRPPL 1.000000
+# Unique. 283 AYLEAIHDF
+# Not unique. 284 AYLEAIHHF is similar to AYLEAIHDF 0.917345
+# Not unique. 285 AYLEAIHIF is similar to AYLEAIHDF 0.916833
+# Not unique. 286 AYLEAIHKF is similar to AYLEAIHDF 0.935745
+# Not unique. 287 AYLEAIHSF is similar to AYLEAIHDF 0.944150
+# Not unique. 288 AYLEAIHTF is similar to AYLEAIHDF 0.932927
+# Not unique. 289 AYLEAIHYF is similar to AYLEAIHDF 0.903296
+# Unique. 290 AYNVTRMVSM
+# Not unique. 291 AYQSIKVRI is similar to AAQSVIKAL 0.813243
+# Unique. 292 AYRDLQTRK
+# Unique. 293 AYSFQSLLY
+# Not unique. 294 AYSFQSLLYL is similar to AYSFQSLLY 0.961896
+# Not unique. 295 AYSFQSLLYLL is similar to AFLSTHLKLFL 0.806019
+# Unique. 296 CCYFHFSPK
+# Unique. 297 CGILAENTALY
+# Unique. 298 CISNVFMQR
+# Unique. 299 CISSCNPNL
+# Unique. 300 CIVCTVDLEF
+# Unique. 301 CLAVEEVSL
+# Unique. 302 CLDLKILYL
+# Unique. 303 CLFFGIPWK
+# Unique. 304 CLFPQTLAA
+# Unique. 305 CLFSWHPV
+# Unique. 306 CLGQLSNA
+# Unique. 307 CLLSYELSNI
+# Unique. 308 CLLTNWPSV
+# Unique. 309 CLMHHLAQA
+# Unique. 310 CLNEYHLFL
+# Unique. 311 CLPEIPGV
+# Unique. 312 CLSIRITSI
+# Unique. 313 CLTGQRFTV
+# Unique. 314 CLYGDVTLENL
+# Unique. 315 CMFCSEEFL
+# Unique. 316 CMGENQFNV
+# Unique. 317 CMLARLEVK
+# Unique. 318 CMYEAVNEV
+# Unique. 319 CNGSEDGALAY
+# Unique. 320 CPFSQCTKSF
+# Unique. 321 CPGKPLNIF
+# Not unique. 322 CPGKPLNIF is similar to CPGKPLNIF 1.000000
+# Not unique. 323 CPGKPLNIFRI is similar to CPGKPLNIF 0.919804
+# Unique. 324 CPIASSPCL
+# Not unique. 325 CPIASSPCLPI is similar to ALSPSALSPA 0.801922
+# Unique. 326 CQQWLALFFV
+# Unique. 327 CSESTSCLF
+# Unique. 328 CSMCHVHPH
+# Unique. 329 CSSHCGQGY
+# Unique. 330 CSSTLLLPHY
+# Not unique. 331 CSSTLYLPHY is similar to CSSTLLLPHY 0.909099
+# Unique. 332 CTDELLGAA
+# Unique. 333 CTFSEVAAHY
+# Unique. 334 CTFYFSNMLEF
+# Unique. 335 CTIAVVNFL
+# Unique. 336 CTYEYWPSA
+# Not unique. 337 CVQPHYITV is similar to ALCVQPHYITV 0.905403
+# Unique. 338 CVRVSGQGL
+# Unique. 339 CVSVMISPK
+# Unique. 340 CVVTEVFLL
+# Unique. 341 CYMEAVAL
+# Not unique. 342 CYMEAVALV is similar to CYMEAVAL 0.950771
+# Unique. 343 CYTADNEMEY
+# Unique. 344 CYWSLLSHPL
+# Unique. 345 DANSFLQSV
+# Unique. 346 DDIYPIDFY
+# Unique. 347 DEERIPVL
+# Unique. 348 DENITTIQF
+# Unique. 349 DEQIESMTY
+# Unique. 350 DEVFGSSRL
+# Not unique. 351 DFATPSLHTSV is similar to ATPSLHTSV 0.923071
+# Unique. 352 DFLRNIPRSIF
+# Not unique. 353 DGAILPFTPEF is similar to AILPFTPEF 0.917400
+# Unique. 354 DGVGKSAL
+# Unique. 355 DHFETIIKY
+# Unique. 356 DHREIEGRVMF
+# Unique. 357 DHYAYSYYL
+# Not unique. 358 DHYAYSYYL is similar to DHYAYSYYL 1.000000
+# Not unique. 359 DIFFLGLILF is similar to ARLFLGLAI 0.814254
+# Unique. 360 DIFQVVKAI
+# Unique. 361 DISEYRVEHL
+# Unique. 362 DLAGGTFDV
+# Unique. 363 DLSYTWNIPV
+# Not unique. 364 DMKARQKAL is similar to APSLKGKQKQM 0.801878
+# Not unique. 365 DMKARQKALV is similar to ARRASKARL 0.810629
+# Unique. 366 DMRDVTAL
+# Unique. 367 DMWSIEVICY
+# Unique. 368 DPEEVLVTV
+# Unique. 369 DPESDTLTL
+# Not unique. 370 DPILPELTRLL is similar to ATIVPELNEI 0.806452
+# Unique. 371 DPSQRGCFTL
+# Not unique. 372 DPSQRGCFTL is similar to DPSQRGCFTL 1.000000
+# Unique. 373 DPYALVRLGI
+# Unique. 374 DSEPLCLSY
+# Unique. 375 DSPDGSNGL
+# Unique. 376 DTSPVAVAL
+# Unique. 377 DTVEYPYTSF
+# Unique. 378 DVAAHLQPL
+# Unique. 379 DVFAWEPFV
+# Unique. 380 DVIQQDELDSY
+# Unique. 381 DVKAIGPLV
+# Unique. 382 DVSDNEPDLYR
+# Unique. 383 DVSVQVER
+# Unique. 384 DVWFQGERIAY
+# Unique. 385 DYMIHIIEKW
+# Unique. 386 DYRQDEYYNF
+# Unique. 387 DYSFSISSI
+# Not unique. 388 DYSFSISSIL is similar to DYSFSISSI 0.969024
+# Unique. 389 EAAPPSTSM
+# Unique. 390 EAGNNSRVPR
+# Unique. 391 EASGITYEY
+# Not unique. 392 EAVFSDLHPF is similar to AVFSDLHPF 0.955558
+# Unique. 393 EEADFLLAY
+# Unique. 394 EECLWMAVL
+# Unique. 395 EEDTFSYLI
+# Unique. 396 EEFWLVDLL
+# Not unique. 397 EEFWLVDLLP is similar to EEFWLVDLL 0.951130
+# Unique. 398 EEHAQNVSCAS
+# Not unique. 399 EEKAASSLVSY is similar to AAQSVIKAL 0.800915
+# Unique. 400 EEKLIVVLF
+# Not unique. 401 EELSATVPS is similar to ALTASTVPL 0.841655
+# Not unique. 402 EELSATVPSQ is similar to ALSPSALSPA 0.806606
+# Unique. 403 EEMEPLPVM
+# Unique. 404 EENANFYKIF
+# Unique. 405 EESGGAVAFF
+# Not unique. 406 EETPPFSNY is similar to AEETPPFSNY 0.956390
+# Unique. 407 EEVTPILAI
+# Unique. 408 EEYYADAFDF
+# Unique. 409 EGSLGISHTR
+# Unique. 410 EHIPESAGF
+# Unique. 411 EHLSCPDNFL
+# Unique. 412 EIGMWHAKK
+# Unique. 413 EKTSSGLYVFR
+# Unique. 414 ELAGIGILTV
+# Unique. 415 ELATRGAQM
+# Unique. 416 ELDGLFRPY
+# Unique. 417 ELDPDIQLEY
+# Unique. 418 ELFDPNQSPQV
+# Unique. 419 ELMERLNK
+# Unique. 420 ELMRDINSM
+# Unique. 421 ELNARRCSF
+# Unique. 422 ELSKEELPYYV
+# Unique. 423 EMDMHLSDY
+# Unique. 424 EMKRVFGFPV
+# Unique. 425 EMSAICQVY
+# Not unique. 426 ENITTIQFY is similar to DENITTIQF 0.891917
+# Unique. 427 EPDKHFSHY
+# Unique. 428 EPEVVFLQF
+# Unique. 429 EPKPFLYVL
+# Not unique. 430 EPKPFLYVL is similar to EPKPFLYVL 1.000000
+# Unique. 431 EPKPLFPKL
+# Not unique. 432 EPKPLFPKLAF is similar to EPKPLFPKL 0.929207
+# Not unique. 433 EPKPLFPKLAF is similar to EPKPLFPKL 0.929207
+# Unique. 434 EPKWDPFPL
+# Not unique. 435 EPKWDPFPL is similar to EPKWDPFPL 1.000000
+# Unique. 436 EPLLIYSTHY
+# Unique. 437 EPLSYSLLQR
+# Unique. 438 EQNFVSTSDIK
+# Unique. 439 EQYDVYMYQEV
+# Unique. 440 ESAPINTPL
+# Unique. 441 ESFGCASK
+# Not unique. 442 ESFSSILK is similar to ASISSFLLV 0.815250
+# Not unique. 443 ESGGAVAFF is similar to EESGGAVAFF 0.964018
+# Unique. 444 ETDESLIYSF
+# Unique. 445 ETFAPGPRLLY
+# Unique. 446 ETMQCSEL
+# Not unique. 447 ETMQCSELY is similar to ETMQCSEL 0.927261
+# Not unique. 448 ETMQCSELYHM is similar to ETMQCSEL 0.848948
+# Unique. 449 ETPNLDLM
+# Not unique. 450 ETPPFSNYNTL is similar to AEETPPFSNY 0.809081
+# Not unique. 451 ETTEEMKYVL is similar to AFQTSEKKFYI 0.808016
+# Unique. 452 ETVKNLLEF
+# Not unique. 453 EVADAATLTM is similar to AIDAALTFV 0.843918
+# Unique. 454 EVDTSMLHF
+# Unique. 455 EVIVPLSGW
+# Unique. 456 EVLPFFLFF
+# Unique. 457 EVQQFLRY
+# Not unique. 458 EVTPILAIR is similar to EEVTPILAI 0.899085
+# Unique. 459 EYCKFSFLF
+# Unique. 460 EYESLVSEDF
+# Unique. 461 EYVPRFVFK
+# Not unique. 462 EYYADAFDF is similar to EEYYADAFDF 0.955462
+# Not unique. 463 EYYADAFDFY is similar to EEYYADAFDF 0.920271
+# Unique. 464 EYYSKNLNSF
+# Not unique. 465 FAFDAVSKPGL is similar to ALFTADSAQTK 0.806623
+# Not unique. 466 FAFVEFYHF is similar to AFVEFYHF 0.938057
+# Unique. 467 FAIADTAYV
+# Unique. 468 FAKNPHLHYI
+# Unique. 469 FALGNVISA
+# Not unique. 470 FALGNVISAL is similar to FALGNVISA 0.961923
+# Not unique. 471 FALLQEEAHV is similar to ALLQEEAHV 0.961638
+# Not unique. 472 FALYLLSKSF is similar to ALLFLESEL 0.815769
+# Unique. 473 FARAHALMF
+# Unique. 474 FASDIPRIL
+# Not unique. 475 FASGTSYHLSL is similar to ALSIGTSYRY 0.800200
+# Not unique. 476 FASLALARRY is similar to ALALAQKGV 0.811082
+# Not unique. 477 FASLALARRYL is similar to ALALAQKGV 0.816106
+# Unique. 478 FATDNYCHV
+# Not unique. 479 FATPSLHTSV is similar to ATPSLHTSV 0.952703
+# Not unique. 480 FAVGSYVYSV is similar to AVGSYVYSV 0.956723
+# Unique. 481 FAVWTLAETI
+# Unique. 482 FAWEPFVAQF
+# Unique. 483 FCTSCPAGYYI
+# Unique. 484 FCWLPNHVIY
+# Unique. 485 FEAEFTQVA
+# Unique. 486 FEDKSVAYT
+# Unique. 487 FEFCEDDLW
+# Unique. 488 FEIRARTAA
+# Unique. 489 FFARLFVFQV
+# Unique. 490 FFCDVQQVIKL
+# Unique. 491 FFHETRQYKF
+# Unique. 492 FFKTSAQVVL
+# Unique. 493 FFLGLILFEL
+# Unique. 494 FFSIFPKCF
+# Not unique. 495 FFSSVTVAL is similar to ALTASTVPL 0.805503
+# Unique. 496 FFYLLDFTF
+# Not unique. 497 FGASMTGIVY is similar to ASMTGIVYSL 0.862392
+# Not unique. 498 FGLLGNILLVI is similar to AALLQVTLLL 0.801329
+# Unique. 499 FGMPPCLLAL
+# Unique. 500 FGRAKLLGA
+# Unique. 501 FHASEGWL
+# Unique. 502 FHATNPLNL
+# Not unique. 503 FHETRQYKF is similar to FFHETRQYKF 0.949266
+# Not unique. 504 FHGESTQVQL is similar to FFKTSAQVVL 0.801534
+# Unique. 505 FHLKGHEDL
+# Unique. 506 FIAKNLIQSA
+# Unique. 507 FICAIIVVV
+# Unique. 508 FIDCYLLAI
+# Unique. 509 FIFPSFLRVHA
+# Unique. 510 FIFSYVVAV
+# Unique. 511 FIGPLMDAL
+# Unique. 512 FIGQQFAVGSY
+# Unique. 513 FIHGGAIATV
+# Unique. 514 FIKSLPLVVKY
+# Not unique. 515 FILAERSSLF is similar to CGILAENTALY 0.821468
+# Unique. 516 FILDAVQRV
+# Unique. 517 FILDLFRTWNI
+# Not unique. 518 FILKLFFMGL is similar to FFLGLILFEL 0.808567
+# Not unique. 519 FILLLFLTIFI is similar to FFLGLILFEL 0.844994
+# Unique. 520 FILMGLPHV
+# Not unique. 521 FILMGLPHV is similar to FILMGLPHV 1.000000
+# Unique. 522 FIMDTIGGREV
+# Not unique. 523 FIMGISILL is similar to ELAGIGILTV 0.813272
+# Unique. 524 FIPKFVSFL
+# Unique. 525 FISEYCGEI
+# Unique. 526 FISIFFFLEI
+# Unique. 527 FISNTVFRK
+# Not unique. 528 FIWIISMLL is similar to AIVVILMSMV 0.801365
+# Unique. 529 FIYQYYSSI
+# Unique. 530 FKLDTEKMPV
+# Not unique. 531 FKVSAQGITM is similar to FFKTSAQVVL 0.830930
+# Unique. 532 FLAADGHPA
+# Unique. 533 FLAEHEYGL
+# Unique. 534 FLAKILKPL
+# Not unique. 535 FLAPLFLVLL is similar to AALLQVTLLL 0.800030
+# Unique. 536 FLAPTGVPV
+# Unique. 537 FLASLNICK
+# Not unique. 538 FLASPSVPL is similar to ALSPSALSPA 0.807523
+# Unique. 539 FLAYELLPAL
+# Unique. 540 FLCPGLLKEVY
+# Unique. 541 FLCRFKQLL
+# Unique. 542 FLCTLTSI
+# Unique. 543 FLDEFMEGV
+# Unique. 544 FLDFMTKINDL
+# Unique. 545 FLDPLAHEI
+# Unique. 546 FLDREQRESY
+# Unique. 547 FLEAGYICDA
+# Unique. 548 FLEEHKEFL
+# Unique. 549 FLEGNEVGKTY
+# Unique. 550 FLEIYTVTV
+# Unique. 551 FLEPQWYRV
+# Not unique. 552 FLESELSIRI is similar to EYESLVSEDF 0.801602
+# Unique. 553 FLFELIPEP
+# Unique. 554 FLFLELLHWF
+# Not unique. 555 FLFLELLHWFK is similar to FLFLELLHWF 0.960634
+# Not unique. 556 FLFMYLVMV is similar to FIFSYVVAV 0.802370
+# Unique. 557 FLFQDSKKI
+# Unique. 558 FLFYPLDFT
+# Unique. 559 FLGAGLFLYF
+# Unique. 560 FLGDINPQHSW
+# Unique. 561 FLGEAWAQV
+# Unique. 562 FLGEYIPTV
+# Not unique. 563 FLGEYIPVF is similar to FLGEYIPTV 0.927480
+# Unique. 564 FLGIFNTGF
+# Not unique. 565 FLGIFNTGFKM is similar to FLGIFNTGF 0.918983
+# Unique. 566 FLGYIPKAWII
+# Unique. 567 FLHKGLSKPV
+# Not unique. 568 FLHKGVFKL is similar to FLHKGLSKPV 0.812697
+# Unique. 569 FLHKGYVPC
+# Unique. 570 FLHQSSVPTL
+# Unique. 571 FLHTVSKTRL
+# Not unique. 572 FLIDFMFFESS is similar to FISIFFFLEI 0.818229
+# Unique. 573 FLIEHQRA
+# Unique. 574 FLILRGVLV
+# Not unique. 575 FLILVSTV is similar to AIVVILMSMV 0.812084
+# Unique. 576 FLIQTEQKL
+# Unique. 577 FLIYLDVSV
+# Unique. 578 FLKDSVKV
+# Unique. 579 FLKHKMPLSL
+# Not unique. 580 FLKRLELKPL is similar to FLAKILKPL 0.800628
+# Unique. 581 FLKTWNPK
+# Unique. 582 FLLDDPLSTV
+# Unique. 583 FLLDEAIGL
+# Unique. 584 FLLDSCTKL
+# Unique. 585 FLLINSSV
+# Unique. 586 FLLLVAAMI
+# Unique. 587 FLLPSGMAL
+# Unique. 588 FLLQLPFRG
+# Unique. 589 FLLRFLYTQL
+# Unique. 590 FLLTDYALS
+# Unique. 591 FLLYYGQDI
+# Unique. 592 FLMASISSF
+# Not unique. 593 FLMASISSF is similar to FLMASISSF 1.000000
+# Not unique. 594 FLMASISSF is similar to FLMASISSF 1.000000
+# Not unique. 595 FLMASISSFL is similar to ASISSFLLV 0.810041
+# Not unique. 596 FLMASISSFLL is similar to ALSYLVSFQR 0.806976
+# Unique. 597 FLMKSSNL
+# Unique. 598 FLMRVMDISY
+# Not unique. 599 FLMRVMDISYL is similar to FLMRVMDISY 0.969374
+# Unique. 600 FLNDLLSVL
+# Unique. 601 FLNFLPTV
+# Unique. 602 FLNVLFPLL
+# Unique. 603 FLPDLNVNA
+# Unique. 604 FLPIPNWEQ
+# Unique. 605 FLPRPPLPPSV
+# Not unique. 606 FLPVTDASSV is similar to ALFTADSAQTK 0.810133
+# Unique. 607 FLQDLKFV
+# Unique. 608 FLQEVNVCGV
+# Unique. 609 FLQFRGNEV
+# Not unique. 610 FLRNIPRSI is similar to DFLRNIPRSIF 0.911845
+# Not unique. 611 FLRNIPRSI is similar to DFLRNIPRSIF 0.911845
+# Not unique. 612 FLRNIPRSIF is similar to DFLRNIPRSIF 0.961135
+# Not unique. 613 FLSASSNSF is similar to ALHSSSSYH 0.830761
+# Unique. 614 FLSCPLYRFSL
+# Unique. 615 FLSDHLYLV
+# Unique. 616 FLSGGGPFSNL
+# Unique. 617 FLSIILDHL
+# Not unique. 618 FLSNFIILML is similar to ASSYIILAM 0.828009
+# Unique. 619 FLSQRVAFL
+# Not unique. 620 FLSQRVAFLGL is similar to FLSQRVAFL 0.927081
+# Unique. 621 FLSSPAYFS
+# Not unique. 622 FLSTHLKLFL is similar to AFLSTHLKLFL 0.969331
+# Unique. 623 FLSTKYRGYML
+# Unique. 624 FLSTVMDRV
+# Not unique. 625 FLTAHSLPL is similar to ALTASTVPL 0.807459
+# Unique. 626 FLTVFSHFM
+# Not unique. 627 FLVFYVIPL is similar to FIFSYVVAV 0.800940
+# Unique. 628 FLVGKPGSSM
+# Unique. 629 FLVLMPMKV
+# Not unique. 630 FLVNKFSTL is similar to ALVNKLYSL 0.826305
+# Unique. 631 FLVYGVRPGM
+# Not unique. 632 FLVYGVRPGM is similar to FLVYGVRPGM 1.000000
+# Unique. 633 FLWRKTSKYM
+# Unique. 634 FLWSVFMLI
+# Unique. 635 FLYEKQHEL
+# Unique. 636 FLYFRDRLGDI
+# Unique. 637 FLYNLLTRV
+# Not unique. 638 FLYSMGSIKFI is similar to FLMASISSF 0.806529
+# Not unique. 639 FLYVLGRKK is similar to ALFLVFGRTRK 0.805234
+# Not unique. 640 FMASILKGYRL is similar to FLAKILKPL 0.802867
+# Unique. 641 FMASNDEGV
+# Unique. 642 FMDMAILVES
+# Not unique. 643 FMDSVIFIL is similar to FMDMAILVES 0.803115
+# Not unique. 644 FMEAVSSKYSM is similar to ALFTADSAQTK 0.811370
+# Unique. 645 FMFEGHDTTT
+# Unique. 646 FMFVNSLLL
+# Unique. 647 FMGHINIV
+# Unique. 648 FMIGYTSAL
+# Unique. 649 FMLLQACRSV
+# Not unique. 650 FMLLTQARI is similar to FLLLVAAMI 0.806994
+# Not unique. 651 FMLVQACRSV is similar to FMLLQACRSV 0.958921
+# Not unique. 652 FMLYLLTLM is similar to FFLGLILFEL 0.804570
+# Unique. 653 FMMPRIVDV
+# Not unique. 654 FMMPRIVDVT is similar to FMMPRIVDV 0.958154
+# Unique. 655 FMPDFDLHL
+# Unique. 656 FMQQGCDIL
+# Unique. 657 FMQRLLGPQRV
+# Unique. 658 FMSESTSNI
+# Not unique. 659 FMSTMDVLV is similar to FLSTVMDRV 0.807793
+# Not unique. 660 FMTKINDLEV is similar to FLDFMTKINDL 0.848134
+# Not unique. 661 FMVDTRGGSM is similar to FIMDTIGGREV 0.818628
+# Unique. 662 FMVPRDPAL
+# Unique. 663 FNQLIYELYV
+# Unique. 664 FPAAAFPTA
+# Not unique. 665 FPAAAFPTAS is similar to FPAAAFPTA 0.963534
+# Unique. 666 FPDPPSSLDL
+# Unique. 667 FPGNQWNPV
+# Unique. 668 FPKKIQMLA
+# Unique. 669 FPKQDGGTQK
+# Unique. 670 FPLPNQLEIAL
+# Not unique. 671 FPLTASKVL is similar to ALTASTVPL 0.809327
+# Unique. 672 FPQGLPNEY
+# Unique. 673 FPRKSAFSL
+# Unique. 674 FPRYAGLMV
+# Not unique. 675 FPSPSKTSLTL is similar to ALSPSALSPA 0.801623
+# Not unique. 676 FPVHSWYNF is similar to AFPVHSWYNF 0.946127
+# Unique. 677 FPVVNSHSL
+# Unique. 678 FPYPGMTNQ
+# Unique. 679 FQANFSQTW
+# Unique. 680 FQAQHIAMA
+# Unique. 681 FQDDDQTRL
+# Unique. 682 FQDSVRTT
+# Unique. 683 FQETHLPI
+# Unique. 684 FQHPYDQAHLL
+# Unique. 685 FQLNQSFEI
+# Unique. 686 FQPSFSHLV
+# Not unique. 687 FQPSFSHLVAF is similar to FQPSFSHLV 0.926459
+# Unique. 688 FQQEIQILK
+# Not unique. 689 FQTSEKKFYI is similar to AFQTSEKKFYI 0.970911
+# Unique. 690 FQYFRATYPL
+# Unique. 691 FRFFATPAL
+# Unique. 692 FRFFTRKSL
+# Unique. 693 FRHSLVVPY
+# Unique. 694 FRICPIFVF
+# Unique. 695 FRMFLTQGF
+# Unique. 696 FRQKTNLIL
+# Unique. 697 FRQSLYLKI
+# Unique. 698 FRSGLDSYV
+# Unique. 699 FRSIYLNTLL
+# Unique. 700 FRYLSLQDI
+# Unique. 701 FRYYRVSILL
+# Unique. 702 FSATLAYFL
+# Not unique. 703 FSATLAYFL is similar to FSATLAYFL 1.000000
+# Unique. 704 FSEFFIGPLM
+# Unique. 705 FSFPETQFIAV
+# Unique. 706 FSFPRSSEPF
+# Not unique. 707 FSGEYIPTV is similar to FLGEYIPTV 0.930732
+# Unique. 708 FSISYCPV
+# Unique. 709 FSLARQFSL
+# Unique. 710 FSLPKSVPL
+# Not unique. 711 FSLPKSVPL is similar to FSLPKSVPL 1.000000
+# Not unique. 712 FSLPKSVPLF is similar to FIKSLPLVVKY 0.812305
+# Not unique. 713 FSMAKTSTSL is similar to ALFTADSAQTK 0.811782
+# Unique. 714 FSPEFSEFF
+# Not unique. 715 FSPEFSEFFI is similar to FSPEFSEFF 0.956460
+# Unique. 716 FSSDVLNLV
+# Unique. 717 FSSFMFGWHV
+# Not unique. 718 FSSKSLLEV is similar to ASISSFLLV 0.812408
+# Unique. 719 FSSSFPKPPSF
+# Not unique. 720 FSSSFVEIVTI is similar to ASISSFLLV 0.803404
+# Unique. 721 FSWRDSSFTEV
+# Unique. 722 FSYLIWSNPRY
+# Not unique. 723 FTAAALAGH is similar to AVAAGAGK 0.812666
+# Unique. 724 FTDEKVKAY
+# Unique. 725 FTDFENVP
+# Unique. 726 FTDLSGFQV
+# Not unique. 727 FTEPEVVFLQF is similar to EPEVVFLQF 0.918703
+# Unique. 728 FTFEVAAK
+# Unique. 729 FTGQFVSEEV
+# Unique. 730 FTIYIFEY
+# Unique. 731 FTLEGGHRA
+# Unique. 732 FTLERRWYNEI
+# Unique. 733 FTLMYEERAV
+# Not unique. 734 FTLVTILL is similar to AALLQVTLLL 0.830374
+# Unique. 735 FTNSCVNPF
+# Not unique. 736 FTNSCVNPFAL is similar to FTNSCVNPF 0.914841
+# Unique. 737 FTNSLQLDV
+# Unique. 738 FTSKHHFSF
+# Unique. 739 FTTDNLCFVSL
+# Unique. 740 FTVPNLLPR
+# Unique. 741 FVADWAGTF
+# Unique. 742 FVALSTCHEL
+# Unique. 743 FVERYLGLY
+# Unique. 744 FVFKLYYFEI
+# Unique. 745 FVGALSFSI
+# Unique. 746 FVHLSNVKV
+# Unique. 747 FVIGYDPPSA
+# Not unique. 748 FVLAVKRTV is similar to FILDAVQRV 0.800019
+# Not unique. 749 FVLAVKRTV is similar to FILDAVQRV 0.800019
+# Unique. 750 FVLNGGGEV
+# Not unique. 751 FVLTCIIIVCF is similar to FICAIIVVV 0.848742
+# Unique. 752 FVPPVSPPSY
+# Unique. 753 FVRTNSLVFR
+# Unique. 754 FVSALCMFL
+# Not unique. 755 FVSFVNMNSLL is similar to FMFVNSLLL 0.822854
+# Not unique. 756 FVSKDISSGSV is similar to ALFTADSAQTK 0.800167
+# Not unique. 757 FVSTSDIKSM is similar to ALFTADSAQTK 0.810212
+# Unique. 758 FVTETPLEV
+# Unique. 759 FVTFSCHGADK
+# Unique. 760 FVTSICARL
+# Unique. 761 FVVPYMIYLL
+# Unique. 762 FVYQCFEGYI
+# Unique. 763 FVYVFITHL
+# Not unique. 764 FWLFWGLTY is similar to AFWLFWGLTYI 0.913395
+# Not unique. 765 FWLFWGLTYI is similar to AFWLFWGLTYI 0.959597
+# Not unique. 766 FWLFWGLTYI is similar to AFWLFWGLTYI 0.959597
+# Unique. 767 FWYTHNLI
+# Not unique. 768 FWYTHNLIF is similar to FWYTHNLI 0.930483
+# Not unique. 769 FWYTHNLIFV is similar to FWYTHNLI 0.887511
+# Not unique. 770 FWYTHNLIFVF is similar to FWYTHNLI 0.846433
+# Unique. 771 FWYYAKVDL
+# Unique. 772 FYCRPHFTI
+# Not unique. 773 FYFFHETRQY is similar to FFHETRQYKF 0.816721
+# Not unique. 774 FYFSNMLEF is similar to CTFYFSNMLEF 0.909835
+# Not unique. 775 FYFSNMLEFY is similar to CTFYFSNMLEF 0.890208
+# Unique. 776 FYGKTILWF
+# Unique. 777 FYHFQDATSW
+# Unique. 778 FYNDIILMV
+# Unique. 779 FYPGMLQRR
+# Not unique. 780 FYQSVISNPF is similar to EYESLVSEDF 0.806980
+# Unique. 781 GACCPVCLK
+# Not unique. 782 GACCPVCLKK is similar to GACCPVCLK 0.954277
+# Not unique. 783 GADGVGKSA is similar to DGVGKSAL 0.830688
+# Not unique. 784 GADGVGKSAL is similar to DGVGKSAL 0.906515
+# Not unique. 785 GAILPFTPEF is similar to AILPFTPEF 0.953483
+# Unique. 786 GAQSWLWFV
+# Not unique. 787 GASMTGIVY is similar to ASMTGIVYSL 0.877541
+# Not unique. 788 GASSATAVL is similar to AASRSVVM 0.818025
+# Unique. 789 GDFGLATEK
+# Unique. 790 GEEDGAGGHSL
+# Unique. 791 GEQDHTFRV
+# Unique. 792 GEYFTHQIR
+# Not unique. 793 GFAFVEFYHF is similar to AFVEFYHF 0.907230
+# Not unique. 794 GFTVPNLLPR is similar to FTVPNLLPR 0.949651
+# Unique. 795 GIIAAQPPNFL
+# Unique. 796 GIIPPSVQV
+# Unique. 797 GIKFVKHLGK
+# Unique. 798 GINYHSSFGCK
+# Unique. 799 GIPENSFNV
+# Unique. 800 GIQTFCSRV
+# Not unique. 801 GITTSVFPV is similar to ALTASTVPL 0.820125
+# Unique. 802 GITYEYRPSK
+# Unique. 803 GLAAIDLIL
+# Unique. 804 GLAEFQDNV
+# Unique. 805 GLAFDMDEI
+# Not unique. 806 GLAMAGSLV is similar to ALAAGSCLV 0.817502
+# Not unique. 807 GLAMAGSLVF is similar to ALAAGSCLV 0.825828
+# Not unique. 808 GLAMAGSLVFL is similar to AIDAALTFV 0.804304
+# Not unique. 809 GLANQQSLK is similar to APNLQNQMSSL 0.815331
+# Unique. 810 GLAPGLPSV
+# Unique. 811 GLAQEYTTSL
+# Unique. 812 GLAYEIEPI
+# Unique. 813 GLDGAVDMG
+# Unique. 814 GLEPTTMV
+# Unique. 815 GLFGCLFECGI
+# Unique. 816 GLFRPYGSTV
+# Unique. 817 GLGEEQNHGV
+# Unique. 818 GLGKGTYGV
+# Unique. 819 GLGPGFSSY
+# Unique. 820 GLGPKDTYV
+# Unique. 821 GLGSPTVYK
+# Unique. 822 GLIEPSPPSA
+# Not unique. 823 GLIPFFMVV is similar to EVLPFFLFF 0.807637
+# Unique. 824 GLKQFSFPR
+# Not unique. 825 GLLDEAKRLLY is similar to AEAERLDVKAI 0.805713
+# Unique. 826 GLLDEDFYA
+# Unique. 827 GLLEPHTV
+# Unique. 828 GLLNSIWPL
+# Unique. 829 GLLPVLSWLL
+# Not unique. 830 GLMGTEQLF is similar to APGLMGTEQLF 0.915227
+# Unique. 831 GLMSNTPTPR
+# Unique. 832 GLMVIAWFI
+# Unique. 833 GLNVPVQSNK
+# Unique. 834 GLPAEGVSEV
+# Unique. 835 GLPNHGATFKV
+# Unique. 836 GLPSGPAPRK
+# Unique. 837 GLPWSFLGWL
+# Unique. 838 GLPWWLGL
+# Unique. 839 GLRERMGLSY
+# Unique. 840 GLRHQVLK
+# Not unique. 841 GLSFFILSL is similar to FISIFFFLEI 0.827786
+# Unique. 842 GLSLYTTEM
+# Unique. 843 GLSYCLPPTF
+# Not unique. 844 GLTSFFIAI is similar to ASISSFLLV 0.802457
+# Unique. 845 GLVRAQPK
+# Unique. 846 GLWRPAWRCV
+# Unique. 847 GLYLELTPK
+# Unique. 848 GLYVFRNER
+# Unique. 849 GMAGQIPPL
+# Unique. 850 GMDCNREEYL
+# Unique. 851 GMFEAGDCQV
+# Unique. 852 GMGPLLAMV
+# Unique. 853 GMLCSFQTPDA
+# Unique. 854 GMMTTQQAGYV
+# Unique. 855 GMNSIEPAK
+# Unique. 856 GMNWRPILTI
+# Unique. 857 GMPKVLYST
+# Not unique. 858 GMPPCLLAL is similar to FGMPPCLLAL 0.941324
+# Not unique. 859 GMVKAALEAI is similar to AAQSVIKAL 0.801975
+# Not unique. 860 GMYASSYIIL is similar to AMYSNADIYLF 0.801892
+# Not unique. 861 GMYASSYIILA is similar to AMYSNADIYLF 0.809877
+# Not unique. 862 GPAPVGTLSF is similar to AATPVGSLY 0.819121
+# Unique. 863 GPLDRKSRDL
+# Unique. 864 GPPDRCQPA
+# Unique. 865 GPPSLLWMNL
+# Unique. 866 GPQTVWTGA
+# Not unique. 867 GPQTVWTGAW is similar to GPQTVWTGA 0.939230
+# Not unique. 868 GPQTVWTGAW is similar to GPQTVWTGA 0.939230
+# Unique. 869 GPRGLDQLREL
+# Unique. 870 GPRLLLPCPM
+# Unique. 871 GPRWRSWLV
+# Unique. 872 GPTFNCLLDM
+# Unique. 873 GQFEPLETTA
+# Not unique. 874 GQFEPLETTAK is similar to GQFEPLETTA 0.971185
+# Unique. 875 GQFLTPNSH
+# Unique. 876 GQKGNIGPPGF
+# Unique. 877 GQVPYNYI
+# Unique. 878 GQWGFSHGA
+# Unique. 879 GRIAFFLKY
+# Unique. 880 GRKLFGTHF
+# Unique. 881 GRMRSLEAL
+# Unique. 882 GRQSWSLYV
+# Not unique. 883 GRTGAGKSFL is similar to DGVGKSAL 0.804778
+# Unique. 884 GRWALHSAF
+# Unique. 885 GSAPAVPEAF
+# Not unique. 886 GSILAYLVV is similar to ASISSFLLV 0.809428
+# Unique. 887 GSKRAVTK
+# Unique. 888 GSLDVLMAV
+# Unique. 889 GSLHSGTAK
+# Unique. 890 GSSFHALEEK
+# Unique. 891 GSSIYWAY
+# Unique. 892 GSSMSLAK
+# Unique. 893 GSSPFQHLEK
+# Unique. 894 GSTEQCAFCK
+# Unique. 895 GSVSFGTVY
+# Unique. 896 GSWFSEYK
+# Not unique. 897 GSYVYSVAK is similar to AVGSYVYSV 0.821174
+# Unique. 898 GTAVGQYAY
+# Unique. 899 GTAWLEWWHV
+# Unique. 900 GTCKNIVGSY
+# Not unique. 901 GTKAATAAAR is similar to ASNASSAAK 0.848190
+# Unique. 902 GTKKDVDVLK
+# Unique. 903 GTKPNPHVY
+# Unique. 904 GTLVRCAKAK
+# Not unique. 905 GTSSLIIYK is similar to ASSYIILAM 0.817202
+# Not unique. 906 GTSSLIIYKN is similar to ASMTGIVYSL 0.804404
+# Unique. 907 GTVQTGMDTSK
+# Unique. 908 GTWSGTTK
+# Unique. 909 GTYVRVTVQAR
+# Not unique. 910 GVADVLLYR is similar to GSLDVLMAV 0.809447
+# Not unique. 911 GVAVMKFKNPL is similar to AVMKFKNPL 0.932982
+# Unique. 912 GVCNLDEHLK
+# Unique. 913 GVFDGAASV
+# Unique. 914 GVITKALYK
+# Unique. 915 GVLPLSPSV
+# Unique. 916 GVRLSFSGPAL
+# Unique. 917 GVSKIIGGNPK
+# Not unique. 918 GVSVFTLTADR is similar to GLSLYTTEM 0.803095
+# Unique. 919 GYCECFEEF
+# Unique. 920 GYWFVNFETK
+# Unique. 921 GYYLEGWRFL
+# Unique. 922 HDLGRLHSC
+# Not unique. 923 HEIHIGYL is similar to AVYHEIHIGYL 0.858076
+# Not unique. 924 HEIHIGYLEY is similar to AVYHEIHIGYL 0.837654
+# Not unique. 925 HEIHIGYLEYV is similar to AVYHEIHIGYL 0.840555
+# Unique. 926 HELMTLHGF
+# Not unique. 927 HELMTLHGFM is similar to HELMTLHGF 0.949133
+# Unique. 928 HESRTNTAI
+# Not unique. 929 HESRTNTAIL is similar to HESRTNTAI 0.965232
+# Unique. 930 HFSKKCSRALL
+# Not unique. 931 HFTSKHHFSF is similar to FTSKHHFSF 0.952190
+# Unique. 932 HHWQSTIGM
+# Unique. 933 HIAKSLFEV
+# Unique. 934 HIDDSDSITV
+# Unique. 935 HIDKWCLDLK
+# Unique. 936 HIFKICGQHTK
+# Unique. 937 HIHCVNPPL
+# Unique. 938 HIIRLMLEY
+# Not unique. 939 HIKAQSIISK is similar to AAQSVIKAL 0.835739
+# Unique. 940 HIKIEPVAI
+# Unique. 941 HILTTLQK
+# Unique. 942 HIMPDTAEI
+# Unique. 943 HIQPHLASV
+# Unique. 944 HIVEISTPV
+# Unique. 945 HIVRIGDLK
+# Unique. 946 HIVTYYPGK
+# Not unique. 947 HIVTYYPGKK is similar to HIVTYYPGK 0.950073
+# Unique. 948 HIYEGQITAL
+# Unique. 949 HIYIGIHMCV
+# Not unique. 950 HLAAQFSSDVL is similar to AAQFSSDVL 0.928436
+# Not unique. 951 HLAAQFSSDVL is similar to AAQFSSDVL 0.928436
+# Unique. 952 HLARHRHLM
+# Unique. 953 HLEDFLLHI
+# Unique. 954 HLFAEAAV
+# Unique. 955 HLGMSCHCK
+# Unique. 956 HLHCYRSSF
+# Not unique. 957 HLIDSNTLQV is similar to HIDDSDSITV 0.805764
+# Not unique. 958 HLKILFLPL is similar to FLNVLFPLL 0.801668
+# Not unique. 959 HLKILFLPL is similar to FLNVLFPLL 0.801668
+# Unique. 960 HLLPYFCIIYM
+# Unique. 961 HLLSVEYQI
+# Unique. 962 HLMDGDLGL
+# Unique. 963 HLMWLERLY
+# Unique. 964 HLNGLLREV
+# Unique. 965 HLNHDSVWNFY
+# Unique. 966 HLNRAMLHK
+# Not unique. 967 HLQALLTL is similar to AALLQVTLLL 0.813179
+# Unique. 968 HLRAWFVSL
+# Unique. 969 HLRIYTGEKPY
+# Unique. 970 HLSPGELHKEV
+# Unique. 971 HLVMNLPA
+# Not unique. 972 HLYASLSRV is similar to FLMASISSF 0.809490
+# Unique. 973 HLYAYHEEL
+# Unique. 974 HLYDIPGSTY
+# Unique. 975 HLYDLESGMCI
+# Unique. 976 HLYRCRLSSL
+# Unique. 977 HMADVSLR
+# Unique. 978 HMCVYSYIHMY
+# Unique. 979 HMHIYPIVV
+# Unique. 980 HMKVSEQK
+# Unique. 981 HMMGFRTQEV
+# Unique. 982 HMTEVVRHC
+# Unique. 983 HMYIFPVH
+# Not unique. 984 HPAPPAPPPA is similar to APAPPAPAF 0.883736
+# Unique. 985 HPFMTDEEY
+# Unique. 986 HPHHYTRRRI
+# Unique. 987 HPKVHLNTM
+# Unique. 988 HPLCGYHEQV
+# Unique. 989 HPLKNGDIL
+# Unique. 990 HPPEQRGMF
+# Not unique. 991 HPQASSAVGF is similar to ASNASSAAK 0.833677
+# Unique. 992 HPRAVTGFLW
+# Unique. 993 HPSPDLPGTHL
+# Not unique. 994 HPSPDLPGTHL is similar to HPSPDLPGTHL 1.000000
+# Unique. 995 HPWLELSDVHL
+# Not unique. 996 HPYDQAHLL is similar to FQHPYDQAHLL 0.905884
+# Unique. 997 HQFHVHPLL
+# Not unique. 998 HQMLLQTCQDF is similar to FMLLQACRSV 0.815872
+# Unique. 999 HQNPVTGLLL
+# Unique. 1000 HQRMHTGEK
+# Unique. 1001 HRGCSIWPR
+# Unique. 1002 HRYFFFVAM
+# Unique. 1003 HSCVMASLR
+# Unique. 1004 HSDGAILPF
+# Unique. 1005 HSHFWDNSK
+# Unique. 1006 HSKPEDTDAW
+# Unique. 1007 HSLSSFRIHER
+# Not unique. 1008 HSMASFLVFY is similar to AMAGSLVFL 0.821093
+# Not unique. 1009 HSMASFLVFY is similar to AMAGSLVFL 0.821093
+# Unique. 1010 HSPFTATSL
+# Unique. 1011 HSRNTHLGK
+# Not unique. 1012 HSRNTHLGKK is similar to HSRNTHLGK 0.954468
+# Not unique. 1013 HSRNTHLGKKK is similar to HSRNTHLGK 0.920289
+# Unique. 1014 HSSKKVMRTK
+# Not unique. 1015 HSSSGSSLTLF is similar to ASNASSAAK 0.806704
+# Not unique. 1016 HSVSSAFKK is similar to ASNASSAAK 0.815492
+# Unique. 1017 HSYSELCTW
+# Not unique. 1018 HTFILLQACR is similar to FMLLQACRSV 0.815244
+# Not unique. 1019 HTFMLLQACR is similar to FMLLQACRSV 0.838434
+# Unique. 1020 HTFNCRMFMK
+# Unique. 1021 HTLLLWEHNR
+# Unique. 1022 HTQEVYNEY
+# Unique. 1023 HTRHYALYR
+# Unique. 1024 HTYSVVSV
+# Unique. 1025 HVHRLCAVRCL
+# Unique. 1026 HVIENIYF
+# Unique. 1027 HVIYLYRSY
+# Unique. 1028 HVKITDFGR
+# Not unique. 1029 HVKITDFGRAK is similar to HVKITDFGR 0.916557
+# Not unique. 1030 HVKITDFGRAK is similar to HVKITDFGR 0.916557
+# Not unique. 1031 HVMLQIINIV is similar to AALLQVTLLL 0.807582
+# Unique. 1032 HVYYFFSKR
+# Not unique. 1033 HWQSTIGML is similar to HHWQSTIGM 0.867979
+# Unique. 1034 HYAALRELI
+# Unique. 1035 HYHLANDIYF
+# Not unique. 1036 HYTAQIILAL is similar to AALLQVTLLL 0.804109
+# Not unique. 1037 IAAISEQVRF is similar to AAAAAAQQIQV 0.806789
+# Not unique. 1038 IAAQPPNFL is similar to GIIAAQPPNFL 0.919673
+# Not unique. 1039 IAASRSVVM is similar to AASRSVVM 0.953729
+# Not unique. 1040 IAKNLIQSAY is similar to FIAKNLIQSA 0.925628
+# Unique. 1041 IAKYIVPYMK
+# Not unique. 1042 IAMAVLYLA is similar to AALLQVTLLL 0.807217
+# Unique. 1043 IAMDVTEGL
+# Unique. 1044 IASPIKEL
+# Not unique. 1045 IASPIKELL is similar to IASPIKEL 0.939893
+# Not unique. 1046 IAVSSCILAK is similar to AVSSCILAK 0.964446
+# Unique. 1047 IAYAPEPNQK
+# Unique. 1048 IEHNIRNAKY
+# Unique. 1049 IEVEVNEI
+# Not unique. 1050 IFFLGLILF is similar to FFLGLILFEL 0.898958
+# Not unique. 1051 IFFLGLILFEL is similar to ARLFLGLAI 0.801157
+# Unique. 1052 IFQEMFDKHYK
+# Unique. 1053 IFQLSSLNL
+# Not unique. 1054 IFSATLAYFL is similar to AIDAALTFV 0.800198
+# Not unique. 1055 IFWYTHNLIF is similar to FWYTHNLI 0.877847
+# Not unique. 1056 IGDFGLATEK is similar to GDFGLATEK 0.949945
+# Unique. 1057 IHYTAQIIL
+# Not unique. 1058 IHYTAQIILAL is similar to AALLQVTLLL 0.800547
+# Unique. 1059 IIGAGPAEV
+# Unique. 1060 IIGIHLSLMEK
+# Unique. 1061 IIGSVSKEK
+# Unique. 1062 IILDVCSSGL
+# Not unique. 1063 IILMLVTNR is similar to AIVVILMSMV 0.816275
+# Unique. 1064 IILVAVPHV
+# Not unique. 1065 IIMLSSNVINF is similar to FLMASISSF 0.814450
+# Unique. 1066 IINEPIDLK
+# Unique. 1067 IIQARFEEV
+# Unique. 1068 IIQEYKKFTK
+# Unique. 1069 IISDGGCTCPV
+# Unique. 1070 IISNIQDTQV
+# Unique. 1071 IISVYYYFI
+# Not unique. 1072 IISVYYYFIAK is similar to FVFKLYYFEI 0.811735
+# Unique. 1073 IKLIPGVSTT
+# Not unique. 1074 ILAALFLGL is similar to ARLFLGLAI 0.802939
+# Not unique. 1075 ILAALFLGLGV is similar to ARLFLGLAI 0.868581
+# Unique. 1076 ILAELELSRRL
+# Not unique. 1077 ILAENTALY is similar to CGILAENTALY 0.919935
+# Not unique. 1078 ILAENTALYF is similar to CGILAENTALY 0.894489
+# Not unique. 1079 ILALAKETQFW is similar to ALAKETQFW 0.940029
+# Not unique. 1080 ILAMRLWVIRV is similar to AMRLWVIRV 0.931128
+# Not unique. 1081 ILAPEAVGSGI is similar to GLPAEGVSEV 0.810662
+# Not unique. 1082 ILASWYRIYSK is similar to ASWYRIYSK 0.914523
+# Unique. 1083 ILCETCLIV
+# Unique. 1084 ILCSIQGVK
+# Unique. 1085 ILDGGHEDASL
+# Unique. 1086 ILDKVLVHL
+# Unique. 1087 ILDSASHHCPL
+# Unique. 1088 ILDTAGKEEY
+# Not unique. 1089 ILDTAGREEY is similar to ILDTAGKEEY 0.959762
+# Not unique. 1090 ILDVCSSGL is similar to IILDVCSSGL 0.958857
+# Unique. 1091 ILENPFFSI
+# Not unique. 1092 ILENPFFSI is similar to ILENPFFSI 1.000000
+# Not unique. 1093 ILENPFFSIF is similar to ILENPFFSI 0.949713
+# Unique. 1094 ILFDSLTRECV
+# Unique. 1095 ILFEEANGRL
+# Unique. 1096 ILGEQVVHT
+# Not unique. 1097 ILGEQVVHTV is similar to ILGEQVVHT 0.956571
+# Not unique. 1098 ILGEQVVHTVL is similar to ILGEQVVHT 0.926054
+# Not unique. 1099 ILGIFNEFV is similar to FLGIFNTGF 0.814132
+# Not unique. 1100 ILHFQNPGY is similar to AQILHFQNPGY 0.916658
+# Unique. 1101 ILITGQFYDR
+# Not unique. 1102 ILITQVLGL is similar to AALLQVTLLL 0.816195
+# Not unique. 1103 ILIVMFPFL is similar to FLNVLFPLL 0.810924
+# Unique. 1104 ILKNLCLELYL
+# Unique. 1105 ILKQNYFSV
+# Not unique. 1106 ILLAVLQEI is similar to AALLQVTLLL 0.810240
+# Unique. 1107 ILLDWAANI
+# Not unique. 1108 ILLLFLTIFI is similar to FFLGLILFEL 0.823737
+# Unique. 1109 ILLLNLLPYK
+# Not unique. 1110 ILLQACRSV is similar to FMLLQACRSV 0.941605
+# Unique. 1111 ILLRRLLSSA
+# Unique. 1112 ILMHGLVSL
+# Unique. 1113 ILNAMIAKI
+# Unique. 1114 ILNASNVKTF
+# Unique. 1115 ILNVDIFTL
+# Unique. 1116 ILPDAGQTV
+# Not unique. 1117 ILPELTRLL is similar to ILAELELSRRL 0.814056
+# Not unique. 1118 ILPFTPEFL is similar to AILPFTPEF 0.881551
+# Not unique. 1119 ILPFTPEFLV is similar to AILPFTPEF 0.853983
+# Not unique. 1120 ILPKVLILI is similar to FIKSLPLVVKY 0.807518
+# Unique. 1121 ILQDGFLYV
+# Unique. 1122 ILQSNPLLEV
+# Not unique. 1123 ILRTLQQIKK is similar to FLIQTEQKL 0.803016
+# Unique. 1124 ILSGGRTLQI
+# Unique. 1125 ILSPIDISGQV
+# Unique. 1126 ILSPLQDGTK
+# Not unique. 1127 ILSPSAHEL is similar to ALSPSALSPA 0.814162
+# Unique. 1128 ILTDIEEKV
+# Unique. 1129 ILTGLNYEV
+# Unique. 1130 ILTPVLNPI
+# Unique. 1131 ILTSSDGGEPV
+# Unique. 1132 ILWIFSIYL
+# Unique. 1133 ILWRQDINL
+# Unique. 1134 ILWYAPESL
+# Unique. 1135 ILWYVFRLAGI
+# Unique. 1136 IMAHCILDL
+# Unique. 1137 IMDQVPFSV
+# Not unique. 1138 IMLSSNVINF is similar to ILNASNVKTF 0.838968
+# Unique. 1139 IMPGNSFAV
+# Unique. 1140 IMPNFPPQA
+# Unique. 1141 IMQLMPFGSL
+# Unique. 1142 IMQPSVVIPA
+# Unique. 1143 IMQTLAGELY
+# Unique. 1144 IMRTYTYEI
+# Unique. 1145 IMSKELWPV
+# Not unique. 1146 IMSSSLFNL is similar to ASISSFLLV 0.825078
+# Unique. 1147 IMVDGELY
+# Unique. 1148 IMYLTGMVNK
+# Unique. 1149 IPAEHINQA
+# Unique. 1150 IPAFDQRSGL
+# Not unique. 1151 IPAMHINQA is similar to IPAEHINQA 0.880732
+# Not unique. 1152 IPASVSAPK is similar to ALSPSALSPA 0.823108
+# Not unique. 1153 IPATGQAKEL is similar to ATKPAQNALEK 0.801923
+# Unique. 1154 IPAVKLNKL
+# Not unique. 1155 IPAVKLNKLL is similar to IPAVKLNKL 0.962316
+# Unique. 1156 IPDSIALIQQL
+# Unique. 1157 IPEAVFSDL
+# Not unique. 1158 IPEAVFSDL is similar to IPEAVFSDL 1.000000
+# Not unique. 1159 IPEPKWDPFPL is similar to EPKWDPFPL 0.904312
+# Not unique. 1160 IPEPKWDPFPL is similar to EPKWDPFPL 0.904312
+# Unique. 1161 IPINPRRCL
+# Unique. 1162 IPLENQDKF
+# Unique. 1163 IPLSDNTIF
+# Not unique. 1164 IPLSIISVY is similar to IPDSIALIQQL 0.803568
+# Not unique. 1165 IPLSIISVYY is similar to FIKSLPLVVKY 0.801966
+# Not unique. 1166 IPRSIFSSDL is similar to IPEAVFSDL 0.818647
+# Unique. 1167 IPSSQKVIF
+# Unique. 1168 IPTHTQMTTSA
+# Unique. 1169 IPVAIKTSP
+# Not unique. 1170 IPVAIKTSPK is similar to IPVAIKTSP 0.960035
+# Not unique. 1171 IPVAIKTSPK is similar to IPVAIKTSP 0.960035
+# Unique. 1172 IQAAYVHVI
+# Unique. 1173 IQANALPLM
+# Not unique. 1174 IQANALPLM is similar to IQANALPLM 1.000000
+# Unique. 1175 IQASMFDQK
+# Unique. 1176 IQDQIQNCI
+# Unique. 1177 IQINSHCFVV
+# Not unique. 1178 IQMFTIVLVSY is similar to AALLQVTLLL 0.810540
+# Unique. 1179 IQVFWIAPPV
+# Unique. 1180 IQVKTLMVK
+# Unique. 1181 IQVWEALLTL
+# Not unique. 1182 IQYLELNRLV is similar to ILAELELSRRL 0.821976
+# Unique. 1183 IRLYQFRLIV
+# Not unique. 1184 IRLYQFRLIVI is similar to FRYYRVSILL 0.800600
+# Unique. 1185 IRMKHCVMV
+# Unique. 1186 ISFENLDTA
+# Not unique. 1187 ISHIVTYYPGK is similar to HIVTYYPGK 0.922035
+# Unique. 1188 ISIQRAQPL
+# Not unique. 1189 ISLNNAVIEL is similar to ATKNNKVIMA 0.821263
+# Unique. 1190 ISNEINWPEK
+# Unique. 1191 ISPILENPFF
+# Unique. 1192 ISVPFSAKRK
+# Not unique. 1193 ISVYYYFIAK is similar to HVYYFFSKR 0.821493
+# Not unique. 1194 ISYLMIALM is similar to AIVVILMSMV 0.804921
+# Not unique. 1195 ISYLMIALMVV is similar to AALLQVTLLL 0.826261
+# Unique. 1196 ITAEIFMEK
+# Not unique. 1197 ITAPSLSGK is similar to ALSPSALSPA 0.815118
+# Unique. 1198 ITCQSLRSPMY
+# Unique. 1199 ITDAHELGV
+# Not unique. 1200 ITDAHELGVA is similar to ITDAHELGV 0.954998
+# Unique. 1201 ITDFGRAKL
+# Not unique. 1202 ITDFGRAKL is similar to ITDFGRAKL 1.000000
+# Unique. 1203 ITDPFVEV
+# Unique. 1204 ITEEPILMTY
+# Unique. 1205 ITFDDYIACFV
+# Unique. 1206 ITMQLMNREK
+# Unique. 1207 ITMTDNQRK
+# Not unique. 1208 ITNLLFAIPY is similar to FLNVLFPLL 0.800501
+# Unique. 1209 ITNYVVEK
+# Unique. 1210 ITQKYDFFFY
+# Unique. 1211 ITRKNSRTPL
+# Not unique. 1212 ITRTVSANTV is similar to ALTASTVPL 0.808132
+# Not unique. 1213 ITVARCMKMAY is similar to GTLVRCAKAK 0.806989
+# Not unique. 1214 ITYEYRPSK is similar to GITYEYRPSK 0.950964
+# Not unique. 1215 ITYEYRPSKA is similar to GITYEYRPSK 0.916507
+# Not unique. 1216 IVAADLIMTL is similar to AALLQVTLLL 0.806795
+# Not unique. 1217 IVCTVDLEF is similar to CIVCTVDLEF 0.951181
+# Unique. 1218 IVFGVSQPDV
+# Not unique. 1219 IVILVVTGV is similar to AIVVILMSMV 0.850738
+# Unique. 1220 IVMEYLAFL
+# Unique. 1221 IVMTDAGRL
+# Not unique. 1222 IVTYYPGKK is similar to HIVTYYPGK 0.875819
+# Unique. 1223 IYDRFGQEI
+# Unique. 1224 IYFPAAQTM
+# Unique. 1225 IYIGVSVPI
+# Unique. 1226 IYKAPCENW
+# Unique. 1227 IYLLQYVTL
+# Unique. 1228 IYMDGTADFSF
+# Unique. 1229 IYSKIMDLI
+# Unique. 1230 IYTHNTLSSL
+# Not unique. 1231 IYTSSGQLQLF is similar to EKTSSGLYVFR 0.808179
+# Unique. 1232 IYVRPFSNF
+# Not unique. 1233 KAAFIWIISM is similar to AAFIWIISM 0.957218
+# Unique. 1234 KADAKALL
+# Not unique. 1235 KADAKALLHI is similar to KADAKALL 0.904659
+# Not unique. 1236 KADAKALLHIL is similar to IPDSIALIQQL 0.801271
+# Unique. 1237 KAEDLGMLLK
+# Unique. 1238 KAFCQFSHL
+# Unique. 1239 KAFPDYCTYL
+# Unique. 1240 KAGECGLK
+# Not unique. 1241 KAIESFLEK is similar to ASISSFLLV 0.802649
+# Unique. 1242 KAIQMAQK
+# Not unique. 1243 KALDPHSGHFV is similar to ALDPHSGHF 0.912169
+# Not unique. 1244 KAPQVTESIEF is similar to APQVTESIEF 0.969127
+# Unique. 1245 KAPSDLYQF
+# Not unique. 1246 KARLPVGAY is similar to ARLPVGAYEV 0.857382
+# Unique. 1247 KCFFSGSM
+# Unique. 1248 KEASSRHFL
+# Unique. 1249 KEIRAIFLF
+# Not unique. 1250 KELEGILLL is similar to KAEDLGMLLK 0.813183
+# Unique. 1251 KELLKHPFTL
+# Unique. 1252 KENSLIIQF
+# Unique. 1253 KEWEDSQLV
+# Not unique. 1254 KEWEDSQLVS is similar to KEWEDSQLV 0.960961
+# Unique. 1255 KEYPVIFKSI
+# Unique. 1256 KFARGDYTTTI
+# Unique. 1257 KFGDLTNNF
+# Unique. 1258 KFHPQRLQL
+# Not unique. 1259 KFHPQRLQL is similar to KFHPQRLQL 1.000000
+# Not unique. 1260 KFHPQRLQLTW is similar to KFHPQRLQL 0.922465
+# Not unique. 1261 KFLCRFKQL is similar to FLCRFKQLL 0.881281
+# Not unique. 1262 KFLCRFKQLL is similar to FLCRFKQLL 0.945927
+# Unique. 1263 KFLESCDEVI
+# Unique. 1264 KFQNYSQRR
+# Unique. 1265 KFRSSVYLL
+# Not unique. 1266 KFRSSVYLLM is similar to ASISSFLLV 0.817155
+# Unique. 1267 KGDADVSVPK
+# Not unique. 1268 KGTQRILAAL is similar to AAQSVIKAL 0.800229
+# Unique. 1269 KHILVWAL
+# Not unique. 1270 KHILVWAL is similar to KHILVWAL 1.000000
+# Unique. 1271 KIDIERILSV
+# Unique. 1272 KIDLHKYVTV
+# Unique. 1273 KIFIEWLK
+# Unique. 1274 KIFNFYPRK
+# Unique. 1275 KIFSEVTLK
+# Unique. 1276 KIIAYQPYGK
+# Not unique. 1277 KIIGSVSKEK is similar to IIGSVSKEK 0.961973
+# Unique. 1278 KIINVDDEI
+# Not unique. 1279 KIIQEYKKFTK is similar to IIQEYKKFTK 0.971644
+# Unique. 1280 KIISFYTALL
+# Not unique. 1281 KILDAVVAQK is similar to FILDAVQRV 0.841746
+# Unique. 1282 KINAGINTI
+# Unique. 1283 KINDLEVQI
+# Unique. 1284 KINHFCEILSV
+# Unique. 1285 KINLSLFAL
+# Unique. 1286 KIPCESPPLQV
+# Unique. 1287 KIPRPVLWV
+# Not unique. 1288 KIPVAITSPK is similar to HIVEISTPV 0.802921
+# Not unique. 1289 KIQANALPL is similar to IQANALPLM 0.895942
+# Not unique. 1290 KIQANALPLML is similar to ILQSNPLLEV 0.805535
+# Not unique. 1291 KIQTNRNTVK is similar to ITRKNSRTPL 0.800167
+# Not unique. 1292 KIQVKTLMVK is similar to AALLQVTLLL 0.812911
+# Unique. 1293 KISEGTEFRI
+# Not unique. 1294 KITDFGRAK is similar to ITDFGRAKL 0.882690
+# Unique. 1295 KITQNSKK
+# Unique. 1296 KIVEAQSGV
+# Not unique. 1297 KIVEAQSGVK is similar to AVADMQVGAV 0.801746
+# Not unique. 1298 KIWEELLKI is similar to IQVWEALLTL 0.809900
+# Unique. 1299 KIWFEKFK
+# Unique. 1300 KIYAAGTFY
+# Not unique. 1301 KIYFFLRK is similar to HVYYFFSKR 0.813910
+# Unique. 1302 KIYRRQIFK
+# Unique. 1303 KKKVKGSPSF
+# Unique. 1304 KKRLFRNFGGL
+# Unique. 1305 KLAAHLRRK
+# Unique. 1306 KLAALESI
+# Unique. 1307 KLACADTWL
+# Unique. 1308 KLADYLNVL
+# Unique. 1309 KLAFGQKPPL
+# Unique. 1310 KLANPLPYT
+# Unique. 1311 KLARHYLIHTV
+# Not unique. 1312 KLARVISRLAV is similar to AAQSVIKAL 0.800819
+# Not unique. 1313 KLASVTHSVDK is similar to ALFTADSAQTK 0.802617
+# Unique. 1314 KLATNLLK
+# Not unique. 1315 KLATNLLKEL is similar to AFLSTHLKLFL 0.803174
+# Unique. 1316 KLCEANQQQQF
+# Unique. 1317 KLCIFAPFV
+# Unique. 1318 KLCRTVIAAA
+# Unique. 1319 KLCVACPMHSL
+# Unique. 1320 KLDPRLAQL
+# Unique. 1321 KLDSVCLLK
+# Not unique. 1322 KLDTEKMPVV is similar to FKLDTEKMPV 0.922379
+# Not unique. 1323 KLEAFPLVTEV is similar to FIKSLPLVVKY 0.835366
+# Not unique. 1324 KLESSSPV is similar to FMSESTSNI 0.801831
+# Not unique. 1325 KLESSSPVK is similar to FLHQSSVPTL 0.806112
+# Unique. 1326 KLFAIVVGRGI
+# Unique. 1327 KLFAQLINNKA
+# Unique. 1328 KLFEFLVYGV
+# Unique. 1329 KLFEHYSQEL
+# Unique. 1330 KLFESKAEL
+# Not unique. 1331 KLFESKAELA is similar to ALDQEAALAK 0.802342
+# Unique. 1332 KLFHDMNVSY
+# Unique. 1333 KLGDSCVTAL
+# Unique. 1334 KLGDVITII
+# Unique. 1335 KLGNRINIIV
+# Unique. 1336 KLGSMQPRHLK
+# Unique. 1337 KLHPKAITPR
+# Not unique. 1338 KLIELTRQV is similar to ILAELELSRRL 0.839880
+# Not unique. 1339 KLIKPNSKDSV is similar to AIKESPKANK 0.801680
+# Unique. 1340 KLILWRGLK
+# Unique. 1341 KLINECSRPI
+# Not unique. 1342 KLIPGVSTT is similar to IKLIPGVSTT 0.957114
+# Unique. 1343 KLITKYNLREL
+# Unique. 1344 KLKAIPTTL
+# Not unique. 1345 KLKDIREIVPL is similar to KIDIERILSV 0.818165
+# Not unique. 1346 KLKFVTLVF is similar to EEKLIVVLF 0.802857
+# Not unique. 1347 KLKFVTLVF is similar to EEKLIVVLF 0.802857
+# Not unique. 1348 KLKLPIIMK is similar to FIKSLPLVVKY 0.810877
+# Unique. 1349 KLKNPKRYQIM
+# Unique. 1350 KLKRFNLSA
+# Not unique. 1351 KLLAGVEIV is similar to ELAGIGILTV 0.806327
+# Not unique. 1352 KLLASEGI is similar to KLAALESI 0.821512
+# Unique. 1353 KLLENFYVT
+# Not unique. 1354 KLLENFYVTV is similar to KLLENFYVT 0.955743
+# Not unique. 1355 KLLMSQANV is similar to AQYTLMSQAV 0.804409
+# Not unique. 1356 KLLSGEMAIEL is similar to IMQTLAGELY 0.807086
+# Unique. 1357 KLLTDMQL
+# Unique. 1358 KLMNIQQKL
+# Not unique. 1359 KLNFRLFVI is similar to KINLSLFAL 0.803120
+# Not unique. 1360 KLNFRLFVIR is similar to FFARLFVFQV 0.804658
+# Unique. 1361 KLNLIQNV
+# Unique. 1362 KLNTITAVV
+# Unique. 1363 KLPKYGVKV
+# Unique. 1364 KLPLDIDPV
+# Unique. 1365 KLPVGSQCLV
+# Unique. 1366 KLQFHCMPV
+# Unique. 1367 KLRRVDFETFL
+# Unique. 1368 KLSELHTYI
+# Unique. 1369 KLSEQILKK
+# Unique. 1370 KLSHQLVLL
+# Not unique. 1371 KLSHQLVLLFL is similar to AALLQVTLLL 0.832127
+# Unique. 1372 KLSKFDEK
+# Not unique. 1373 KLSLGLLI is similar to ARLFLGLAI 0.812186
+# Not unique. 1374 KLSPQQDAGV is similar to ILSPLQDGTK 0.810438
+# Not unique. 1375 KLSRFSLAR is similar to KLKRFNLSA 0.839804
+# Unique. 1376 KLTRRPIFI
+# Not unique. 1377 KLTRTQAATV is similar to FFKTSAQVVL 0.805769
+# Unique. 1378 KLVEHFCPEF
+# Unique. 1379 KLVFGSVFL
+# Unique. 1380 KLVRGATLY
+# Not unique. 1381 KLVVGAVGV is similar to KLFAIVVGRGI 0.831617
+# Not unique. 1382 KLVVGAVGV is similar to KLFAIVVGRGI 0.831617
+# Not unique. 1383 KLVVGAVGV is similar to KLFAIVVGRGI 0.831617
+# Not unique. 1384 KLVVVAVGV is similar to AIVVILMSMV 0.803271
+# Not unique. 1385 KLVVVGACGV is similar to KLFAIVVGRGI 0.815046
+# Not unique. 1386 KLVVVGADGV is similar to KLFAIVVGRGI 0.830396
+# Not unique. 1387 KLVVVGAVGV is similar to KLFAIVVGRGI 0.852945
+# Unique. 1388 KLWASPLHV
+# Unique. 1389 KLWYASLTLV
+# Not unique. 1390 KLYEEAGDVFL is similar to ILFEEANGRL 0.800047
+# Unique. 1391 KLYGLDWAEL
+# Not unique. 1392 KLYLAMISEGY is similar to AQYTLMSQAV 0.803946
+# Unique. 1393 KLYPKLSRK
+# Unique. 1394 KLYQCNECK
+# Not unique. 1395 KLYTSEILSPI is similar to EYESLVSEDF 0.801506
+# Unique. 1396 KMAACPKKL
+# Unique. 1397 KMANDIRFL
+# Unique. 1398 KMEKKTCAL
+# Unique. 1399 KMIENESPL
+# Not unique. 1400 KMIGFSKTA is similar to FMIGYTSAL 0.803457
+# Unique. 1401 KMIGNHLWV
+# Not unique. 1402 KMILTGILLI is similar to AALLQVTLLL 0.826249
+# Unique. 1403 KMKNFFFTK
+# Unique. 1404 KMPEMHFKALK
+# Unique. 1405 KMPWNNQLL
+# Unique. 1406 KMTNFKTTPPV
+# Unique. 1407 KMVAVFYNT
+# Not unique. 1408 KMVEAMATGI is similar to KIVEAQSGV 0.822495
+# Unique. 1409 KMWAGKKLA
+# Unique. 1410 KMYHHCPWV
+# Unique. 1411 KNRLVNQPL
+# Not unique. 1412 KNRSSGTVSA is similar to AEWRNGSTSSL 0.814486
+# Not unique. 1413 KPASKQLHNEV is similar to ATKPAQNALEK 0.808430
+# Unique. 1414 KPFCVLISL
+# Unique. 1415 KPFHSLSSF
+# Not unique. 1416 KPFHSLSSF is similar to KPFHSLSSF 1.000000
+# Not unique. 1417 KPFHSLSSFRI is similar to HSLSSFRIHER 0.832813
+# Unique. 1418 KPKKENLWRM
+# Unique. 1419 KPLFPKLAF
+# Not unique. 1420 KPLFPKLAF is similar to KPLFPKLAF 1.000000
+# Unique. 1421 KPLLNCKIYNY
+# Unique. 1422 KPPKAKPSPTY
+# Unique. 1423 KPRHKNKNRL
+# Unique. 1424 KPSDTPRPVM
+# Not unique. 1425 KPSPLAPAA is similar to ALSPSALSPA 0.822808
+# Not unique. 1426 KPSPLAPAAL is similar to ALSPSALSPA 0.837057
+# Unique. 1427 KPYDAPGAPT
+# Unique. 1428 KQAPGDQVTEI
+# Unique. 1429 KQASSAPFFML
+# Not unique. 1430 KQASSAPFFML is similar to KQASSAPFFML 1.000000
+# Unique. 1431 KQFSAMALK
+# Unique. 1432 KQHGFASI
+# Not unique. 1433 KQIIHILSK is similar to DYMIHIIEKW 0.803132
+# Unique. 1434 KQKVSLLFDHL
+# Unique. 1435 KQLEDEEV
+# Unique. 1436 KQLHVVPL
+# Unique. 1437 KQNTSCFK
+# Unique. 1438 KQPEGLWPPL
+# Unique. 1439 KQSKIVFSV
+# Unique. 1440 KQSVSPPV
+# Not unique. 1441 KQTALVELVK is similar to AALLQVTLLL 0.823914
+# Unique. 1442 KQWLVWLAL
+# Not unique. 1443 KQWLVWLFL is similar to KQWLVWLAL 0.926624
+# Not unique. 1444 KQWLVWLFL is similar to KQWLVWLAL 0.926624
+# Unique. 1445 KQWSYSTGFPV
+# Unique. 1446 KRFLHRQPL
+# Unique. 1447 KRHEVPVPL
+# Unique. 1448 KRIPLPPHLC
+# Not unique. 1449 KRIYTGEKPY is similar to HLRIYTGEKPY 0.941790
+# Not unique. 1450 KRMSVIVRTL is similar to AAQSVIKAL 0.803184
+# Unique. 1451 KRPIPIKYKAM
+# Unique. 1452 KRPTPTFHF
+# Unique. 1453 KRRLLILGR
+# Unique. 1454 KRTNVGILK
+# Unique. 1455 KRVALLSWTK
+# Not unique. 1456 KSAVLASNSQF is similar to ALFTADSAQTK 0.823403
+# Unique. 1457 KSDIGWIWELW
+# Unique. 1458 KSDKTGWTTF
+# Not unique. 1459 KSDKTGWTTFF is similar to KSDKTGWTTF 0.961559
+# Not unique. 1460 KSEALKLFL is similar to AFLSTHLKLFL 0.805513
+# Unique. 1461 KSFAVWTLA
+# Unique. 1462 KSFTLNGTK
+# Unique. 1463 KSKIPRPVL
+# Unique. 1464 KSLANFGGW
+# Not unique. 1465 KSLVAQADK is similar to ALALAQKGV 0.803812
+# Not unique. 1466 KSMAPRQLQPV is similar to AAQARLQPV 0.808660
+# Not unique. 1467 KSMAPRQLQPV is similar to AAQARLQPV 0.808660
+# Unique. 1468 KSMLRNERQFK
+# Unique. 1469 KSPNPSTPC
+# Unique. 1470 KSQREFVRR
+# Not unique. 1471 KSSPFTAAA is similar to HSPFTATSL 0.827673
+# Unique. 1472 KSYWNRLQF
+# Not unique. 1473 KSYWNRLQF is similar to KSYWNRLQF 1.000000
+# Unique. 1474 KTFEVVPEI
+# Unique. 1475 KTFSLPSLL
+# Not unique. 1476 KTFSLPSLLH is similar to KTFSLPSLL 0.954107
+# Unique. 1477 KTGEQRVVTL
+# Not unique. 1478 KTLAYSFQSL is similar to ALSYLVSFQR 0.807809
+# Not unique. 1479 KTLAYSFQSLL is similar to ALSYLVSFQR 0.816118
+# Not unique. 1480 KTLAYSFQSLL is similar to ALSYLVSFQR 0.816118
+# Not unique. 1481 KTLETPEFV is similar to ALLETPSLL 0.821989
+# Unique. 1482 KTLGPIWK
+# Not unique. 1483 KTLMVKVMR is similar to IQVKTLMVK 0.819803
+# Unique. 1484 KTLPEMRAY
+# Unique. 1485 KTLQHWPHIVR
+# Unique. 1486 KTNRIALI
+# Not unique. 1487 KTNRIALILA is similar to IPDSIALIQQL 0.800317
+# Unique. 1488 KTQGAVAQM
+# Not unique. 1489 KTQIKLHLSPK is similar to IIGIHLSLMEK 0.800703
+# Not unique. 1490 KTSDVNSLV is similar to FSSDVLNLV 0.828456
+# Not unique. 1491 KTSDVNSLVGK is similar to EQNFVSTSDIK 0.806492
+# Not unique. 1492 KTSEEIMLV is similar to KLSEQILKK 0.812051
+# Not unique. 1493 KTSPKANKEI is similar to AIKESPKANK 0.852876
+# Not unique. 1494 KTSSGLYVFR is similar to EKTSSGLYVFR 0.971315
+# Unique. 1495 KTTLVYPATEK
+# Unique. 1496 KTVPDGNLVK
+# Not unique. 1497 KTVSITSYI is similar to KLNTITAVV 0.809242
+# Not unique. 1498 KTYETTLEK is similar to AKTYETTLEK 0.961029
+# Not unique. 1499 KTYIIFFVL is similar to FISIFFFLEI 0.807776
+# Not unique. 1500 KTYIIFFVLV is similar to FISIFFFLEI 0.838643
+# Not unique. 1501 KTYIIFFVLVI is similar to FISIFFFLEI 0.842931
+# Unique. 1502 KTYPCKIFY
+# Unique. 1503 KTYQVSYGFR
+# Not unique. 1504 KVDIFFLGL is similar to FISIFFFLEI 0.814206
+# Unique. 1505 KVDPIGHVY
+# Unique. 1506 KVFEHVGSR
+# Unique. 1507 KVFKLGNKV
+# Unique. 1508 KVFRETAK
+# Unique. 1509 KVHSGESRK
+# Not unique. 1510 KVHTGERPYK is similar to HLRIYTGEKPY 0.801188
+# Unique. 1511 KVIDHVIET
+# Unique. 1512 KVINLSPFK
+# Not unique. 1513 KVIQASMFDQK is similar to IQASMFDQK 0.931369
+# Unique. 1514 KVIQFVANYA
+# Not unique. 1515 KVLGKGSFAK is similar to GLGKGTYGV 0.808197
+# Not unique. 1516 KVLSLQTAL is similar to AALLQVTLLL 0.812818
+# Unique. 1517 KVMCRFRPV
+# Unique. 1518 KVMSDDQCSK
+# Unique. 1519 KVMTDPSRK
+# Unique. 1520 KVQDLTPAK
+# Unique. 1521 KVRCSGLHK
+# Not unique. 1522 KVSSVFYTTV is similar to KIISFYTALL 0.816693
+# Unique. 1523 KVTGHRWLK
+# Unique. 1524 KVVFLFPAV
+# Unique. 1525 KVYEGVWKK
+# Unique. 1526 KWIHCFNDV
+# Unique. 1527 KWRLSLCTV
+# Unique. 1528 KYAFITWLV
+# Unique. 1529 KYINKTIRV
+# Not unique. 1530 KYINKTIRVKF is similar to KYINKTIRV 0.937569
+# Unique. 1531 KYLPVKEIYSW
+# Unique. 1532 KYLQCPLKF
+# Unique. 1533 KYPRKGHVV
+# Unique. 1534 KYSSGFCNI
+# Unique. 1535 KYVYDFGVSV
+# Unique. 1536 LACERLLYL
+# Unique. 1537 LADFRLARLY
+# Not unique. 1538 LADLAGFKELF is similar to ALADLAGFK 0.861566
+# Not unique. 1539 LAENTALYF is similar to CGILAENTALY 0.840946
+# Unique. 1540 LAKELIFRY
+# Not unique. 1541 LAKTYETTLEK is similar to AKTYETTLEK 0.972386
+# Not unique. 1542 LALSIGTSY is similar to ALSIGTSYRY 0.873277
+# Not unique. 1543 LAMAGSLVF is similar to ALAAGSCLV 0.827022
+# Not unique. 1544 LAMAGSLVF is similar to ALAAGSCLV 0.827022
+# Not unique. 1545 LAMAGSLVFL is similar to AIDAALTFV 0.803830
+# Not unique. 1546 LANLETLSHSF is similar to ILAELELSRRL 0.802603
+# Not unique. 1547 LARAKRPSVF is similar to ARRASKARL 0.809758
+# Unique. 1548 LARQTPEPAEL
+# Not unique. 1549 LASVTHSVDK is similar to ASVTHSVDK 0.963817
+# Not unique. 1550 LASWYRIYSK is similar to ASWYRIYSK 0.949964
+# Unique. 1551 LASYFFWGL
+# Not unique. 1552 LAVFYTILTPV is similar to AVFYTILTPV 0.972942
+# Not unique. 1553 LAVRWFFAHF is similar to AVRWFFAHF 0.954577
+# Not unique. 1554 LAYFLPRPPL is similar to AYFLPRPPL 0.955575
+# Not unique. 1555 LAYSFQSLL is similar to AYSFQSLLY 0.897169
+# Not unique. 1556 LAYSFQSLLYL is similar to AFLSTHLKLFL 0.800190
+# Unique. 1557 LDLGKSFHF
+# Unique. 1558 LDYEWGTVTF
+# Unique. 1559 LEAVARNTF
+# Unique. 1560 LEEEINRKM
+# Unique. 1561 LEFENKQAL
+# Unique. 1562 LELKAVHAY
+# Unique. 1563 LEREIPLNQPF
+# Not unique. 1564 LESAPINTPL is similar to ESAPINTPL 0.958537
+# Not unique. 1565 LESLSAESY is similar to ALFTADSAQTK 0.804557
+# Not unique. 1566 LFGASMTGIVY is similar to ASMTGIVYSL 0.856327
+# Unique. 1567 LFGVCIYSF
+# Not unique. 1568 LFHDMNVSY is similar to KLFHDMNVSY 0.948227
+# Unique. 1569 LFHTFYELL
+# Not unique. 1570 LFHTFYELLI is similar to LFHTFYELL 0.961090
+# Not unique. 1571 LFLSASSNSF is similar to ALFTADSAQTK 0.820877
+# Unique. 1572 LFPGALYLV
+# Unique. 1573 LFQQGKDLQQY
+# Not unique. 1574 LFRIKFKEPL is similar to AVMKFKNPL 0.802147
+# Not unique. 1575 LFSSSSFQK is similar to ALHSSSSYH 0.829041
+# Unique. 1576 LFVVFQTVY
+# Unique. 1577 LFYALGIVF
+# Unique. 1578 LFYLGSSTAF
+# Unique. 1579 LGNVWCFPY
+# Unique. 1580 LGPMGGSLTL
+# Not unique. 1581 LGSLHSGTAK is similar to GSLHSGTAK 0.957227
+# Unique. 1582 LGVVESAK
+# Not unique. 1583 LHAMIQAAGKL is similar to ALALAQKGV 0.804501
+# Unique. 1584 LHEAQPWFEF
+# Not unique. 1585 LHEAQPWFEFL is similar to LHEAQPWFEF 0.957280
+# Unique. 1586 LHSDFVSFLI
+# Unique. 1587 LHSEAAYTL
+# Not unique. 1588 LIAVSSCILAK is similar to AVSSCILAK 0.936790
+# Not unique. 1589 LIDAVDSTGV is similar to HIDDSDSITV 0.806696
+# Unique. 1590 LIDDYGVEEV
+# Not unique. 1591 LIDKTVLIEK is similar to FMDMAILVES 0.820074
+# Unique. 1592 LIDSNTLQV
+# Unique. 1593 LIFNMLYWI
+# Not unique. 1594 LIFSATLAYFL is similar to AFLSTHLKLFL 0.804546
+# Unique. 1595 LIIPFIHLI
+# Not unique. 1596 LIMQLMPFGCL is similar to IMQLMPFGSL 0.924458
+# Unique. 1597 LIQNVRSMK
+# Unique. 1598 LIQRINLKK
+# Unique. 1599 LISGPSVGV
+# Not unique. 1600 LIYELYVSEL is similar to FNQLIYELYV 0.815831
+# Unique. 1601 LIYIFEYDK
+# Unique. 1602 LKHPFTLMY
+# Not unique. 1603 LKLRRVDFETF is similar to KLRRVDFETFL 0.942224
+# Unique. 1604 LLAELYCRA
+# Not unique. 1605 LLAEVKSL is similar to CLAVEEVSL 0.809835
+# Not unique. 1606 LLAGTLAVV is similar to AMAGSLVFL 0.828029
+# Not unique. 1607 LLAIKVPNV is similar to IILVAVPHV 0.810027
+# Not unique. 1608 LLAILTYYV is similar to ALAVIELYNA 0.805111
+# Unique. 1609 LLAMTVPNV
+# Unique. 1610 LLARFATSAL
+# Unique. 1611 LLASYDEISV
+# Not unique. 1612 LLAVRWFFAHF is similar to AVRWFFAHF 0.918596
+# Unique. 1613 LLCKMINLSK
+# Unique. 1614 LLCRRSRAAL
+# Unique. 1615 LLCSSCWDF
+# Unique. 1616 LLDDECAFYT
+# Unique. 1617 LLDDQILQL
+# Unique. 1618 LLDEKGPEV
+# Not unique. 1619 LLDIDRFTI is similar to ILNVDIFTL 0.809807
+# Unique. 1620 LLDIWDGIPHV
+# Unique. 1621 LLDNSTTGTDV
+# Unique. 1622 LLDSLPMDV
+# Unique. 1623 LLEPHQVGL
+# Not unique. 1624 LLFAAFSSA is similar to FLMASISSF 0.819587
+# Unique. 1625 LLFALHFSA
+# Unique. 1626 LLFAPEYGPK
+# Unique. 1627 LLFGMPPCL
+# Not unique. 1628 LLFGMPPCLL is similar to FGMPPCLLAL 0.817514
+# Unique. 1629 LLFGYSFAT
+# Not unique. 1630 LLFLTIFIYA is similar to FFLGLILFEL 0.809741
+# Unique. 1631 LLFQRFFVI
+# Not unique. 1632 LLFSDKKV is similar to FLFQDSKKI 0.832230
+# Not unique. 1633 LLFSLFFLI is similar to FISIFFFLEI 0.838213
+# Unique. 1634 LLFYETFGK
+# Unique. 1635 LLGCVMYTLL
+# Not unique. 1636 LLGGNSFEV is similar to IMPGNSFAV 0.810667
+# Unique. 1637 LLGGWFQSSL
+# Unique. 1638 LLGPNSFEV
+# Not unique. 1639 LLGSSCAPPL is similar to ALLGSSCAPPL 0.973257
+# Unique. 1640 LLGSVNNLL
+# Unique. 1641 LLHASFVTL
+# Not unique. 1642 LLHASFVTL is similar to LLHASFVTL 1.000000
+# Not unique. 1643 LLHASFVTLGK is similar to LHSDFVSFLI 0.803184
+# Unique. 1644 LLHGFSFYL
+# Unique. 1645 LLHTELERF
+# Not unique. 1646 LLHTELERFL is similar to ALQHFELENSL 0.806800
+# Not unique. 1647 LLIASVTWL is similar to FLMASISSF 0.814477
+# Unique. 1648 LLIGFLSGSL
+# Unique. 1649 LLINRGFSK
+# Unique. 1650 LLIPVPNL
+# Unique. 1651 LLIQKFTDV
+# Not unique. 1652 LLKAELVAGL is similar to ILAELELSRRL 0.804029
+# Not unique. 1653 LLKEVYQSEHL is similar to DISEYRVEHL 0.800163
+# Unique. 1654 LLKHIFSTG
+# Not unique. 1655 LLKHPFTLM is similar to KELLKHPFTL 0.848322
+# Unique. 1656 LLKYKIKDY
+# Not unique. 1657 LLLAELSSPFV is similar to ALLETPSLL 0.813293
+# Not unique. 1658 LLLASTSGA is similar to FLMASISSF 0.842300
+# Unique. 1659 LLLCGVQAV
+# Unique. 1660 LLLCIPGL
+# Unique. 1661 LLLEFGANM
+# Unique. 1662 LLLEVVWHL
+# Not unique. 1663 LLLFLTIFI is similar to FFLGLILFEL 0.810888
+# Unique. 1664 LLLNAGSTV
+# Not unique. 1665 LLLNMLIVL is similar to AALLQVTLLL 0.805303
+# Unique. 1666 LLLPHYASAK
+# Unique. 1667 LLLQLTTPA
+# Unique. 1668 LLMGSSDLA
+# Not unique. 1669 LLMLLIGFL is similar to FFLGLILFEL 0.804929
+# Not unique. 1670 LLMSQANV is similar to FLMKSSNL 0.811093
+# Not unique. 1671 LLMVSITLL is similar to AALLQVTLLL 0.848923
+# Unique. 1672 LLNYFQNSHSV
+# Unique. 1673 LLPALSPGL
+# Not unique. 1674 LLPHYASAK is similar to LLLPHYASAK 0.955650
+# Unique. 1675 LLPPVYLTF
+# Not unique. 1676 LLPVLSWLL is similar to GLLPVLSWLL 0.955676
+# Unique. 1677 LLQDGDIQV
+# Not unique. 1678 LLQEEAHVPL is similar to ALDQEAALAK 0.800763
+# Unique. 1679 LLQICERIPTI
+# Unique. 1680 LLQNITYL
+# Unique. 1681 LLQVYCEMYGL
+# Not unique. 1682 LLRKHQLIYL is similar to KLSHQLVLL 0.815148
+# Unique. 1683 LLRPTLDQSTM
+# Unique. 1684 LLSAPPCTQHI
+# Unique. 1685 LLSCSADGAV
+# Not unique. 1686 LLSIIFFPA is similar to FISIFFFLEI 0.804023
+# Unique. 1687 LLSIVPCTV
+# Unique. 1688 LLSPDLIRNEV
+# Not unique. 1689 LLTKDSYKV is similar to FLKDSVKV 0.808315
+# Unique. 1690 LLTQLRAEV
+# Not unique. 1691 LLVAAMIGGFV is similar to KLFAIVVGRGI 0.825543
+# Unique. 1692 LLVDAMHNQL
+# Not unique. 1693 LLVDLAEEL is similar to ILTDIEEKV 0.817956
+# Unique. 1694 LLVEKTTCV
+# Unique. 1695 LLVRNSFEV
+# Unique. 1696 LLWMNLFVGF
+# Not unique. 1697 LLWMNLFVGF is similar to LLWMNLFVGF 1.000000
+# Unique. 1698 LLYNDQPPR
+# Unique. 1699 LLYPHSLSS
+# Not unique. 1700 LLYPHSLSSK is similar to LLLPHYASAK 0.812806
+# Not unique. 1701 LLYPHSLSSKL is similar to LLLPHYASAK 0.805191
+# Not unique. 1702 LLYQELLPL is similar to FLAYELLPAL 0.825820
+# Not unique. 1703 LMASISSFL is similar to ASISSFLLV 0.820107
+# Not unique. 1704 LMASISSFLL is similar to AMAGSLVFL 0.809195
+# Not unique. 1705 LMASISSFLLV is similar to ALSYLVSFQR 0.804205
+# Not unique. 1706 LMASTSLKQQL is similar to ALFTADSAQTK 0.813647
+# Not unique. 1707 LMAVAILKEV is similar to AALLQVTLLL 0.807113
+# Unique. 1708 LMAVRSKYSEV
+# Unique. 1709 LMFWASSSI
+# Not unique. 1710 LMGTEQLFTEL is similar to APGLMGTEQLF 0.836087
+# Unique. 1711 LMILSANWAY
+# Not unique. 1712 LMILSANWAYV is similar to LMILSANWAY 0.961249
+# Not unique. 1713 LMLEISTSL is similar to FLMASISSF 0.825058
+# Unique. 1714 LMLEYQKILWK
+# Unique. 1715 LMMEHPSLQAI
+# Not unique. 1716 LMMPFSIVYI is similar to AMPFSIFYPM 0.817782
+# Not unique. 1717 LMMSLSALF is similar to FLMASISSF 0.838929
+# Unique. 1718 LMRDHMPPV
+# Not unique. 1719 LMRVMDISYL is similar to FLMRVMDISY 0.926715
+# Unique. 1720 LMTDTQFVL
+# Not unique. 1721 LMTDTQFVLAV is similar to LMTDTQFVL 0.931749
+# Unique. 1722 LMTLHGFMMY
+# Unique. 1723 LMVPHSPSL
+# Not unique. 1724 LNRSSSQGTQL is similar to LLDNSTTGTDV 0.800280
+# Not unique. 1725 LPAEGVSEV is similar to GLPAEGVSEV 0.952469
+# Not unique. 1726 LPAIMFFVSA is similar to FISIFFFLEI 0.807043
+# Unique. 1727 LPALAFTFFSL
+# Unique. 1728 LPALKIWEEL
+# Unique. 1729 LPALSQCSQL
+# Not unique. 1730 LPALSQCSQL is similar to LPALSQCSQL 1.000000
+# Unique. 1731 LPAPGGGES
+# Unique. 1732 LPAPQQYIV
+# Unique. 1733 LPATGWTKS
+# Not unique. 1734 LPATGWTKSM is similar to LPATGWTKS 0.950838
+# Unique. 1735 LPEMRAYQDKW
+# Unique. 1736 LPEPDKMLVAV
+# Not unique. 1737 LPFSPEFSEFF is similar to FSPEFSEFF 0.925150
+# Not unique. 1738 LPFSPEFSEFF is similar to FSPEFSEFF 0.925150
+# Unique. 1739 LPGEKGHPGL
+# Not unique. 1740 LPGFSGLRGI is similar to APGLPGFSGL 0.824031
+# Not unique. 1741 LPGLPGNGL is similar to APGLPGFSGL 0.808583
+# Not unique. 1742 LPGLPGNGLPG is similar to APGLPGFSGL 0.805033
+# Not unique. 1743 LPILGEQVV is similar to ALPILGEQV 0.891376
+# Unique. 1744 LPIQYEPVL
+# Unique. 1745 LPMETPLVI
+# Unique. 1746 LPNEYAFVT
+# Not unique. 1747 LPNEYAFVTT is similar to LPNEYAFVT 0.957010
+# Unique. 1748 LPNHVIYLY
+# Unique. 1749 LPPEMTVARSL
+# Not unique. 1750 LPPEMTVARSL is similar to LPPEMTVARSL 1.000000
+# Unique. 1751 LPQGWKMNSTL
+# Not unique. 1752 LPQQFHLKIL is similar to APLPQQFHLKI 0.887024
+# Not unique. 1753 LPRAKKLIL is similar to APKKKSIKL 0.817657
+# Unique. 1754 LPSFRPPTAL
+# Unique. 1755 LPSWGASQQAL
+# Unique. 1756 LPTLPTREPK
+# Not unique. 1757 LPTVKLAEV is similar to IPAVKLNKL 0.826751
+# Unique. 1758 LPVEGNIHV
+# Not unique. 1759 LPVEGNIHV is similar to LPVEGNIHV 1.000000
+# Not unique. 1760 LPVGSQCLV is similar to KLPVGSQCLV 0.950677
+# Not unique. 1761 LPVGSQCLVDL is similar to KLPVGSQCLV 0.892345
+# Not unique. 1762 LPVGSQCLVDL is similar to KLPVGSQCLV 0.892345
+# Unique. 1763 LPVTRKNMPL
+# Unique. 1764 LPWLSAHEL
+# Unique. 1765 LQEEAHVPL
+# Not unique. 1766 LQEEAHVPLQF is similar to LQEEAHVPL 0.920220
+# Unique. 1767 LQFEYTFEI
+# Unique. 1768 LQHDKLVRV
+# Unique. 1769 LQINCSHFSTI
+# Unique. 1770 LQQYKTLAYSF
+# Unique. 1771 LQREQQHLK
+# Unique. 1772 LQRIHHMAA
+# Unique. 1773 LQTIKDIASPI
+# Unique. 1774 LRAAFFGKCF
+# Not unique. 1775 LRFNLIANQH is similar to KLFAQLINNKA 0.807741
+# Unique. 1776 LRFSIIEEF
+# Unique. 1777 LRILKVTEFK
+# Not unique. 1778 LRILRIKLR is similar to LRILKVTEFK 0.818142
+# Unique. 1779 LRLNHPAQL
+# Unique. 1780 LRMRGTIFR
+# Unique. 1781 LRNSGGEVF
+# Unique. 1782 LRSEGSPLV
+# Unique. 1783 LRTKVYAEL
+# Unique. 1784 LSAQSHCSTY
+# Unique. 1785 LSDSRPRHL
+# Unique. 1786 LSEECYWSL
+# Not unique. 1787 LSEECYWSL is similar to LSEECYWSL 1.000000
+# Unique. 1788 LSGEWFTFYL
+# Not unique. 1789 LSGEWFTFYLV is similar to LSGEWFTFYL 0.965751
+# Unique. 1790 LSHSFNWRK
+# Not unique. 1791 LSIGTSYRY is similar to ALSIGTSYRY 0.962888
+# Not unique. 1792 LSIISVYYY is similar to IISVYYYFI 0.809931
+# Unique. 1793 LSPLSWVSV
+# Unique. 1794 LSQCSQLTTFY
+# Unique. 1795 LSRLSNRLL
+# Not unique. 1796 LSSFRIHER is similar to HSLSSFRIHER 0.932221
+# Not unique. 1797 LSSSGAPSLK is similar to ALLGSSCAPPL 0.801556
+# Not unique. 1798 LSSSSTLTL is similar to ALTASTVPL 0.813266
+# Unique. 1799 LSSSVPRK
+# Not unique. 1800 LSVEFSEMM is similar to ALSVEFSEM 0.902499
+# Not unique. 1801 LSVTHMTSR is similar to ASVTHSVDK 0.817124
+# Not unique. 1802 LSYCLPPTF is similar to GLSYCLPPTF 0.948142
+# Unique. 1803 LSYLLAMR
+# Not unique. 1804 LSYTWNIPV is similar to DLSYTWNIPV 0.948580
+# Not unique. 1805 LTATTQAPM is similar to ALTASTVPL 0.825738
+# Not unique. 1806 LTEKVSLLK is similar to IQVKTLMVK 0.805823
+# Unique. 1807 LTFLERPREK
+# Unique. 1808 LTFNQCYGV
+# Unique. 1809 LTGNESFALPY
+# Unique. 1810 LTHEVIVPL
+# Not unique. 1811 LTHKQELQAVK is similar to FQQEIQILK 0.804587
+# Unique. 1812 LTHNAVCPI
+# Unique. 1813 LTINSIFY
+# Unique. 1814 LTLFWAPPER
+# Unique. 1815 LTLSGFFLR
+# Unique. 1816 LTPKWSEKYSK
+# Not unique. 1817 LTSLSGIAHK is similar to ASMTGIVYSL 0.801185
+# Not unique. 1818 LTSTVQLIM is similar to AALLQVTLLL 0.801370
+# Not unique. 1819 LTSTVQLIM is similar to AALLQVTLLL 0.801370
+# Not unique. 1820 LTVETLTKV is similar to AKTYETTLEK 0.800540
+# Unique. 1821 LVFPLVMGV
+# Unique. 1822 LVFVGLFAF
+# Unique. 1823 LVGPAQLSHW
+# Unique. 1824 LVIGMPPPV
+# Not unique. 1825 LVLFEDAVAY is similar to FLLDEAIGL 0.800966
+# Not unique. 1826 LVLLFLRDPYV is similar to ILLLNLLPYK 0.804284
+# Unique. 1827 LVNKFSTLY
+# Not unique. 1828 LVNSLSLEF is similar to FTNSLQLDV 0.836598
+# Unique. 1829 LVRDRWQKV
+# Not unique. 1830 LVRDRWQKVLV is similar to LVRDRWQKV 0.915598
+# Not unique. 1831 LVRGATLYI is similar to KLVRGATLY 0.893833
+# Unique. 1832 LVRGVRLSF
+# Unique. 1833 LVRLGIQTF
+# Not unique. 1834 LVRLGIQTF is similar to LVRLGIQTF 1.000000
+# Not unique. 1835 LVRRSRTYSL is similar to ITRKNSRTPL 0.802613
+# Not unique. 1836 LVRRTLLHV is similar to ILLRRLLSSA 0.803294
+# Unique. 1837 LVTKGEHMTEK
+# Not unique. 1838 LVTYSGKFLIL is similar to EKTSSGLYVFR 0.805017
+# Not unique. 1839 LVVVGASGVGK is similar to AVAAGAGK 0.832088
+# Unique. 1840 LVYGPLGAGK
+# Not unique. 1841 LWMNLFVGF is similar to LLWMNLFVGF 0.951624
+# Not unique. 1842 LWMNLFVGFRF is similar to LLWMNLFVGF 0.900746
+# Unique. 1843 LWTEMITNI
+# Unique. 1844 LYCVLIESL
+# Unique. 1845 LYIVDGMAQLM
+# Unique. 1846 LYIWFKTACL
+# Unique. 1847 LYLDYQIQATV
+# Not unique. 1848 LYNAGLFLW is similar to FLGAGLFLYF 0.808096
+# Unique. 1849 LYNGMEHLI
+# Unique. 1850 LYPEFIASI
+# Unique. 1851 LYQFILKAL
+# Unique. 1852 LYQRWEAQNKV
+# Not unique. 1853 LYTSEILSPI is similar to LQTIKDIASPI 0.812112
+# Unique. 1854 LYWHVSHDF
+# Unique. 1855 LYYEYWSNF
+# Unique. 1856 MAASLPPTL
+# Unique. 1857 MAEGIFHSPGY
+# Unique. 1858 MAGPKGFQY
+# Not unique. 1859 MAGSLVFLSSL is similar to ALSYLVSFQR 0.814592
+# Unique. 1860 MAHVSVVPVF
+# Not unique. 1861 MAKTSTSLPY is similar to ALTASTVPL 0.840898
+# Not unique. 1862 MALNSEALSV is similar to ALDQEAALAK 0.815886
+# Not unique. 1863 MALTASTVPL is similar to ALFTADSAQTK 0.809032
+# Not unique. 1864 MASFLVFYVI is similar to ALSYLVSFQR 0.801061
+# Unique. 1865 MASGDHSAY
+# Unique. 1866 MASILKGYRLY
+# Not unique. 1867 MASISSFLL is similar to ASISSFLLV 0.917945
+# Not unique. 1868 MASISSFLL is similar to ASISSFLLV 0.917945
+# Not unique. 1869 MASISSFLLV is similar to AMAGSLVFL 0.809938
+# Not unique. 1870 MASISSFLLVR is similar to AFLSTHLKLFL 0.805260
+# Not unique. 1871 MASMSGRWKR is similar to ASMSGRWK 0.887589
+# Not unique. 1872 MASMSGRWKRK is similar to ASMSGRWK 0.857405
+# Not unique. 1873 MAVGISHLK is similar to EGSLGISHTR 0.827341
+# Unique. 1874 MDIQASHALM
+# Unique. 1875 MEAIRLYQF
+# Not unique. 1876 MEAVALVGAW is similar to KLFAIVVGRGI 0.804611
+# Not unique. 1877 MEAVALVGAWY is similar to KLFAIVVGRGI 0.801860
+# Unique. 1878 MELKVESF
+# Unique. 1879 METLHIIYLEA
+# Unique. 1880 MGFFRRSVIK
+# Not unique. 1881 MGMNSIEPAK is similar to GMNSIEPAK 0.952049
+# Unique. 1882 MHENFTNLL
+# Not unique. 1883 MIISHLYLI is similar to FLSDHLYLV 0.816283
+# Not unique. 1884 MILTGILLIEI is similar to AALLQVTLLL 0.826353
+# Unique. 1885 MIMLGDKKKTF
+# Unique. 1886 MIQLCSKLRK
+# Unique. 1887 MISPNSFFH
+# Unique. 1888 MIYGYDTWI
+# Not unique. 1889 MLAEKTVQV is similar to LLVEKTTCV 0.831579
+# Not unique. 1890 MLAEQLKQA is similar to ILAELELSRRL 0.801245
+# Unique. 1891 MLAPKTQR
+# Not unique. 1892 MLAVISCAV is similar to LLSIVPCTV 0.821781
+# Not unique. 1893 MLEYQKILWK is similar to LMLEYQKILWK 0.969888
+# Not unique. 1894 MLEYQKILWKV is similar to LMLEYQKILWK 0.944207
+# Unique. 1895 MLGEQLFPL
+# Unique. 1896 MLICCCCTL
+# Unique. 1897 MLIGIPVYV
+# Not unique. 1898 MLKAKSQFK is similar to LMAVRSKYSEV 0.808479
+# Not unique. 1899 MLLAIPEAV is similar to IILVAVPHV 0.805448
+# Unique. 1900 MLLAIPEAVF
+# Not unique. 1901 MLLENKAVEK is similar to KLFESKAEL 0.816405
+# Not unique. 1902 MLLENKAVEKA is similar to CGILAENTALY 0.800586
+# Not unique. 1903 MLLENVLKPL is similar to FLAKILKPL 0.827136
+# Not unique. 1904 MLLIGFLSGSL is similar to LLIGFLSGSL 0.972608
+# Unique. 1905 MLLKHDVSL
+# Not unique. 1906 MLLLGLLHA is similar to FILMGLPHV 0.808957
+# Not unique. 1907 MLLLMEREDKV is similar to ALLFLESEL 0.801348
+# Not unique. 1908 MLLQAYRSV is similar to FMLLQACRSV 0.833392
+# Unique. 1909 MLLQTCQDF
+# Unique. 1910 MLMKNISTK
+# Not unique. 1911 MLMLAVIVA is similar to FICAIIVVV 0.805008
+# Not unique. 1912 MLNELKSTVTK is similar to EQNFVSTSDIK 0.805586
+# Not unique. 1913 MLNNSTQTY is similar to ILNASNVKTF 0.802609
+# Unique. 1914 MLQIINIVL
+# Unique. 1915 MLQQQPSPPV
+# Unique. 1916 MLQYKKKAAV
+# Unique. 1917 MLREEIAML
+# Unique. 1918 MLRHILPK
+# Not unique. 1919 MLSILALVRV is similar to AALLQVTLLL 0.833161
+# Not unique. 1920 MLSSNVINF is similar to ILNASNVKTF 0.824726
+# Not unique. 1921 MLTRYARAQFV is similar to LLARFATSAL 0.809758
+# Not unique. 1922 MLVLTFRDVAV is similar to FLIYLDVSV 0.800412
+# Unique. 1923 MLVRRTEGI
+# Unique. 1924 MMDYPYPTNFL
+# Unique. 1925 MMFPAQPFGL
+# Not unique. 1926 MMGFRTQEV is similar to HMMGFRTQEV 0.944065
+# Unique. 1927 MMMWDCWHA
+# Not unique. 1928 MMMWDCWHAV is similar to MMMWDCWHA 0.939127
+# Not unique. 1929 MMPFSIVYI is similar to AMPFSIFYPM 0.830819
+# Not unique. 1930 MMPFSIVYIV is similar to AMPFSIFYPM 0.841721
+# Unique. 1931 MMPPLPGI
+# Not unique. 1932 MMWDCWHAV is similar to MMMWDCWHA 0.848407
+# Unique. 1933 MNLFVGFRF
+# Not unique. 1934 MNLRPILTI is similar to GMNWRPILTI 0.826924
+# Not unique. 1935 MNLRPILTII is similar to GMNWRPILTI 0.806291
+# Unique. 1936 MPAAEEMRKNV
+# Unique. 1937 MPAWRTRGA
+# Not unique. 1938 MPAWRTRGAI is similar to MPAWRTRGA 0.953398
+# Unique. 1939 MPFTTVSELM
+# Not unique. 1940 MPGRSSSNSA is similar to ASNASSAAK 0.801552
+# Unique. 1941 MPIEPGDIGC
+# Not unique. 1942 MPLVILIVL is similar to AIVVILMSMV 0.834694
+# Not unique. 1943 MPLVILIVLVL is similar to AALLQVTLLL 0.810666
+# Unique. 1944 MPSHCNTQY
+# Unique. 1945 MQAFAQVFSK
+# Unique. 1946 MQLLFDNEV
+# Not unique. 1947 MQLMPFGCL is similar to IMQLMPFGSL 0.881534
+# Not unique. 1948 MQLMPFGCLL is similar to IMQLMPFGSL 0.853705
+# Not unique. 1949 MQLMPFGSLL is similar to IMQLMPFGSL 0.923665
+# Unique. 1950 MRMNQGVCC
+# Unique. 1951 MRRTRPSAA
+# Unique. 1952 MSCVYFLHKY
+# Not unique. 1953 MSDDQCSKGY is similar to KVMSDDQCSK 0.829987
+# Unique. 1954 MSQPDAQRY
+# Not unique. 1955 MTDTQFVLAV is similar to LMTDTQFVL 0.873943
+# Unique. 1956 MTEHHAGRY
+# Not unique. 1957 MTFSDVLTL is similar to FSSDVLNLV 0.805727
+# Not unique. 1958 MTFSSTKDYV is similar to EQNFVSTSDIK 0.819535
+# Not unique. 1959 MTGPRGLDQLR is similar to GPRGLDQLREL 0.878494
+# Not unique. 1960 MTLHGFMMY is similar to LMTLHGFMMY 0.956427
+# Not unique. 1961 MTLHGFMMY is similar to LMTLHGFMMY 0.956427
+# Unique. 1962 MTLKEYHYV
+# Unique. 1963 MTSLHLTTR
+# Unique. 1964 MTSPHFIEFV
+# Not unique. 1965 MTVARSLVK is similar to AASRSVVM 0.801318
+# Unique. 1966 MVDTRGGSM
+# Not unique. 1967 MVLAELYVSER is similar to ALAVIELYNA 0.834023
+# Unique. 1968 MVVHEIQNY
+# Unique. 1969 MVYWTGGIPA
+# Unique. 1970 MWMTLTFF
+# Not unique. 1971 MWMTLTFFV is similar to MWMTLTFF 0.943660
+# Unique. 1972 MYLMVEHI
+# Not unique. 1973 MYSNADIYL is similar to AMYSNADIYLF 0.922735
+# Not unique. 1974 MYSNADIYLF is similar to AMYSNADIYLF 0.966816
+# Not unique. 1975 MYSNADIYLFD is similar to AMYSNADIYLF 0.940858
+# Not unique. 1976 MYSRAQVEL is similar to FFKTSAQVVL 0.801578
+# Unique. 1977 MYSRAQVELNL
+# Not unique. 1978 NAFSGEYIPTV is similar to FLGEYIPTV 0.863743
+# Not unique. 1979 NETPVAVLTI is similar to DTSPVAVAL 0.858756
+# Not unique. 1980 NEVSEVTVF is similar to KIFSEVTLK 0.816388
+# Unique. 1981 NEYAFVTTF
+# Not unique. 1982 NFFKTSAQVVL is similar to ALFTADSAQTK 0.810234
+# Unique. 1983 NFLNNSGIL
+# Not unique. 1984 NGTSSLIIYK is similar to ASISSFLLV 0.807327
+# Unique. 1985 NHARIDAAKV
+# Unique. 1986 NHDETSFLL
+# Unique. 1987 NIHAVLLPK
+# Unique. 1988 NILFCQTPK
+# Unique. 1989 NISEDVIFF
+# Not unique. 1990 NISSGTRML is similar to ILSGGRTLQI 0.803851
+# Unique. 1991 NIYVDALFK
+# Not unique. 1992 NIYVDALFK is similar to NIYVDALFK 1.000000
+# Unique. 1993 NLAQTDLATV
+# Not unique. 1994 NLDEKANEI is similar to LLDEKGPEV 0.808633
+# Unique. 1995 NLFNRYLAL
+# Unique. 1996 NLGENKHYDV
+# Unique. 1997 NLGNREAEL
+# Unique. 1998 NLIFVFYM
+# Not unique. 1999 NLIFVFYML is similar to FISIFFFLEI 0.822663
+# Unique. 2000 NLIQSAYNL
+# Unique. 2001 NLKRVVEDSEY
+# Not unique. 2002 NLLGGNSFEVR is similar to LLGPNSFEV 0.812962
+# Unique. 2003 NLLNHSWLV
+# Unique. 2004 NLNCCSVPV
+# Unique. 2005 NLNKHRRYK
+# Unique. 2006 NLNPNVDPQV
+# Unique. 2007 NLQERIDYCHL
+# Not unique. 2008 NLQNQMSSL is similar to ALQSQSISL 0.813981
+# Not unique. 2009 NLQNQMSSL is similar to ALQSQSISL 0.813981
+# Unique. 2010 NLQREEYTV
+# Unique. 2011 NLRYFAKSL
+# Not unique. 2012 NLSHPAQK is similar to LRLNHPAQL 0.801225
+# Unique. 2013 NLSPALGQMPL
+# Unique. 2014 NLTEGPYPL
+# Unique. 2015 NLWIPSSSLAK
+# Unique. 2016 NLYAEPPV
+# Unique. 2017 NMDVYCFL
+# Unique. 2018 NMLKNNLV
+# Unique. 2019 NPALCVQPHY
+# Not unique. 2020 NPDVNITNLEF is similar to DENITTIQF 0.805075
+# Unique. 2021 NPEAIAEVV
+# Unique. 2022 NPHYHENAGI
+# Not unique. 2023 NPKSDELKL is similar to DPESDTLTL 0.805524
+# Unique. 2024 NPLMCRLLGI
+# Not unique. 2025 NPLVNSLSL is similar to FPVVNSHSL 0.823763
+# Not unique. 2026 NPLVNSLSLEF is similar to EPLSYSLLQR 0.806045
+# Unique. 2027 NPMWVVLL
+# Unique. 2028 NPSVATFSL
+# Not unique. 2029 NPSVATFSL is similar to NPSVATFSL 1.000000
+# Not unique. 2030 NPSVATFSLI is similar to ASISSFLLV 0.819695
+# Not unique. 2031 NPSVATFSLI is similar to ASISSFLLV 0.819695
+# Not unique. 2032 NQLIYELYV is similar to FNQLIYELYV 0.953721
+# Unique. 2033 NQMEEFTV
+# Unique. 2034 NQTFISCAPY
+# Unique. 2035 NRHDCWSLISL
+# Unique. 2036 NSCVNPFALY
+# Unique. 2037 NSKKKWFLF
+# Not unique. 2038 NSLIQRINLKK is similar to KLFAQLINNKA 0.815046
+# Not unique. 2039 NSTLSGEWFTF is similar to LSGEWFTFYL 0.807471
+# Unique. 2040 NTATNLPSV
+# Not unique. 2041 NTHSDGAILPF is similar to CNGSEDGALAY 0.803521
+# Unique. 2042 NTLPNYQSF
+# Not unique. 2043 NTSRYATAL is similar to LLARFATSAL 0.804890
+# Unique. 2044 NTVILETLK
+# Unique. 2045 NTYASPRFK
+# Unique. 2046 NVDMRTISF
+# Not unique. 2047 NVDQKVIQASM is similar to AAQSVIKAL 0.810887
+# Unique. 2048 NVELRRNVL
+# Unique. 2049 NVLEWIIYA
+# Not unique. 2050 NVLSSLVLV is similar to AALLQVTLLL 0.820033
+# Not unique. 2051 NVYEVVNSK is similar to CMYEAVNEV 0.808185
+# Unique. 2052 NVYEVVNSKK
+# Not unique. 2053 NVYEVVNSKKK is similar to NVYEVVNSKK 0.974856
+# Unique. 2054 NWPTRVCADV
+# Unique. 2055 NYICNSSCM
+# Unique. 2056 NYIPSNDLRAF
+# Not unique. 2057 NYMISPNSFF is similar to MISPNSFFH 0.839109
+# Unique. 2058 NYNENTGEKL
+# Not unique. 2059 NYQSFSSTSAL is similar to ALHSSSSYH 0.800581
+# Unique. 2060 NYVAGGQEV
+# Not unique. 2061 NYVAGGQEVF is similar to NYVAGGQEV 0.954453
+# Unique. 2062 NYWWRGQTL
+# Not unique. 2063 PFFSIFPKCF is similar to FFSIFPKCF 0.948159
+# Not unique. 2064 PFLDLGKSFHF is similar to LDLGKSFHF 0.918225
+# Not unique. 2065 PFSQCTKSF is similar to CPFSQCTKSF 0.937285
+# Not unique. 2066 PILENPFFSI is similar to ILENPFFSI 0.946475
+# Not unique. 2067 PILENPFFSIF is similar to ILENPFFSI 0.911768
+# Unique. 2068 PIYIPSRLCK
+# Not unique. 2069 PLFSSSSGV is similar to ALHSSSSYH 0.816852
+# Unique. 2070 PLIDVNWCA
+# Unique. 2071 PLLEAIDPDV
+# Not unique. 2072 PLLPALSPGL is similar to ALSPSALSPA 0.807716
+# Unique. 2073 PLMGISHQEEV
+# Unique. 2074 PLYRFSLLNK
+# Not unique. 2075 PPEMTVARSL is similar to LPPEMTVARSL 0.964037
+# Unique. 2076 PPEPRRGLL
+# Not unique. 2077 PPNFLNNSGIL is similar to NFLNNSGIL 0.898701
+# Unique. 2078 PPPSRPISPA
+# Unique. 2079 PPRGFSPYL
+# Not unique. 2080 PPSAEYESL is similar to APPSAEYESL 0.957082
+# Not unique. 2081 PPSAEYESLV is similar to APPSAEYESL 0.929596
+# Not unique. 2082 PPSLLWMNL is similar to GPPSLLWMNL 0.946785
+# Not unique. 2083 PPSPAGAPGPA is similar to APSPGQPPAL 0.805120
+# Not unique. 2084 PPSRPISPA is similar to PPPSRPISPA 0.954383
+# Unique. 2085 PPTSPVQTPL
+# Unique. 2086 PSDTRQMLFY
+# Not unique. 2087 PSLLWMNLFV is similar to GPPSLLWMNL 0.805391
+# Unique. 2088 PVKNLPQV
+# Unique. 2089 PWWNFGSLL
+# Not unique. 2090 PYALVRLGI is similar to DPYALVRLGI 0.947432
+# Unique. 2091 PYISGPLRF
+# Unique. 2092 PYMFLSEWI
+# Unique. 2093 PYTRDQIMTI
+# Not unique. 2094 PYTRDQIMTIL is similar to PYTRDQIMTI 0.971598
+# Not unique. 2095 QALADLAGFK is similar to ALADLAGFK 0.960856
+# Unique. 2096 QASGNHHVW
+# Unique. 2097 QATEAERSF
+# Not unique. 2098 QAVAAVQKL is similar to AAAAAAQQIQV 0.850403
+# Unique. 2099 QCEEVARVL
+# Not unique. 2100 QDVSVQVER is similar to DVSVQVER 0.943176
+# Not unique. 2101 QEECLWMAV is similar to EECLWMAVL 0.874477
+# Unique. 2102 QEFAPLGTV
+# Not unique. 2103 QEIQILKAL is similar to DIFQVVKAI 0.808682
+# Not unique. 2104 QFAVGSYVY is similar to AVGSYVYSV 0.811417
+# Not unique. 2105 QFHLKILFL is similar to CLDLKILYL 0.807967
+# Not unique. 2106 QFHLKILFLPL is similar to CLDLKILYL 0.801509
+# Not unique. 2107 QFMGVIMFI is similar to FFLGLILFEL 0.802148
+# Not unique. 2108 QFVLAVKRTVF is similar to GTYVRVTVQAR 0.812279
+# Unique. 2109 QHQPNPFEV
+# Not unique. 2110 QICERIPTI is similar to LLQICERIPTI 0.917516
+# Not unique. 2111 QIDEPVSPSEV is similar to GLIEPSPPSA 0.808421
+# Unique. 2112 QIFLSEIRWEK
+# Unique. 2113 QIIHTYSNTV
+# Unique. 2114 QIKLHLSPK
+# Not unique. 2115 QIMTILANMSV is similar to AIVVILMSMV 0.831148
+# Not unique. 2116 QINITAVAHV is similar to KLNTITAVV 0.833042
+# Not unique. 2117 QKRPIPIKYKAM is similar to KRPIPIKYKAM 0.973467
+# Not unique. 2118 QKTYQVSYGFR is similar to KTYQVSYGFR 0.969029
+# Not unique. 2119 QLALSIGTSY is similar to ALSIGTSYRY 0.863032
+# Unique. 2120 QLANGAFK
+# Not unique. 2121 QLANGAFKV is similar to QLANGAFK 0.934974
+# Unique. 2122 QLCDVMFYL
+# Unique. 2123 QLDIIPASV
+# Unique. 2124 QLDKCSAFV
+# Unique. 2125 QLFARARPM
+# Not unique. 2126 QLFSLPPVLR is similar to KTFSLPSLL 0.823784
+# Not unique. 2127 QLFYALGIV is similar to LFYALGIVF 0.892963
+# Not unique. 2128 QLFYALGIVF is similar to LFYALGIVF 0.954397
+# Unique. 2129 QLHNEVLK
+# Unique. 2130 QLIMQLMPF
+# Unique. 2131 QLIMTFFQV
+# Unique. 2132 QLIPRLFFA
+# Not unique. 2133 QLIYELYVSEL is similar to FNQLIYELYV 0.862142
+# Unique. 2134 QLLCCQPGL
+# Unique. 2135 QLLQDHWEI
+# Unique. 2136 QLLQYEGYK
+# Not unique. 2137 QLLRNFASQTV is similar to LLARFATSAL 0.824800
+# Unique. 2138 QLLVSLWGL
+# Unique. 2139 QLPDFVNQL
+# Unique. 2140 QLPFGDPFAV
+# Unique. 2141 QLPGPIWEFL
+# Unique. 2142 QLQHILCSHV
+# Not unique. 2143 QLQKANVLL is similar to FRQKTNLIL 0.826260
+# Not unique. 2144 QLQREQQHLK is similar to FLDREQRESY 0.805577
+# Unique. 2145 QLRLFQYNYSY
+# Unique. 2146 QLSCISTYV
+# Not unique. 2147 QLTSLSGIAHK is similar to ASMTGIVYSL 0.805542
+# Unique. 2148 QLWKNALQEI
+# Unique. 2149 QLWVDSTPL
+# Unique. 2150 QLYKCEHCGK
+# Unique. 2151 QMIYSAARV
+# Not unique. 2152 QMKNPILEL is similar to ILQSNPLLEV 0.822664
+# Not unique. 2153 QNGTSSLIIYK is similar to ASISSFLLV 0.800999
+# Unique. 2154 QPAAHIISELI
+# Unique. 2155 QPEPSTVL
+# Unique. 2156 QPHYITVSV
+# Not unique. 2157 QPPALSPSY is similar to ALSPSALSPA 0.818916
+# Not unique. 2158 QPSFSHLVA is similar to FQPSFSHLV 0.882372
+# Not unique. 2159 QPSFSHLVA is similar to FQPSFSHLV 0.882372
+# Not unique. 2160 QPSFSHLVAF is similar to FQPSFSHLV 0.858749
+# Not unique. 2161 QPSFSHLVAF is similar to FQPSFSHLV 0.858749
+# Unique. 2162 QPSGIILDY
+# Unique. 2163 QPSGVPTSL
+# Not unique. 2164 QPTGAPTPL is similar to QPSGVPTSL 0.849337
+# Not unique. 2165 QPTGAPTPL is similar to QPSGVPTSL 0.849337
+# Unique. 2166 QPYGSSFHAL
+# Not unique. 2167 QPYGSSFHAL is similar to QPYGSSFHAL 1.000000
+# Not unique. 2168 QQEIQILKAL is similar to AAQSVIKAL 0.802530
+# Not unique. 2169 QQFAVGSYV is similar to FIGQQFAVGSY 0.849771
+# Unique. 2170 QQFHLKILFL
+# Not unique. 2171 QQLDTAIRLTL is similar to NLAQTDLATV 0.812281
+# Unique. 2172 QQMGLLTRV
+# Unique. 2173 QQMQVAFSA
+# Unique. 2174 QQQQVVTNK
+# Not unique. 2175 QQWHLDLVLLI is similar to QQFHLKILFL 0.812809
+# Not unique. 2176 QQWLALFFV is similar to CQQWLALFFV 0.942341
+# Not unique. 2177 QQYKTLAYSF is similar to LQQYKTLAYSF 0.969493
+# Not unique. 2178 QRIYTGEKPF is similar to HLRIYTGEKPY 0.928308
+# Not unique. 2179 QRLMLRKVAL is similar to ILLRRLLSSA 0.816137
+# Unique. 2180 QSAEISNNL
+# Unique. 2181 QSANLVNPK
+# Unique. 2182 QSAYCGWKVRK
+# Unique. 2183 QSDETDQFLV
+# Not unique. 2184 QSFSSTSAL is similar to ALHSSSSYH 0.802235
+# Unique. 2185 QSLFWSIFV
+# Unique. 2186 QSNHLSVSK
+# Not unique. 2187 QSSASTESPAF is similar to ALFTADSAQTK 0.800565
+# Not unique. 2188 QTAAAVGVLK is similar to AAAAAAQQIQV 0.804547
+# Not unique. 2189 QTALVELVK is similar to AALLQVTLLL 0.821004
+# Unique. 2190 QTDTRPWSGPY
+# Not unique. 2191 QTFISCAPY is similar to NQTFISCAPY 0.951589
+# Not unique. 2192 QTFISCAPY is similar to NQTFISCAPY 0.951589
+# Unique. 2193 QTIDNIVFL
+# Unique. 2194 QTKPASLLY
+# Unique. 2195 QTNPVTLQY
+# Not unique. 2196 QTRKNKKLAL is similar to APKKKSIKL 0.814373
+# Unique. 2197 QTRLKGSLK
+# Unique. 2198 QTYTLSQCF
+# Not unique. 2199 QVAEKMEKK is similar to MPAAEEMRKNV 0.819053
+# Unique. 2200 QVMPIACGNK
+# Unique. 2201 QVTDFLAPL
+# Unique. 2202 QVTEILPSV
+# Unique. 2203 QVVKGDPPL
+# Unique. 2204 QVWNPSFCFK
+# Unique. 2205 QWINLFLQF
+# Not unique. 2206 QYIFQLSSLNL is similar to AQYTLMSQAV 0.801521
+# Not unique. 2207 QYKTLAYSF is similar to LQQYKTLAYSF 0.926483
+# Unique. 2208 QYQDLTQGSF
+# Unique. 2209 QYYFECDCF
+# Unique. 2210 RAAHSRVPSPR
+# Unique. 2211 RAFFVKFEV
+# Unique. 2212 RAFYILMEK
+# Not unique. 2213 RAILLGAEEK is similar to AILLGAEEK 0.960826
+# Not unique. 2214 RAKLLGAEEK is similar to AILLGAEEK 0.902807
+# Not unique. 2215 RALFALLEIL is similar to AALLQVTLLL 0.824964
+# Unique. 2216 RANSGFGRGL
+# Not unique. 2217 RARAHSIEIMK is similar to FARAHALMF 0.808534
+# Unique. 2218 RARGRPRKTKL
+# Not unique. 2219 RASKARLPV is similar to AAQARLQPV 0.806445
+# Unique. 2220 RATIVPEL
+# Unique. 2221 RATVAPRSL
+# Unique. 2222 RAYEAHNENK
+# Unique. 2223 RAYQDKWAEK
+# Not unique. 2224 RDFQQEIQIL is similar to FQQEIQILK 0.875635
+# Unique. 2225 RDLRPPGLLR
+# Unique. 2226 REEKIHDLAL
+# Unique. 2227 REELLAATL
+# Unique. 2228 REEMEVHEL
+# Not unique. 2229 REEMEVHEL is similar to REEMEVHEL 1.000000
+# Unique. 2230 REFDKIELA
+# Not unique. 2231 REFDKIELAY is similar to REFDKIELA 0.954695
+# Unique. 2232 REHALLAYM
+# Not unique. 2233 REIEGRVMF is similar to DHREIEGRVMF 0.916490
+# Not unique. 2234 REIEGRVMF is similar to DHREIEGRVMF 0.916490
+# Not unique. 2235 REIPLNQPF is similar to LEREIPLNQPF 0.925646
+# Unique. 2236 REMEKGSPF
+# Not unique. 2237 REMEKGSPF is similar to REMEKGSPF 1.000000
+# Not unique. 2238 REMEKGSPFL is similar to REMEKGSPF 0.951178
+# Unique. 2239 RERHHQPQTY
+# Unique. 2240 RESAFWLFW
+# Unique. 2241 RESFDPSAFM
+# Not unique. 2242 REVFLLKSL is similar to LYQFILKAL 0.816809
+# Unique. 2243 RFHTPMYFF
+# Unique. 2244 RFKDIFQEM
+# Unique. 2245 RFLEYLPLRF
+# Unique. 2246 RFLHDLHLL
+# Unique. 2247 RFQQLDTAI
+# Not unique. 2248 RFQQLDTAIRL is similar to NLAQTDLATV 0.817260
+# Unique. 2249 RFREELEGPPL
+# Unique. 2250 RFRHREDRPF
+# Unique. 2251 RFSGVPDSF
+# Unique. 2252 RFWLRGGRCW
+# Unique. 2253 RGFPRDPSTEF
+# Not unique. 2254 RGLLDSAQRK is similar to ALFTADSAQTK 0.825508
+# Not unique. 2255 RGRNSATSADK is similar to AEWRNGSTSSL 0.819133
+# Not unique. 2256 RGRPRKTKL is similar to RARGRPRKTKL 0.941075
+# Not unique. 2257 RGYWFVNFETK is similar to GYWFVNFETK 0.954133
+# Unique. 2258 RHDLPPYRVYL
+# Unique. 2259 RHRLGRDPL
+# Unique. 2260 RIAGKALKK
+# Not unique. 2261 RIALILAGSK is similar to FLLLVAAMI 0.819536
+# Unique. 2262 RIAQCFLRV
+# Unique. 2263 RIAQKIGLI
+# Unique. 2264 RIECIFFSV
+# Unique. 2265 RIKQTARK
+# Not unique. 2266 RILAALFLGL is similar to AALLQVTLLL 0.801495
+# Not unique. 2267 RILCSIQGVK is similar to ILCSIQGVK 0.950955
+# Not unique. 2268 RILKVTEFK is similar to LRILKVTEFK 0.963722
+# Not unique. 2269 RILKVTEFKK is similar to LRILKVTEFK 0.934852
+# Unique. 2270 RILNEGHISHF
+# Unique. 2271 RIMYKWIEPK
+# Not unique. 2272 RINLKKRRDSL is similar to GPLDRKSRDL 0.805570
+# Unique. 2273 RIQTHILK
+# Not unique. 2274 RIYSKIMDLI is similar to IYSKIMDLI 0.954622
+# Not unique. 2275 RIYTGEKPFK is similar to HLRIYTGEKPY 0.874163
+# Not unique. 2276 RIYTGEKPY is similar to HLRIYTGEKPY 0.917942
+# Unique. 2277 RIYVGGKINHI
+# Not unique. 2278 RKEASSRHFL is similar to KEASSRHFL 0.964050
+# Unique. 2279 RKLNFRLFVI
+# Not unique. 2280 RKSKIPRPVL is similar to KPSDTPRPVM 0.806743
+# Not unique. 2281 RLADAEKLFQL is similar to AEAERLDVKAI 0.814660
+# Unique. 2282 RLASGVYL
+# Not unique. 2283 RLDAVLMEV is similar to FMDMAILVES 0.821923
+# Not unique. 2284 RLDPRMSTLQK is similar to KLDPRLAQL 0.832477
+# Not unique. 2285 RLDSTLLLY is similar to EVDTSMLHF 0.800257
+# Not unique. 2286 RLDSTLLLY is similar to EVDTSMLHF 0.800257
+# Not unique. 2287 RLDSTLLLYHA is similar to AFLSTHLKLFL 0.804184
+# Not unique. 2288 RLDTSVIFEGL is similar to ETDESLIYSF 0.803199
+# Not unique. 2289 RLDWYSLMTSL is similar to KLWYASLTLV 0.805874
+# Not unique. 2290 RLESLSAESY is similar to ALFTADSAQTK 0.811317
+# Unique. 2291 RLFDEGKLKA
+# Not unique. 2292 RLFEYLRLTSL is similar to FLLRFLYTQL 0.808085
+# Unique. 2293 RLFGEAPREL
+# Unique. 2294 RLFKGYEGSLIK
+# Not unique. 2295 RLFLGLAIK is similar to ARLFLGLAI 0.904547
+# Unique. 2296 RLFNGNSRGSV
+# Not unique. 2297 RLFQYNYSY is similar to QLRLFQYNYSY 0.935221
+# Unique. 2298 RLFTPISAGY
+# Not unique. 2299 RLGIQTFCSRV is similar to GIQTFCSRV 0.921015
+# Unique. 2300 RLGRDPLLLL
+# Unique. 2301 RLHAGEKPYK
+# Unique. 2302 RLHDLVFPL
+# Not unique. 2303 RLHSEAAYTL is similar to ALDQEAALAK 0.805002
+# Not unique. 2304 RLHSSEKPYK is similar to AFQTSEKKFYI 0.800108
+# Not unique. 2305 RLIELIRRA is similar to ILAELELSRRL 0.816362
+# Not unique. 2306 RLIELIRRAK is similar to ILAELELSRRL 0.821656
+# Unique. 2307 RLIKHYPGI
+# Not unique. 2308 RLIKHYPGI is similar to RLIKHYPGI 1.000000
+# Unique. 2309 RLIPRVLAM
+# Not unique. 2310 RLISGPSVGV is similar to LISGPSVGV 0.955263
+# Unique. 2311 RLKCPFYGK
+# Not unique. 2312 RLLKHIFST is similar to LLKHIFSTG 0.884946
+# Unique. 2313 RLLRGYDQYA
+# Unique. 2314 RLLVHLQVI
+# Unique. 2315 RLLVNGCK
+# Unique. 2316 RLMFFRPIK
+# Not unique. 2317 RLMLRKVAL is similar to FLILRGVLV 0.806917
+# Not unique. 2318 RLMLRKVALK is similar to CMLARLEVK 0.805418
+# Unique. 2319 RLMVAVEEA
+# Not unique. 2320 RLMVAVEEAFI is similar to ALAVIELYNA 0.811909
+# Unique. 2321 RLPLHLYDI
+# Not unique. 2322 RLPVGAYEV is similar to ARLPVGAYEV 0.951405
+# Unique. 2323 RLQESNSL
+# Unique. 2324 RLQIALNV
+# Unique. 2325 RLRKRNEYR
+# Not unique. 2326 RLSCMLARLEV is similar to CMLARLEVK 0.864950
+# Unique. 2327 RLSDFSEQL
+# Not unique. 2328 RLSFSGPAL is similar to GVRLSFSGPAL 0.930244
+# Not unique. 2329 RLSFSGPAL is similar to GVRLSFSGPAL 0.930244
+# Not unique. 2330 RLSFSGPALL is similar to GVRLSFSGPAL 0.906592
+# Not unique. 2331 RLSISFENL is similar to ALSVEFSEM 0.825471
+# Not unique. 2332 RLSSSSSSK is similar to ALHSSSSYH 0.852548
+# Not unique. 2333 RLSTASFPT is similar to ALTASTVPL 0.822049
+# Not unique. 2334 RLSTQEKILTV is similar to AFQTSEKKFYI 0.820436
+# Unique. 2335 RLVCKAANTK
+# Unique. 2336 RLVPYLEFL
+# Unique. 2337 RLVSEGNLLEV
+# Unique. 2338 RLWKVSDLI
+# Unique. 2339 RLWLEVPDSAV
+# Not unique. 2340 RLYEFIVGHFL is similar to KLFEFLVYGV 0.815380
+# Unique. 2341 RLYKLILWR
+# Not unique. 2342 RLYSKQVTIAI is similar to FFKTSAQVVL 0.821497
+# Unique. 2343 RMAISIPIR
+# Unique. 2344 RMARSAPY
+# Unique. 2345 RMATVECV
+# Unique. 2346 RMCDVQVHK
+# Not unique. 2347 RMFSAMRVK is similar to KQFSAMALK 0.845437
+# Not unique. 2348 RMHTGEKPYV is similar to HLRIYTGEKPY 0.819345
+# Unique. 2349 RMIDVQNWAYF
+# Not unique. 2350 RMIGVGVAV is similar to ELAGIGILTV 0.809762
+# Unique. 2351 RMLEVPLCQIL
+# Unique. 2352 RMLHWENPV
+# Not unique. 2353 RMLRRRAQK is similar to LLCRRSRAAL 0.802733
+# Unique. 2354 RMQYSMECF
+# Unique. 2355 RMTGLPIPPEI
+# Unique. 2356 RMWDFDIFL
+# Not unique. 2357 RMWMTLTF is similar to ARMWMTLTF 0.930817
+# Not unique. 2358 RMWMTLTFF is similar to ARMWMTLTF 0.889785
+# Not unique. 2359 RMWMTLTFFV is similar to ARMWMTLTF 0.865688
+# Unique. 2360 RMYSGALL
+# Not unique. 2361 RMYSGALLF is similar to RMYSGALL 0.938589
+# Unique. 2362 RNYRQSSNMK
+# Unique. 2363 RPAARGSRV
+# Unique. 2364 RPAWRCVPF
+# Unique. 2365 RPCPGDTTEV
+# Unique. 2366 RPCRRVCAV
+# Unique. 2367 RPEFHVHAPG
+# Unique. 2368 RPHHDQRSL
+# Unique. 2369 RPHVPESAF
+# Not unique. 2370 RPIPIKYKA is similar to KRPIPIKYKAM 0.923767
+# Not unique. 2371 RPIPIKYKAM is similar to KRPIPIKYKAM 0.964806
+# Unique. 2372 RPISPAPNCI
+# Not unique. 2373 RPISPAPNCIV is similar to RPISPAPNCI 0.963691
+# Not unique. 2374 RPKTVEKATDV is similar to APQVTESIEF 0.811884
+# Unique. 2375 RPPIEQANVL
+# Not unique. 2376 RPPPSRPISPA is similar to KPPKAKPSPTY 0.815173
+# Unique. 2377 RPQVRKQL
+# Unique. 2378 RPRCLCTAV
+# Unique. 2379 RPRKTKLGSM
+# Unique. 2380 RPSDREEWEEL
+# Not unique. 2381 RPSVLLGDHL is similar to KQKVSLLFDHL 0.805415
+# Unique. 2382 RPVLWVNTDQV
+# Unique. 2383 RPYGSTVPA
+# Not unique. 2384 RPYGSTVPA is similar to RPYGSTVPA 1.000000
+# Unique. 2385 RQAEEIFENI
+# Not unique. 2386 RQMAAILLRR is similar to AALLQVTLLL 0.802746
+# Unique. 2387 RQMPLSSAV
+# Not unique. 2388 RQTPEPAEL is similar to LARQTPEPAEL 0.928135
+# Not unique. 2389 RRASKARLP is similar to ARRASKARL 0.916639
+# Not unique. 2390 RRFSSLYSF is similar to KFRSSVYLL 0.801049
+# Unique. 2391 RRHCRSYNR
+# Unique. 2392 RRHVLEVEK
+# Not unique. 2393 RRIYTGERPY is similar to HLRIYTGEKPY 0.909163
+# Not unique. 2394 RRLLILGRI is similar to KRRLLILGR 0.910299
+# Unique. 2395 RRTQRYFMK
+# Unique. 2396 RSDHVALHMK
+# Unique. 2397 RSDSGQQARY
+# Unique. 2398 RSELNLLV
+# Unique. 2399 RSHAGAVHK
+# Unique. 2400 RSKGDIGA
+# Unique. 2401 RSLEGHGVK
+# Unique. 2402 RSLPGKPSK
+# Unique. 2403 RSLRLHRFR
+# Unique. 2404 RSQWVLRGAK
+# Not unique. 2405 RSRPVAATA is similar to DTSPVAVAL 0.815706
+# Not unique. 2406 RSRPVAATAK is similar to DTSPVAVAL 0.815995
+# Unique. 2407 RSRTPSLPTL
+# Unique. 2408 RSSEPFQGSYK
+# Unique. 2409 RSSHIFPSL
+# Unique. 2410 RSSSRLGVNEK
+# Not unique. 2411 RSSVSLEWSK is similar to ATNLPSVEWNK 0.800680
+# Unique. 2412 RSTTCMTSLK
+# Not unique. 2413 RSYQVRRALER is similar to MYSRAQVELNL 0.800854
+# Not unique. 2414 RTAECFLRV is similar to RIAQCFLRV 0.889730
+# Unique. 2415 RTAHETEK
+# Not unique. 2416 RTAKQNPLTK is similar to ATKPAQNALEK 0.809093
+# Not unique. 2417 RTAKQNPLTKK is similar to ATKPAQNALEK 0.814276
+# Unique. 2418 RTAPRPGSQK
+# Not unique. 2419 RTAVYHEIHI is similar to AVYHEIHIGYL 0.832900
+# Unique. 2420 RTDFLIQTVAK
+# Unique. 2421 RTDVHIWVFR
+# Unique. 2422 RTDVKAYNVT
+# Unique. 2423 RTGKAAGLL
+# Unique. 2424 RTIDCLRQADK
+# Not unique. 2425 RTMAATTLK is similar to ALTASTVPL 0.826186
+# Unique. 2426 RTNEPQKQK
+# Not unique. 2427 RTNTAILETL is similar to KLNTITAVV 0.814249
+# Not unique. 2428 RTNTGILETLK is similar to KRTNVGILK 0.827045
+# Not unique. 2429 RTNTVILETLK is similar to FVRTNSLVFR 0.801891
+# Unique. 2430 RTPDGFLLV
+# Not unique. 2431 RTPDGFLLV is similar to RTPDGFLLV 1.000000
+# Unique. 2432 RTQDAEFLK
+# Not unique. 2433 RTQDVSVQVER is similar to DVSVQVER 0.884934
+# Unique. 2434 RTRARESPHF
+# Unique. 2435 RTSSTQQDNPK
+# Not unique. 2436 RTTIESPSRK is similar to KVMTDPSRK 0.805493
+# Unique. 2437 RTVPYILRV
+# Unique. 2438 RVADETYKAFL
+# Not unique. 2439 RVALLSWTK is similar to KRVALLSWTK 0.960654
+# Unique. 2440 RVCGPCSTY
+# Unique. 2441 RVFDEQYSKK
+# Unique. 2442 RVFNKYPTLK
+# Unique. 2443 RVFRDSWAL
+# Not unique. 2444 RVHARIHTGEK is similar to HQRMHTGEK 0.831964
+# Unique. 2445 RVHTVERPYK
+# Not unique. 2446 RVIHLLVEK is similar to HIIRLMLEY 0.812825
+# Unique. 2447 RVIKVHAK
+# Unique. 2448 RVKMVWYK
+# Not unique. 2449 RVLEAQSFI is similar to KIVEAQSGV 0.862137
+# Unique. 2450 RVLHFKNSY
+# Unique. 2451 RVLSHDSIFI
+# Unique. 2452 RVMDISYLNL
+# Unique. 2453 RVQQIVIHREY
+# Unique. 2454 RVRKIKPFSEI
+# Unique. 2455 RVRVMAIYK
+# Unique. 2456 RVSTLRVSL
+# Unique. 2457 RVSTRFKSY
+# Unique. 2458 RVYISYLDCI
+# Unique. 2459 RVYKCIFNH
+# Not unique. 2460 RVYKCIFNHK is similar to RVYKCIFNH 0.942098
+# Unique. 2461 RWLKWQPWKM
+# Unique. 2462 RWQKVLVNL
+# Unique. 2463 RWVFSGMRPW
+# Unique. 2464 RYAGLMVPPL
+# Unique. 2465 RYLETNKYCRM
+# Unique. 2466 RYLPSSVFL
+# Unique. 2467 RYLYHRVDVI
+# Not unique. 2468 RYLYHRVDVIF is similar to FRYYRVSILL 0.807129
+# Unique. 2469 RYPRYLYKL
+# Not unique. 2470 RYSVFFQLL is similar to FISIFFFLEI 0.801774
+# Unique. 2471 RYTEGAELM
+# Unique. 2472 RYVLHVVAA
+# Not unique. 2473 RYVPLTPW is similar to ARYVPLTPWF 0.869276
+# Not unique. 2474 RYVPLTPWF is similar to ARYVPLTPWF 0.953489
+# Not unique. 2475 RYVPLTPWFL is similar to ARYVPLTPWF 0.910595
+# Not unique. 2476 RYVPLTPWFLM is similar to ARYVPLTPWF 0.879776
+# Unique. 2477 RYVTRVLV
+# Not unique. 2478 RYYRVSILL is similar to FRYYRVSILL 0.951493
+# Unique. 2479 RYYVGHKAKF
+# Not unique. 2480 RYYVGHKAKF is similar to RYYVGHKAKF 1.000000
+# Unique. 2481 SADGGGLS
+# Unique. 2482 SAFIEPRYHV
+# Not unique. 2483 SAFWLFWGL is similar to AFWLFWGLTYI 0.837883
+# Unique. 2484 SAIGGEGPQRY
+# Not unique. 2485 SAQSHCSTY is similar to LSAQSHCSTY 0.960990
+# Not unique. 2486 SARMWMTLTF is similar to ARMWMTLTF 0.954827
+# Not unique. 2487 SASCYSSSCY is similar to ASCYSSSCY 0.966558
+# Unique. 2488 SASDLRNQL
+# Unique. 2489 SASLHPATV
+# Not unique. 2490 SASTESPAF is similar to ASNASSAAK 0.802983
+# Not unique. 2491 SAWRNIAAR is similar to ASAWRNIAAR 0.950717
+# Not unique. 2492 SAWRNIAARLL is similar to ASAWRNIAAR 0.903579
+# Unique. 2493 SAWTDTQRL
+# Not unique. 2494 SAWTDTQRL is similar to SAWTDTQRL 1.000000
+# Not unique. 2495 SAYCGWKVRK is similar to QSAYCGWKVRK 0.958215
+# Unique. 2496 SCMGGMNWR
+# Unique. 2497 SCSRAVPQV
+# Unique. 2498 SCTCPTGIDL
+# Unique. 2499 SEHGFGPSL
+# Unique. 2500 SEIISFKSL
+# Not unique. 2501 SEITKQEKDF is similar to AFQTSEKKFYI 0.800596
+# Unique. 2502 SEKLRHMLL
+# Not unique. 2503 SELFRSGLDSY is similar to FRSGLDSYV 0.847252
+# Unique. 2504 SELMKVSAM
+# Unique. 2505 SELRKTLGPIW
+# Unique. 2506 SFEAAAWYW
+# Not unique. 2507 SFEAAAWYWHF is similar to SFEAAAWYW 0.896091
+# Unique. 2508 SFHFQQKEI
+# Not unique. 2509 SFMVDTRGGSM is similar to FIMDTIGGREV 0.822133
+# Not unique. 2510 SFPRSSEPF is similar to FSFPRSSEPF 0.953057
+# Not unique. 2511 SFQSLLYLL is similar to AYSFQSLLY 0.814774
+# Not unique. 2512 SFSISSILEW is similar to ASISSFLLV 0.835306
+# Not unique. 2513 SFSLPKSVPLF is similar to FIKSLPLVVKY 0.821433
+# Unique. 2514 SFSSAPMPQI
+# Not unique. 2515 SFVALSTCHEL is similar to FVALSTCHEL 0.972284
+# Unique. 2516 SGAPSLKGK
+# Unique. 2517 SGFFLRTLY
+# Not unique. 2518 SGLYVFRNER is similar to GLYVFRNER 0.953068
+# Unique. 2519 SHCPSAMGI
+# Not unique. 2520 SHETVIIEL is similar to LTHEVIVPL 0.818943
+# Not unique. 2521 SHIVTYYPGK is similar to HIVTYYPGK 0.954586
+# Unique. 2522 SHLAVVGMF
+# Unique. 2523 SIAECETRLGK
+# Unique. 2524 SIAPEIALEL
+# Not unique. 2525 SIDAVAVTPL is similar to AIDAALTFV 0.820997
+# Unique. 2526 SIFYGLQY
+# Unique. 2527 SIGDYYTCAR
+# Unique. 2528 SIGPELPTPEV
+# Not unique. 2529 SIISLFVLL is similar to AALLQVTLLL 0.800349
+# Not unique. 2530 SIISVYYYFI is similar to IISVYYYFI 0.969894
+# Unique. 2531 SILEQMHRK
+# Not unique. 2532 SILKGYRLY is similar to MASILKGYRLY 0.928295
+# Not unique. 2533 SILMHGLVSL is similar to ILMHGLVSL 0.956397
+# Unique. 2534 SIPDPSFPL
+# Unique. 2535 SISCHVFCL
+# Unique. 2536 SISDEIAKA
+# Not unique. 2537 SISDEIAKAV is similar to ALDQEAALAK 0.818563
+# Not unique. 2538 SISFENLDTA is similar to ISFENLDTA 0.957310
+# Not unique. 2539 SISSFLLVR is similar to ASISSFLLV 0.915435
+# Not unique. 2540 SITRKNSRTPL is similar to ITRKNSRTPL 0.973979
+# Unique. 2541 SIYFCIYFL
+# Unique. 2542 SIYWAYDNGIK
+# Not unique. 2543 SKIPRPVLW is similar to KIPRPVLWV 0.876996
+# Not unique. 2544 SLAADFVESK is similar to ALFTADSAQTK 0.802213
+# Not unique. 2545 SLAATPEIRV is similar to ALAFTPVEQV 0.806762
+# Unique. 2546 SLADMLDHA
+# Unique. 2547 SLAESYFV
+# Unique. 2548 SLAHHIQLI
+# Not unique. 2549 SLAHHIQLIF is similar to KLSHQLVLL 0.804367
+# Not unique. 2550 SLANFGGWV is similar to KSLANFGGW 0.878244
+# Not unique. 2551 SLAPLSPRV is similar to ALSPSALSPA 0.802328
+# Not unique. 2552 SLDLTTSPV is similar to ALTASTVPL 0.810097
+# Not unique. 2553 SLDLTTSPV is similar to ALTASTVPL 0.810097
+# Unique. 2554 SLDQPVTALNV
+# Unique. 2555 SLDTAKVRL
+# Not unique. 2556 SLDVLMAVAIL is similar to AALLQVTLLL 0.826167
+# Unique. 2557 SLEEINCTI
+# Not unique. 2558 SLEFENKQAL is similar to KLFESKAEL 0.802662
+# Unique. 2559 SLEKMVCLV
+# Not unique. 2560 SLEKMVCLVL is similar to EEKLIVVLF 0.805441
+# Not unique. 2561 SLETPSPPL is similar to ASMPSSPPL 0.814092
+# Not unique. 2562 SLFALGNVI is similar to FALGNVISA 0.804536
+# Not unique. 2563 SLFALGNVI is similar to FALGNVISA 0.804536
+# Not unique. 2564 SLFALGNVISA is similar to ALFNLIGTFPL 0.810332
+# Not unique. 2565 SLFNIKNTQQL is similar to IISNIQDTQV 0.826207
+# Unique. 2566 SLFWQTAMV
+# Not unique. 2567 SLGAQTAAA is similar to ASNASSAAK 0.804830
+# Not unique. 2568 SLGKAQTAQV is similar to ALFTADSAQTK 0.810396
+# Unique. 2569 SLHKGSLYPR
+# Unique. 2570 SLIAAFEV
+# Not unique. 2571 SLIEEDLTEV is similar to DVIQQDELDSY 0.806118
+# Unique. 2572 SLIHYTAQI
+# Unique. 2573 SLINGNICHER
+# Not unique. 2574 SLIQRINLKK is similar to KLFAQLINNKA 0.806261
+# Not unique. 2575 SLIVGGIVGI is similar to ELAGIGILTV 0.807814
+# Not unique. 2576 SLKETEESI is similar to QATEAERSF 0.802787
+# Unique. 2577 SLKKSFNFF
+# Unique. 2578 SLKQKKKP
+# Unique. 2579 SLKSTNPSV
+# Unique. 2580 SLKTLMSHY
+# Not unique. 2581 SLLGAEGVPV is similar to GLPAEGVSEV 0.806426
+# Unique. 2582 SLLMWITQA
+# Not unique. 2583 SLLMWITQAL is similar to SLLMWITQA 0.956315
+# Not unique. 2584 SLLMWITQV is similar to SLLMWITQA 0.979332
+# Unique. 2585 SLLPNNAADL
+# Unique. 2586 SLLPPQDPHL
+# Unique. 2587 SLLQGSPHV
+# Not unique. 2588 SLLQLPLAV is similar to AALLQVTLLL 0.807989
+# Not unique. 2589 SLLQTKNYSEI is similar to KLITKYNLREL 0.805680
+# Not unique. 2590 SLLRAAFFGK is similar to LRAAFFGKCF 0.831061
+# Not unique. 2591 SLLRSLENV is similar to GRMRSLEAL 0.824340
+# Unique. 2592 SLLSHPLPEF
+# Not unique. 2593 SLLSHPLPEF is similar to SLLSHPLPEF 1.000000
+# Not unique. 2594 SLLSLPLSL is similar to FIKSLPLVVKY 0.821095
+# Not unique. 2595 SLLTNWPFV is similar to CLLTNWPSV 0.876498
+# Unique. 2596 SLLTPPSTK
+# Not unique. 2597 SLLTQLRAEV is similar to CMLARLEVK 0.801671
+# Not unique. 2598 SLLTTDDAVV is similar to ALFTADSAQTK 0.801863
+# Not unique. 2599 SLLWMNLFV is similar to LLWMNLFVGF 0.863518
+# Not unique. 2600 SLLWMNLFVGF is similar to LLWMNLFVGF 0.965766
+# Not unique. 2601 SLLYPHSLSSK is similar to LLLPHYASAK 0.813720
+# Unique. 2602 SLMDKVSNGI
+# Unique. 2603 SLMPQPLADGI
+# Unique. 2604 SLMSQPGL
+# Unique. 2605 SLMTPNTITM
+# Not unique. 2606 SLMTPNTITMI is similar to KLNTITAVV 0.809292
+# Unique. 2607 SLNDYKPPV
+# Unique. 2608 SLNICKENEV
+# Not unique. 2609 SLNQEIASL is similar to ALDQEAALAK 0.822264
+# Not unique. 2610 SLNQEMSSLL is similar to ALQSQSISL 0.816220
+# Unique. 2611 SLNRLLKV
+# Not unique. 2612 SLNSEEKLDSV is similar to AEAERLDVKAI 0.808053
+# Unique. 2613 SLPFQFAHRL
+# Not unique. 2614 SLPKSVPLF is similar to FSLPKSVPL 0.885723
+# Unique. 2615 SLPMKNFPV
+# Unique. 2616 SLPSNVLSSL
+# Unique. 2617 SLQPAPAL
+# Unique. 2618 SLQPRGSFK
+# Not unique. 2619 SLQPVQALGAV is similar to SLDQPVTALNV 0.826928
+# Not unique. 2620 SLQRLMLRKV is similar to HIIRLMLEY 0.801520
+# Not unique. 2621 SLRSHHYSL is similar to FTSKHHFSF 0.800840
+# Not unique. 2622 SLSEECYWSL is similar to LSEECYWSL 0.954764
+# Not unique. 2623 SLSEECYWSLL is similar to LSEECYWSL 0.915017
+# Not unique. 2624 SLSEQLLQL is similar to KLSEQILKK 0.883362
+# Unique. 2625 SLSKGDCQTL
+# Not unique. 2626 SLSPLQEKQGL is similar to APSLKGKQKQM 0.807508
+# Not unique. 2627 SLSRHASLLY is similar to ALWSLSRHASL 0.835758
+# Not unique. 2628 SLSSASQV is similar to ALFTADSAQTK 0.803430
+# Not unique. 2629 SLSSFRIHER is similar to HSLSSFRIHER 0.968880
+# Not unique. 2630 SLSSLTATT is similar to ALTASTVPL 0.822405
+# Not unique. 2631 SLSSLTATTQA is similar to ALFTADSAQTK 0.826185
+# Not unique. 2632 SLSSSGAPSL is similar to ALLGSSCAPPL 0.825777
+# Not unique. 2633 SLSSSGAPSL is similar to ALLGSSCAPPL 0.825777
+# Not unique. 2634 SLSSSGAPSLK is similar to ALLGSSCAPPL 0.820224
+# Not unique. 2635 SLSTIKDIISL is similar to AAQSVIKAL 0.800888
+# Not unique. 2636 SLSTSPSEL is similar to ALSPSALSPA 0.815734
+# Not unique. 2637 SLTATTQAPM is similar to ALFTADSAQTK 0.806874
+# Not unique. 2638 SLTHNAVCPI is similar to LTHNAVCPI 0.955044
+# Unique. 2639 SLTKKITLL
+# Not unique. 2640 SLTTAATGTV is similar to ALFTADSAQTK 0.812979
+# Unique. 2641 SLVAAWYSGV
+# Unique. 2642 SLVGPLPSGSV
+# Not unique. 2643 SLVLQPLLPV is similar to AALLQVTLLL 0.801972
+# Unique. 2644 SLVNIPANGV
+# Not unique. 2645 SLVSEDFLSSV is similar to EQNFVSTSDIK 0.802433
+# Unique. 2646 SLYCHTYAEKV
+# Unique. 2647 SLYDLDIEA
+# Not unique. 2648 SLYGNSDLTI is similar to AMYSNADIYLF 0.806428
+# Unique. 2649 SLYLKIHLK
+# Unique. 2650 SLYLRPVLI
+# Not unique. 2651 SLYNFLNLT is similar to AIYHTLNLFNI 0.801084
+# Not unique. 2652 SLYNFLNLTAL is similar to AIYHTLNLFNI 0.823924
+# Unique. 2653 SLYTTEMDLR
+# Unique. 2654 SMACVGFFL
+# Not unique. 2655 SMAHVSVVPVF is similar to MAHVSVVPVF 0.972732
+# Not unique. 2656 SMAKTSTSL is similar to ALTASTVPL 0.808521
+# Not unique. 2657 SMAKTSTSL is similar to ALTASTVPL 0.808521
+# Not unique. 2658 SMASEDVAV is similar to CLAVEEVSL 0.802117
+# Not unique. 2659 SMASFLVFY is similar to AMAGSLVFL 0.823080
+# Not unique. 2660 SMASFLVFY is similar to AMAGSLVFL 0.823080
+# Not unique. 2661 SMASFLVFYVI is similar to ALSYLVSFQR 0.810870
+# Unique. 2662 SMEERIAY
+# Unique. 2663 SMHIDNNTLL
+# Unique. 2664 SMIPKAIESF
+# Not unique. 2665 SMIPKAIESFL is similar to MLLAIPEAVF 0.802930
+# Not unique. 2666 SMIQIITGQL is similar to MLQIINIVL 0.810062
+# Unique. 2667 SMIQMLFYM
+# Unique. 2668 SMKGHEKIAK
+# Unique. 2669 SMLHFVTSI
+# Not unique. 2670 SMLHFVTSICA is similar to SMLHFVTSI 0.921482
+# Not unique. 2671 SMLLAIPEA is similar to IILVAVPHV 0.816237
+# Not unique. 2672 SMLLAIPEAV is similar to FLLLVAAMI 0.802004
+# Not unique. 2673 SMLRNERQFK is similar to KSMLRNERQFK 0.971227
+# Not unique. 2674 SMSCVYFLHK is similar to MSCVYFLHKY 0.915151
+# Unique. 2675 SMSPVLHTENK
+# Not unique. 2676 SMTGIVYSL is similar to ASMTGIVYSL 0.959627
+# Not unique. 2677 SMVPREAAFIL is similar to SMIPKAIESF 0.801533
+# Unique. 2678 SMYKDVTSV
+# Unique. 2679 SNISPWWNF
+# Unique. 2680 SNTSRYATAL
+# Unique. 2681 SPAFTESPV
+# Not unique. 2682 SPAFTESPV is similar to SPAFTESPV 1.000000
+# Not unique. 2683 SPALGQMPL is similar to NLSPALGQMPL 0.928410
+# Unique. 2684 SPAPPRRRRSA
+# Not unique. 2685 SPDLPGTHL is similar to HPSPDLPGTHL 0.914233
+# Not unique. 2686 SPDLPGTHLI is similar to HPSPDLPGTHL 0.887234
+# Not unique. 2687 SPEGFLVV is similar to RTPDGFLLV 0.818320
+# Unique. 2688 SPFLSQRVA
+# Not unique. 2689 SPFLSQRVAFL is similar to FLSQRVAFL 0.916087
+# Not unique. 2690 SPFTATSL is similar to HSPFTATSL 0.927630
+# Unique. 2691 SPGDAHRESL
+# Not unique. 2692 SPGGVQEAL is similar to AISPGGVQEAL 0.918836
+# Not unique. 2693 SPHLARHRHL is similar to HLARHRHLM 0.861094
+# Not unique. 2694 SPILENPFF is similar to ISPILENPFF 0.954899
+# Not unique. 2695 SPILENPFFSI is similar to ILENPFFSI 0.911745
+# Not unique. 2696 SPILWYAPESL is similar to ILWYAPESL 0.896333
+# Not unique. 2697 SPLQEKQGL is similar to AVLSPQEKREL 0.802591
+# Unique. 2698 SPLYSVKSL
+# Unique. 2699 SPMEKAISL
+# Not unique. 2700 SPNKYLPVKEI is similar to KYLPVKEIYSW 0.820512
+# Not unique. 2701 SPNQSSTSNEM is similar to ASNASSAAK 0.807354
+# Unique. 2702 SPPHPGRLPDL
+# Not unique. 2703 SPPTSPVQTPL is similar to PPPSRPISPA 0.819777
+# Not unique. 2704 SPRDEKEEM is similar to RPSDREEWEEL 0.822108
+# Not unique. 2705 SPRDEKEEMM is similar to RPSDREEWEEL 0.823137
+# Unique. 2706 SPRSWGPRL
+# Not unique. 2707 SPSKTSLTL is similar to DPESDTLTL 0.802104
+# Unique. 2708 SPSRKLAAH
+# Not unique. 2709 SPSRKLAAH is similar to SPSRKLAAH 1.000000
+# Not unique. 2710 SPSRKLAAHL is similar to SPSRKLAAH 0.959933
+# Not unique. 2711 SPVLRSHSF is similar to FPVVNSHSL 0.812705
+# Unique. 2712 SPVPQGARWRL
+# Not unique. 2713 SPVQTPLEV is similar to FVTETPLEV 0.826809
+# Not unique. 2714 SPVQTPLEVR is similar to FVTETPLEV 0.810482
+# Not unique. 2715 SPVQTPLEVRL is similar to FVTETPLEV 0.806487
+# Unique. 2716 SPVTFPAAA
+# Unique. 2717 SPWATSSHL
+# Not unique. 2718 SPWWNFGSLL is similar to PWWNFGSLL 0.929344
+# Unique. 2719 SQDDNIVGL
+# Unique. 2720 SQDQELPSV
+# Unique. 2721 SQFARVPGYV
+# Unique. 2722 SQGEPALLQPV
+# Unique. 2723 SQGSRSSHI
+# Unique. 2724 SQIAHLVQHR
+# Not unique. 2725 SQLHAVPVLLV is similar to AALLQVTLLL 0.803035
+# Not unique. 2726 SQMEELPSV is similar to SQDQELPSV 0.861564
+# Unique. 2727 SQNSSTICCV
+# Not unique. 2728 SQPPSDLSY is similar to FPDPPSSLDL 0.801770
+# Unique. 2729 SQSDYIPM
+# Unique. 2730 SQSPRSPPGK
+# Unique. 2731 SQSPSSFSM
+# Not unique. 2732 SQSPSSFSM is similar to SQSPSSFSM 1.000000
+# Not unique. 2733 SQYPSSFSTAK is similar to SQSPSSFSM 0.869645
+# Not unique. 2734 SREMEKGSPF is similar to REMEKGSPF 0.958806
+# Unique. 2735 SRHCLQPL
+# Unique. 2736 SRLLVRPTSF
+# Not unique. 2737 SRTNTAILETL is similar to FVRTNSLVFR 0.820652
+# Not unique. 2738 SRTNTAILEV is similar to FVRTNSLVFR 0.820222
+# Not unique. 2739 SRVILFSPL is similar to KVVFLFPAV 0.801384
+# Not unique. 2740 SSAAAPFPL is similar to KQASSAPFFML 0.808054
+# Unique. 2741 SSADHPGASK
+# Not unique. 2742 SSASTESPAF is similar to ALSPSALSPA 0.806020
+# Unique. 2743 SSCAPPLHR
+# Not unique. 2744 SSCAPPLHRR is similar to SSCAPPLHR 0.947287
+# Not unique. 2745 SSCMGGMNLR is similar to SCMGGMNWR 0.863531
+# Unique. 2746 SSCMGGVNR
+# Unique. 2747 SSEDDGFFLGK
+# Not unique. 2748 SSEIISFKSL is similar to SEIISFKSL 0.962817
+# Not unique. 2749 SSFHALEEK is similar to GSSFHALEEK 0.954841
+# Not unique. 2750 SSFPKPPSF is similar to FSSSFPKPPSF 0.930941
+# Not unique. 2751 SSGAPSLKGK is similar to SGAPSLKGK 0.962174
+# Unique. 2752 SSGFCNIAVK
+# Unique. 2753 SSHRHLHVVY
+# Not unique. 2754 SSHSPSLSL is similar to SQSPSSFSM 0.809920
+# Not unique. 2755 SSKKVMRTK is similar to HSSKKVMRTK 0.962051
+# Not unique. 2756 SSLDLTTSPV is similar to ALTASTVPL 0.810675
+# Not unique. 2757 SSLDLTTSPV is similar to ALTASTVPL 0.810675
+# Not unique. 2758 SSLKTLMSHY is similar to AQYTLMSQAV 0.800155
+# Not unique. 2759 SSLSSPQPQL is similar to SFSSAPMPQI 0.845053
+# Not unique. 2760 SSLSSSGAPSL is similar to ALLGSSCAPPL 0.826334
+# Unique. 2761 SSMESRLLK
+# Not unique. 2762 SSNLFSSSSF is similar to ALHSSSSYH 0.803385
+# Unique. 2763 SSRTRHYVTL
+# Not unique. 2764 SSSGAPSLK is similar to ASNASSAAK 0.806784
+# Not unique. 2765 SSSGAPSLKGK is similar to ALSPSALSPA 0.805191
+# Unique. 2766 SSSITTTK
+# Not unique. 2767 SSTCSSTLY is similar to CSESTSCLF 0.805253
+# Not unique. 2768 SSTSNRSSTW is similar to SNTSRYATAL 0.800491
+# Not unique. 2769 SSVPTGHATF is similar to ASSVPTGHATF 0.971699
+# Unique. 2770 SSWHNADDDR
+# Unique. 2771 SSYTGFANK
+# Unique. 2772 STAFDFLAV
+# Unique. 2773 STAKSTTWTY
+# Not unique. 2774 STEQCAFCK is similar to GSTEQCAFCK 0.955256
+# Not unique. 2775 STFFSSVTVAL is similar to DYSFSISSI 0.805856
+# Unique. 2776 STGDATPLPV
+# Unique. 2777 STIARPTIGNK
+# Not unique. 2778 STIEEPSPIVY is similar to GLIEPSPPSA 0.805908
+# Unique. 2779 STIMGSYLGV
+# Not unique. 2780 STKYRGYMLPL is similar to FLSTKYRGYML 0.873944
+# Not unique. 2781 STLSGEWFTF is similar to LSGEWFTFYL 0.820162
+# Not unique. 2782 STMHILTRI is similar to MTSLHLTTR 0.806470
+# Not unique. 2783 STNPSVATF is similar to DTSPVAVAL 0.805285
+# Unique. 2784 STPLPGTRVR
+# Unique. 2785 STRPVLVFER
+# Not unique. 2786 STSGALDTIQY is similar to ASADGTVKLW 0.804064
+# Not unique. 2787 STTCMTSLK is similar to RSTTCMTSLK 0.960414
+# Not unique. 2788 STVPLDTLK is similar to NTVILETLK 0.815546
+# Not unique. 2789 STVQLIMQL is similar to AALLQVTLLL 0.816065
+# Unique. 2790 SVACINLSFCL
+# Unique. 2791 SVFNICDVPL
+# Unique. 2792 SVFNTWNPM
+# Not unique. 2793 SVFNTWNPM is similar to SVFNTWNPM 1.000000
+# Not unique. 2794 SVFNTWNPMWV is similar to SVFNTWNPM 0.887540
+# Unique. 2795 SVFTLTADR
+# Not unique. 2796 SVFTLTADRY is similar to ALFTADSAQTK 0.804355
+# Not unique. 2797 SVGDFSQEF is similar to RLSDFSEQL 0.817508
+# Not unique. 2798 SVIKALEQF is similar to SMIPKAIESF 0.820938
+# Unique. 2799 SVISQLMK
+# Not unique. 2800 SVISQLMKK is similar to KLSEQILKK 0.823695
+# Not unique. 2801 SVIVRTLSGK is similar to GTYVRVTVQAR 0.807294
+# Unique. 2802 SVIVRTSSGK
+# Unique. 2803 SVKPHLCSL
+# Not unique. 2804 SVLDVGVAV is similar to GSLDVLMAV 0.804948
+# Not unique. 2805 SVLENFTIFL is similar to KLLENFYVT 0.812066
+# Not unique. 2806 SVLEYQTAVI is similar to GLAQEYTTSL 0.808160
+# Unique. 2807 SVLLPENYITK
+# Not unique. 2808 SVLLVLTLK is similar to AALLQVTLLL 0.861509
+# Unique. 2809 SVLNYFKPY
+# Not unique. 2810 SVLNYFKPYL is similar to SVLNYFKPY 0.946037
+# Not unique. 2811 SVMDSIDVKI is similar to SLMDKVSNGI 0.800479
+# Not unique. 2812 SVPTGHATF is similar to ASSVPTGHATF 0.927631
+# Unique. 2813 SVQAPVPPK
+# Unique. 2814 SVQDKCVEM
+# Not unique. 2815 SVQDKCVEM is similar to SVQDKCVEM 1.000000
+# Unique. 2816 SVQDVSLFV
+# Not unique. 2817 SVQKDVLEY is similar to GTKKDVDVLK 0.803634
+# Not unique. 2818 SVSDISEYR is similar to RLSDFSEQL 0.802786
+# Not unique. 2819 SVSDISEYRV is similar to DISEYRVEHL 0.803065
+# Not unique. 2820 SVSENVLKILV is similar to AAQSVIKAL 0.811832
+# Unique. 2821 SVTGYYGNWFV
+# Not unique. 2822 SVTSLLYPHSL is similar to CSSTLLLPHY 0.824823
+# Not unique. 2823 SVVLLLRLAK is similar to AALLQVTLLL 0.822202
+# Not unique. 2824 SVVPFLPSV is similar to AILPFTPEF 0.805012
+# Unique. 2825 SVWILCDAHCL
+# Not unique. 2826 SVYGIVVMNR is similar to KLFAIVVGRGI 0.810593
+# Unique. 2827 SVYSCVALPYF
+# Not unique. 2828 SVYYYFIAK is similar to HVYYFFSKR 0.844553
+# Not unique. 2829 SWYRIYSKI is similar to ASWYRIYSK 0.883157
+# Unique. 2830 SYAVRCAFYQL
+# Unique. 2831 SYEKIYLDF
+# Unique. 2832 SYGVRFNSF
+# Unique. 2833 SYLDSGIHF
+# Unique. 2834 SYMIMEIEL
+# Unique. 2835 SYSHKVDIFFL
+# Not unique. 2836 SYWNRLQFL is similar to KSYWNRLQF 0.872998
+# Not unique. 2837 SYWNRLQFL is similar to KSYWNRLQF 0.872998
+# Unique. 2838 SYYKISSDK
+# Unique. 2839 TAHLNCNLF
+# Not unique. 2840 TAKQAHLTTLK is similar to NLAQTDLATV 0.800014
+# Not unique. 2841 TAKSTTWTY is similar to STAKSTTWTY 0.970449
+# Not unique. 2842 TALPQSILLF is similar to AALLQVTLLL 0.823588
+# Not unique. 2843 TAMDIFVTV is similar to AVDDIFVKA 0.812961
+# Unique. 2844 TARKCTGGK
+# Not unique. 2845 TAVAGLASY is similar to AVAAGAGK 0.803624
+# Not unique. 2846 TAVSLGRLKL is similar to AVSLGRLKL 0.962097
+# Unique. 2847 TAYPNSIPLV
+# Not unique. 2848 TDFGRAKLL is similar to ITDFGRAKL 0.884714
+# Not unique. 2849 TDFGRAKLL is similar to ITDFGRAKL 0.884714
+# Not unique. 2850 TDFGRAKLL is similar to ITDFGRAKL 0.884714
+# Unique. 2851 TEATFFPPL
+# Not unique. 2852 TEATFFPPLL is similar to TEATFFPPL 0.952899
+# Unique. 2853 TEDEHFEFY
+# Unique. 2854 TEDYMIHII
+# Unique. 2855 TELERFLEY
+# Not unique. 2856 TEMSAICQVY is similar to EMSAICQVY 0.957813
+# Not unique. 2857 TFADTAALL is similar to FAIADTAYV 0.810400
+# Unique. 2858 TFITIGDTNF
+# Not unique. 2859 TFYFSNMLEF is similar to CTFYFSNMLEF 0.959386
+# Not unique. 2860 THEVIVPL is similar to LTHEVIVPL 0.936558
+# Not unique. 2861 THNLIFVFYML is similar to FISIFFFLEI 0.813326
+# Unique. 2862 TIDVGSGNNY
+# Unique. 2863 TIQKFLSLK
+# Unique. 2864 TISKLYIPK
+# Not unique. 2865 TITAPSLSGK is similar to ALSPSALSPA 0.825052
+# Not unique. 2866 TITMQLMNR is similar to ITMQLMNREK 0.874690
+# Not unique. 2867 TITMQLMNREK is similar to ITMQLMNREK 0.973292
+# Unique. 2868 TIVEHKYPSV
+# Not unique. 2869 TIYIFEYDK is similar to FTIYIFEY 0.808796
+# Unique. 2870 TIYVFEIRAR
+# Unique. 2871 TLAEDLNLL
+# Not unique. 2872 TLALPVINNL is similar to FIKSLPLVVKY 0.801200
+# Not unique. 2873 TLAYFLPRPPL is similar to AYFLPRPPL 0.921928
+# Not unique. 2874 TLAYSFQSL is similar to AYSFQSLLY 0.810202
+# Not unique. 2875 TLAYSFQSL is similar to AYSFQSLLY 0.810202
+# Not unique. 2876 TLAYSFQSL is similar to AYSFQSLLY 0.810202
+# Not unique. 2877 TLAYSFQSLL is similar to ALSYLVSFQR 0.810825
+# Not unique. 2878 TLCIVCTVDL is similar to CIVCTVDLEF 0.860817
+# Unique. 2879 TLDECGLSYL
+# Unique. 2880 TLDQSTMHI
+# Unique. 2881 TLDWLLQTPK
+# Not unique. 2882 TLDWSKNAV is similar to ATLDWSKNAV 0.949397
+# Not unique. 2883 TLFHTFYEL is similar to LFHTFYELL 0.892919
+# Not unique. 2884 TLFHTFYELL is similar to LFHTFYELL 0.954161
+# Unique. 2885 TLFSALWAL
+# Unique. 2886 TLFTMVGTV
+# Not unique. 2887 TLFWAPPER is similar to LTLFWAPPER 0.950757
+# Not unique. 2888 TLHGFMMYL is similar to LLHGFSFYL 0.803863
+# Unique. 2889 TLHHLLMSQV
+# Unique. 2890 TLIAIFPYARL
+# Unique. 2891 TLIGLPWSFL
+# Unique. 2892 TLIQCSHFT
+# Not unique. 2893 TLLLPHYASAK is similar to LLLPHYASAK 0.967781
+# Not unique. 2894 TLLQACRSV is similar to FMLLQACRSV 0.931299
+# Unique. 2895 TLLSLPVHFNL
+# Not unique. 2896 TLLSQVNKV is similar to KLFAQLINNKA 0.801660
+# Not unique. 2897 TLMTDTQFVL is similar to LMTDTQFVL 0.958801
+# Not unique. 2898 TLMTDTQFVL is similar to LMTDTQFVL 0.958801
+# Not unique. 2899 TLMTDTQFVL is similar to LMTDTQFVL 0.958801
+# Not unique. 2900 TLNLRLSAV is similar to ILLRRLLSSA 0.809826
+# Unique. 2901 TLPEEFHEF
+# Unique. 2902 TLPGTLLLDEV
+# Not unique. 2903 TLPQSVSKQSV is similar to ALQSQSISL 0.827491
+# Not unique. 2904 TLPTVKLAEV is similar to FIKSLPLVVKY 0.801101
+# Unique. 2905 TLQELSHAL
+# Unique. 2906 TLQRNTFLGL
+# Not unique. 2907 TLSDNSREAKV is similar to ALNSSEEYNL 0.809285
+# Not unique. 2908 TLSGEWFTFY is similar to LSGEWFTFYL 0.913046
+# Not unique. 2909 TLSGEWFTFYL is similar to LSGEWFTFYL 0.965422
+# Not unique. 2910 TLSGEWFTFYL is similar to LSGEWFTFYL 0.965422
+# Not unique. 2911 TLSGFFLRTL is similar to LTLSGFFLR 0.864312
+# Not unique. 2912 TLSGFFLRTLY is similar to LTLSGFFLR 0.851017
+# Not unique. 2913 TLSGFFLRTLY is similar to LTLSGFFLR 0.851017
+# Unique. 2914 TLSQQLPREPV
+# Not unique. 2915 TLVPDLLSPK is similar to LLSPDLIRNEV 0.805860
+# Not unique. 2916 TLVRCAKAK is similar to GTLVRCAKAK 0.954644
+# Not unique. 2917 TLVYPATEK is similar to KTTLVYPATEK 0.922403
+# Unique. 2918 TLWCSPIKV
+# Unique. 2919 TLWEGGLFKL
+# Not unique. 2920 TLYATVGKEAV is similar to ILDTAGKEEY 0.809850
+# Not unique. 2921 TLYLGTSGI is similar to LFYLGSSTAF 0.833303
+# Not unique. 2922 TLYLPHYASAK is similar to LLLPHYASAK 0.927550
+# Unique. 2923 TLYMDVML
+# Not unique. 2924 TLYSLTLLY is similar to AALLQVTLLL 0.819529
+# Unique. 2925 TLYSPRGEK
+# Not unique. 2926 TMAAISNTV is similar to FLMASISSF 0.820361
+# Not unique. 2927 TMDKVVQIL is similar to ILDKVLVHL 0.819277
+# Unique. 2928 TMFGLPFAT
+# Unique. 2929 TMIEEYDSG
+# Not unique. 2930 TMIEEYDSGL is similar to TMIEEYDSG 0.953716
+# Unique. 2931 TMLTKTWHSSA
+# Not unique. 2932 TMQLMNREK is similar to ITMQLMNREK 0.961157
+# Unique. 2933 TMSFSHLFYL
+# Not unique. 2934 TMSLYDLDIEA is similar to SLYDLDIEA 0.931025
+# Not unique. 2935 TMYIFPVH is similar to HMYIFPVH 0.935497
+# Unique. 2936 TPEPAELSL
+# Unique. 2937 TPITMTLPF
+# Not unique. 2938 TPKTEPRRRK is similar to SPAPPRRRRSA 0.803348
+# Not unique. 2939 TPLNRAIESF is similar to SMIPKAIESF 0.814510
+# Not unique. 2940 TPLPAPQQY is similar to APTPLPAPQQY 0.943008
+# Not unique. 2941 TPLPAPQQYIV is similar to APTPLPAPQQY 0.889454
+# Not unique. 2942 TPLPGTRVRA is similar to STPLPGTRVR 0.921395
+# Not unique. 2943 TPLTKDVTL is similar to SLTKKITLL 0.807281
+# Unique. 2944 TPLVIKIDKPY
+# Not unique. 2945 TPNTLPNYQSF is similar to NTLPNYQSF 0.918123
+# Not unique. 2946 TPSAAVKLI is similar to AAQSVIKAL 0.806993
+# Not unique. 2947 TPSLPTLPT is similar to RSRTPSLPTL 0.827622
+# Not unique. 2948 TPSLPTLPTR is similar to LPTLPTREPK 0.831624
+# Unique. 2949 TPTDVTARHL
+# Unique. 2950 TPTVPSSSF
+# Not unique. 2951 TPYTRDQIMTI is similar to PYTRDQIMTI 0.960920
+# Unique. 2952 TQFLYIWFK
+# Unique. 2953 TQFNAWWHIL
+# Unique. 2954 TQFWCAVAL
+# Not unique. 2955 TQGSAAELI is similar to KTQGAVAQM 0.826823
+# Not unique. 2956 TQLEKEAL is similar to KQLEDEEV 0.809636
+# Not unique. 2957 TQLFYALGIV is similar to ARLFLGLAI 0.803231
+# Not unique. 2958 TQLFYALGIVF is similar to ARLFLGLAI 0.810946
+# Not unique. 2959 TQLLCCQPGL is similar to QLLCCQPGL 0.952199
+# Not unique. 2960 TQLMPFGSLL is similar to IMQLMPFGSL 0.900747
+# Unique. 2961 TRARNEYLLSL
+# Not unique. 2962 TRKNKKLAL is similar to APKKKSIKL 0.811461
+# Not unique. 2963 TRKNSRTPL is similar to ITRKNSRTPL 0.962319
+# Unique. 2964 TRNIIKYNL
+# Not unique. 2965 TSDVNSLVGK is similar to FSSDVLNLV 0.803214
+# Unique. 2966 TSDYLSQSY
+# Not unique. 2967 TSIANLPKL is similar to NTATNLPSV 0.811919
+# Not unique. 2968 TSIVVSQTL is similar to GTYVRVTVQAR 0.803568
+# Unique. 2969 TSLSGIAHK
+# Unique. 2970 TSNHESQVTF
+# Not unique. 2971 TSSGLYVFR is similar to EKTSSGLYVFR 0.924001
+# Not unique. 2972 TSSLIIYK is similar to ASSYIILAM 0.814045
+# Unique. 2973 TSYMPCSAYQK
+# Unique. 2974 TTEGIWKDVY
+# Not unique. 2975 TTETPSASLY is similar to QTKPASLLY 0.812621
+# Not unique. 2976 TTIESPSRK is similar to KVMTDPSRK 0.805267
+# Not unique. 2977 TTLFHTFYEL is similar to LFHTFYELL 0.866665
+# Not unique. 2978 TTLFHTFYEL is similar to LFHTFYELL 0.866665
+# Not unique. 2979 TTLVYPATEK is similar to KTTLVYPATEK 0.969862
+# Unique. 2980 TTSGTSQY
+# Unique. 2981 TTWQRPIMESV
+# Not unique. 2982 TTYSPIGEK is similar to TLYSPRGEK 0.825651
+# Unique. 2983 TVIEYWSQK
+# Unique. 2984 TVITEEFEV
+# Unique. 2985 TVNMHRLHVK
+# Unique. 2986 TVPSKFTFEV
+# Not unique. 2987 TVQTGMDTSK is similar to GTVQTGMDTSK 0.969203
+# Unique. 2988 TVSPFLSQR
+# Unique. 2989 TVTECLNTFCK
+# Unique. 2990 TWSTPHFYF
+# Not unique. 2991 TYGESFHII is similar to QPYGSSFHAL 0.801928
+# Unique. 2992 TYIIKSVGF
+# Unique. 2993 TYLPSAWNF
+# Not unique. 2994 TYLPSAWNFF is similar to TYLPSAWNF 0.939513
+# Not unique. 2995 TYQVSYGFR is similar to KTYQVSYGFR 0.955621
+# Unique. 2996 TYSGKFLIL
+# Unique. 2997 TYYPGKKEPF
+# Not unique. 2998 VAADLIMTLTF is similar to AALLQVTLLL 0.839922
+# Unique. 2999 VADINDHAL
+# Unique. 3000 VAFCDMLLNV
+# Not unique. 3001 VAHFQLQMLK is similar to AHFQLQML 0.897742
+# Unique. 3002 VAKGFISRM
+# Not unique. 3003 VAKNCGIAI is similar to AKNCGIAIPV 0.859313
+# Unique. 3004 VALPYFHSF
+# Not unique. 3005 VALSTCHEL is similar to FVALSTCHEL 0.957459
+# Not unique. 3006 VAQADKYSTK is similar to LMAVRSKYSEV 0.802706
+# Unique. 3007 VARGGSMGV
+# Unique. 3008 VARLSQRFPK
+# Not unique. 3009 VARLSSKSV is similar to ARRASKARL 0.815031
+# Not unique. 3010 VAVMKFKNPL is similar to AVMKFKNPL 0.961243
+# Unique. 3011 VAWHSEVGLPL
+# Not unique. 3012 VCPIASSPCL is similar to CPIASSPCL 0.954133
+# Unique. 3013 VDNPLMCRL
+# Not unique. 3014 VEIEQLTY is similar to DEQIESMTY 0.807997
+# Unique. 3015 VENQKHSL
+# Unique. 3016 VERASAIAW
+# Not unique. 3017 VERASAIAW is similar to VERASAIAW 1.000000
+# Not unique. 3018 VETDAAQPAV is similar to ALDQEAALAK 0.805062
+# Unique. 3019 VEWLGRCIL
+# Not unique. 3020 VEYPYTSF is similar to DTVEYPYTSF 0.890098
+# Not unique. 3021 VFKDILYEL is similar to RFKDIFQEM 0.815794
+# Unique. 3022 VFKDLSVTL
+# Not unique. 3023 VFLDCLELY is similar to APVFLDCLEL 0.841379
+# Not unique. 3024 VFLGASMVYLI is similar to AMAGSLVFL 0.825369
+# Unique. 3025 VFLRTLEKGDW
+# Not unique. 3026 VFTQSFITVSI is similar to EQNFVSTSDIK 0.816857
+# Unique. 3027 VFYRAWHQV
+# Not unique. 3028 VFYTILTPV is similar to AVFYTILTPV 0.961111
+# Not unique. 3029 VGADGVGKSAL is similar to AQGTGVLGSK 0.809216
+# Unique. 3030 VHDYFSVI
+# Not unique. 3031 VIADPSRK is similar to KVMTDPSRK 0.844382
+# Not unique. 3032 VIAMVHYLMIL is similar to AMVHYLMIL 0.935503
+# Unique. 3033 VIDAAFNGGV
+# Unique. 3034 VIDSVNAK
+# Unique. 3035 VIFLACFAPY
+# Unique. 3036 VIHNFLFSLK
+# Not unique. 3037 VIKKVAKSPK is similar to AIKESPKANK 0.812986
+# Unique. 3038 VIMLNGTKK
+# Not unique. 3039 VIPLSIISV is similar to FIKSLPLVVKY 0.800570
+# Not unique. 3040 VIQASMFDQK is similar to IQASMFDQK 0.960391
+# Unique. 3041 VIRRDFSMADK
+# Unique. 3042 VISEGSLK
+# Unique. 3043 VISKKDFHK
+# Not unique. 3044 VISQLMKK is similar to KLSEQILKK 0.814731
+# Not unique. 3045 VIVRTLSGK is similar to SVIVRTSSGK 0.897048
+# Not unique. 3046 VKITDFGRAK is similar to HVKITDFGR 0.847966
+# Not unique. 3047 VLAKKLKFV is similar to FLAKILKPL 0.813843
+# Not unique. 3048 VLAMAIYKQ is similar to ALAVIELYNA 0.801423
+# Unique. 3049 VLANDPDAHRL
+# Not unique. 3050 VLAVKRTVF is similar to LEAVARNTF 0.813664
+# Not unique. 3051 VLDDSETTI is similar to HIDDSDSITV 0.846153
+# Unique. 3052 VLDGFIPGT
+# Unique. 3053 VLDHKLEWV
+# Unique. 3054 VLDKAGSFK
+# Unique. 3055 VLEFEQMNLY
+# Unique. 3056 VLENFTIFLV
+# Not unique. 3057 VLESAPINTPL is similar to ESAPINTPL 0.928870
+# Unique. 3058 VLFEDAVAY
+# Not unique. 3059 VLFFRSASSI is similar to LFYLGSSTAF 0.815586
+# Unique. 3060 VLFHRAFLV
+# Unique. 3061 VLFTCVPAA
+# Not unique. 3062 VLFTCVPAAR is similar to VLFTCVPAA 0.952569
+# Not unique. 3063 VLGIAFFSA is similar to LPALAFTFFSL 0.814185
+# Not unique. 3064 VLHFKNSYHNL is similar to LLNYFQNSHSV 0.814529
+# Unique. 3065 VLHPQTEGM
+# Not unique. 3066 VLICLRLLMRY is similar to HIIRLMLEY 0.815136
+# Not unique. 3067 VLIDAVVDGQV is similar to FILDAVQRV 0.803633
+# Not unique. 3068 VLIESLEVL is similar to ILAELELSRRL 0.807633
+# Not unique. 3069 VLKEQIEEL is similar to KLSEQILKK 0.810443
+# Unique. 3070 VLKNHKLLSK
+# Not unique. 3071 VLLFVAVWL is similar to FLLLVAAMI 0.831588
+# Not unique. 3072 VLLGVKLFGV is similar to FFLGLILFEL 0.802286
+# Not unique. 3073 VLLPKATSLPI is similar to ALSPSALSPA 0.821162
+# Not unique. 3074 VLLRALPVL is similar to ILLRRLLSSA 0.804118
+# Unique. 3075 VLLRFQPRV
+# Unique. 3076 VLLSICYLL
+# Unique. 3077 VLLTSWNHSL
+# Not unique. 3078 VLLTVTESVLK is similar to AALLQVTLLL 0.809452
+# Unique. 3079 VLLYAEIYA
+# Not unique. 3080 VLMAVAILK is similar to AALLQVTLLL 0.811632
+# Not unique. 3081 VLMAVAILKEV is similar to AALLQVTLLL 0.821810
+# Not unique. 3082 VLMGAVALGA is similar to KLFAIVVGRGI 0.807018
+# Not unique. 3083 VLMGAVALGAL is similar to KLFAIVVGRGI 0.811118
+# Unique. 3084 VLNIVRFLK
+# Unique. 3085 VLNPFIYML
+# Not unique. 3086 VLNYFKPYL is similar to SVLNYFKPY 0.882017
+# Unique. 3087 VLPPCIISGGI
+# Unique. 3088 VLQAGMLRI
+# Unique. 3089 VLQDFIIL
+# Not unique. 3090 VLQEATICV is similar to LLVEKTTCV 0.818111
+# Not unique. 3091 VLSAQSHCSTY is similar to ILDSASHHCPL 0.808421
+# Unique. 3092 VLSNDVCAQV
+# Unique. 3093 VLSQVDLPCGI
+# Not unique. 3094 VLSSLVLVPL is similar to AALLQVTLLL 0.831641
+# Not unique. 3095 VLSVATFVA is similar to AIDAALTFV 0.802125
+# Unique. 3096 VLSWLLKYKI
+# Not unique. 3097 VLTADGTSL is similar to ALFTADSAQTK 0.810809
+# Not unique. 3098 VLTAEENLSI is similar to ALNSSEEYNL 0.808621
+# Not unique. 3099 VLVFVGLFAF is similar to FFLGLILFEL 0.802555
+# Unique. 3100 VLVSRMPFV
+# Not unique. 3101 VLVTFEDVAV is similar to VLFEDAVAY 0.806715
+# Unique. 3102 VLVTGCMFV
+# Unique. 3103 VLWDYVYQL
+# Not unique. 3104 VLWDYVYQLL is similar to VLWDYVYQL 0.955591
+# Unique. 3105 VLWHVTYWV
+# Not unique. 3106 VLWVNTDQV is similar to RPVLWVNTDQV 0.903795
+# Not unique. 3107 VLYCVLIESL is similar to KPFCVLISL 0.803344
+# Unique. 3108 VLYLHITWV
+# Not unique. 3109 VLYSAQDQA is similar to ALFTADSAQTK 0.806532
+# Unique. 3110 VLYVWSFFL
+# Not unique. 3111 VMALTASTVPL is similar to ALFTADSAQTK 0.813108
+# Unique. 3112 VMASVDNPL
+# Unique. 3113 VMDDFAAFVEK
+# Not unique. 3114 VMDISYLNL is similar to RVMDISYLNL 0.954245
+# Not unique. 3115 VMDSIDVKI is similar to VIDSVNAK 0.801655
+# Not unique. 3116 VMIIVSSLAV is similar to AIVVILMSMV 0.851627
+# Not unique. 3117 VMKFKNPLV is similar to AVMKFKNPL 0.886093
+# Unique. 3118 VMLCGHDAV
+# Not unique. 3119 VMLEEILKTL is similar to ILAELELSRRL 0.817383
+# Unique. 3120 VMLEGEQEA
+# Unique. 3121 VMLENFRNLLL
+# Not unique. 3122 VMLQIINIV is similar to MLQIINIVL 0.922453
+# Not unique. 3123 VMLQIINIVL is similar to AALLQVTLLL 0.808659
+# Unique. 3124 VMLRVQPDWK
+# Not unique. 3125 VMLRVQPEGK is similar to VMLRVQPDWK 0.883248
+# Unique. 3126 VMNNLLPTSV
+# Not unique. 3127 VMSSLCTIA is similar to AVSSCILAK 0.801345
+# Unique. 3128 VMYNWKMVI
+# Not unique. 3129 VPDQKSKQL is similar to APSLKGKQKQM 0.813254
+# Not unique. 3130 VPGASSATAVL is similar to ALFTADSAQTK 0.801979
+# Unique. 3131 VPKAYTWGAV
+# Unique. 3132 VPKEHPAPPA
+# Unique. 3133 VPKKTPSL
+# Unique. 3134 VPRFVFKLY
+# Not unique. 3135 VPRFVFKLYY is similar to VPRFVFKLY 0.954000
+# Not unique. 3136 VPRFVFKLYYF is similar to FVFKLYYFEI 0.850462
+# Unique. 3137 VPRVSDTI
+# Not unique. 3138 VPSAWTDTQRL is similar to SAWTDTQRL 0.912038
+# Not unique. 3139 VPSRSDGDSSF is similar to ILTSSDGGEPV 0.806397
+# Not unique. 3140 VQDKCVEML is similar to SVQDKCVEM 0.885336
+# Unique. 3141 VQIISCQY
+# Not unique. 3142 VQIISCQY is similar to VQIISCQY 1.000000
+# Not unique. 3143 VQKVASKIPF is similar to LQTIKDIASPI 0.809445
+# Not unique. 3144 VQLEEEYEV is similar to ALLQEEAHV 0.813445
+# Not unique. 3145 VQLIMQLMPF is similar to QLIMQLMPF 0.967670
+# Not unique. 3146 VQPHYITVSV is similar to ALCVQPHYITV 0.808595
+# Unique. 3147 VQVGGVTYI
+# Not unique. 3148 VQVRTLVYTV is similar to GTYVRVTVQAR 0.804393
+# Not unique. 3149 VQVSGVTFML is similar to ASMTGIVYSL 0.818075
+# Unique. 3150 VQYLGMFPV
+# Unique. 3151 VRRASVCLITL
+# Not unique. 3152 VRTLLSQVNK is similar to AQYTLMSQAV 0.818946
+# Not unique. 3153 VSDEGGSPI is similar to ILTSSDGGEPV 0.818322
+# Unique. 3154 VSGHRSTRK
+# Not unique. 3155 VSKIIGGNPK is similar to GVSKIIGGNPK 0.970715
+# Unique. 3156 VSKILPSTW
+# Not unique. 3157 VSKPGLDYEL is similar to AVSKPGLDYEL 0.967285
+# Unique. 3158 VSQPVAPSY
+# Not unique. 3159 VSVGDFSQEF is similar to RLSDFSEQL 0.805454
+# Not unique. 3160 VTECLNTFCK is similar to TVTECLNTFCK 0.968162
+# Unique. 3161 VTEKLQPTY
+# Not unique. 3162 VTFAVSFYVV is similar to KIISFYTALL 0.801562
+# Unique. 3163 VTFGSLPPA
+# Not unique. 3164 VTFSCHGADK is similar to FVTFSCHGADK 0.962354
+# Unique. 3165 VTHYVRPQVRK
+# Unique. 3166 VTIGPRLLL
+# Not unique. 3167 VTKGEHMTEK is similar to LVTKGEHMTEK 0.969298
+# Not unique. 3168 VTLDVILER is similar to GSLDVLMAV 0.823185
+# Unique. 3169 VTRRHASHQTF
+# Not unique. 3170 VTYSGKFLI is similar to TYSGKFLIL 0.891403
+# Not unique. 3171 VTYSGKFLI is similar to TYSGKFLIL 0.891403
+# Unique. 3172 VVGACGVGK
+# Unique. 3173 VVHKRIHLGEK
+# Not unique. 3174 VVLLLRLAK is similar to ILLLNLLPYK 0.819650
+# Not unique. 3175 VVLSVPAKV is similar to IILVAVPHV 0.805832
+# Unique. 3176 VVMSWAPPV
+# Unique. 3177 VVNMNEIVRTK
+# Not unique. 3178 VVQSVTSVAK is similar to AAQSVIKAL 0.829727
+# Not unique. 3179 VVRETLQRNTF is similar to LEAVARNTF 0.800969
+# Unique. 3180 VVSHPHLVYW
+# Not unique. 3181 VVTAVLILV is similar to AALLQVTLLL 0.824563
+# Not unique. 3182 VVTEVFLLA is similar to CVVTEVFLL 0.903877
+# Not unique. 3183 VVVGACGVGK is similar to VVGACGVGK 0.963679
+# Not unique. 3184 VVVGADGVGK is similar to AVAAGAGK 0.802890
+# Not unique. 3185 VVVGAVGVGK is similar to AVAAGAGK 0.807184
+# Unique. 3186 VVVPCEPPEV
+# Not unique. 3187 VWILCDAHCL is similar to SVWILCDAHCL 0.961645
+# Not unique. 3188 VYALIAGATL is similar to FLLLVAAMI 0.802656
+# Not unique. 3189 VYALIAGATL is similar to FLLLVAAMI 0.802656
+# Unique. 3190 VYFFLPDHL
+# Not unique. 3191 VYHEIHIGYL is similar to AVYHEIHIGYL 0.965623
+# Not unique. 3192 VYLACERLLYL is similar to LACERLLYL 0.914658
+# Not unique. 3193 VYNLGNREAEL is similar to NLGNREAEL 0.918201
+# Unique. 3194 VYPPRGFSP
+# Not unique. 3195 VYPPRGFSPY is similar to PPRGFSPYL 0.827316
+# Not unique. 3196 VYPPRGFSPYL is similar to PPRGFSPYL 0.898191
+# Unique. 3197 VYQYTFPDF
+# Not unique. 3198 VYQYTFPDFL is similar to VYQYTFPDF 0.948459
+# Unique. 3199 VYRPLHYPLL
+# Not unique. 3200 VYSCVALPYF is similar to SVYSCVALPYF 0.968893
+# Unique. 3201 VYVAKLHDI
+# Unique. 3202 WATSSSRVW
+# Unique. 3203 WEDSQLVSHL
+# Not unique. 3204 WFQGERIAY is similar to DVWFQGERIAY 0.896169
+# Not unique. 3205 WILCDAHCL is similar to SVWILCDAHCL 0.908432
+# Not unique. 3206 WIPSSSLAK is similar to NLWIPSSSLAK 0.910537
+# Not unique. 3207 WLCRRSRAASV is similar to ARRASKARL 0.811179
+# Unique. 3208 WLEWWHVQPTL
+# Unique. 3209 WLFGMDLNKI
+# Not unique. 3210 WLFWGLTYI is similar to AFWLFWGLTYI 0.909532
+# Unique. 3211 WLIDMKSLV
+# Not unique. 3212 WLIDMKSLVM is similar to WLIDMKSLV 0.960702
+# Not unique. 3213 WLIEGDLQV is similar to LLQDGDIQV 0.803809
+# Unique. 3214 WLIEGDLQVL
+# Not unique. 3215 WLINIENSRSL is similar to ILNASNVKTF 0.801128
+# Unique. 3216 WLIRETQPITK
+# Not unique. 3217 WLLLCIPGL is similar to LLLCIPGL 0.924204
+# Not unique. 3218 WLLMLLIGFL is similar to FFLGLILFEL 0.816410
+# Unique. 3219 WLNGFSVAML
+# Not unique. 3220 WLPNHVIYL is similar to FCWLPNHVIY 0.802947
+# Unique. 3221 WLRDHRMTGL
+# Not unique. 3222 WLRGFSVAML is similar to WLNGFSVAML 0.931440
+# Unique. 3223 WLSDASERHPV
+# Unique. 3224 WLSQGQFLL
+# Unique. 3225 WLSVLECVEL
+# Unique. 3226 WLTGFLLA
+# Unique. 3227 WLVDLLPST
+# Unique. 3228 WLVGGIVAA
+# Unique. 3229 WLWEPLRVV
+# Not unique. 3230 WMLAEKTVQV is similar to LLVEKTTCV 0.809604
+# Not unique. 3231 WMNLFVGFRF is similar to LLWMNLFVGF 0.841420
+# Unique. 3232 WNDINCCY
+# Not unique. 3233 WPTRVCADV is similar to NWPTRVCADV 0.933034
+# Not unique. 3234 WPTRVCADVTI is similar to NWPTRVCADV 0.883533
+# Unique. 3235 WPVLLLNV
+# Unique. 3236 WQADIVAAL
+# Unique. 3237 WQLEFLQPL
+# Not unique. 3238 WQRPIMESV is similar to TTWQRPIMESV 0.894102
+# Not unique. 3239 WRFQQLDTAI is similar to RFQQLDTAI 0.938603
+# Not unique. 3240 WRNILLLSL is similar to KRRLLILGR 0.804362
+# Not unique. 3241 WRNILLLSLH is similar to KRRLLILGR 0.804197
+# Unique. 3242 WRNSFLLRY
+# Not unique. 3243 WSIEVICYI is similar to DMWSIEVICY 0.855326
+# Not unique. 3244 WSIEVICYILV is similar to DMWSIEVICY 0.833071
+# Not unique. 3245 WTGATITVTIK is similar to ALTASTVPL 0.805986
+# Unique. 3246 WTHDNIMSK
+# Unique. 3247 WTRDSCDFSY
+# Unique. 3248 WVAPDSHIF
+# Unique. 3249 WVLALFDEV
+# Unique. 3250 WVMPVIPAL
+# Unique. 3251 WVNGQSLLV
+# Not unique. 3252 WVVSHPHLV is similar to VVSHPHLVYW 0.816073
+# Unique. 3253 WVYECTVFL
+# Unique. 3254 WVYSSHRHL
+# Unique. 3255 WYLKVINLF
+# Unique. 3256 WYLRINKRGKV
+# Unique. 3257 WYTHNLIF
+# Not unique. 3258 WYTHNLIFVF is similar to WYTHNLIF 0.896537
+# Unique. 3259 YADPFALV
+# Not unique. 3260 YALVRLGIQTF is similar to AALLQVTLLL 0.801139
+# Not unique. 3261 YASSYIILA is similar to ASISSFLLV 0.811497
+# Not unique. 3262 YASSYIILAM is similar to ASISSFLLV 0.811377
+# Not unique. 3263 YASSYIILAM is similar to ASISSFLLV 0.811377
+# Unique. 3264 YATALYRQGEL
+# Not unique. 3265 YDEAMSVSLKK is similar to AAQSVIKAL 0.801529
+# Unique. 3266 YDYVSALHPV
+# Unique. 3267 YEGQVISNGF
+# Unique. 3268 YEHEDVKEA
+# Not unique. 3269 YFATLITELF is similar to AALLQVTLLL 0.806467
+# Not unique. 3270 YFFHETRQYKF is similar to FFHETRQYKF 0.962140
+# Unique. 3271 YFFWGLWAL
+# Not unique. 3272 YFSNMLEF is similar to CTFYFSNMLEF 0.843211
+# Unique. 3273 YHGDPMPCL
+# Not unique. 3274 YHMYIFPV is similar to HMYIFPVH 0.805000
+# Unique. 3275 YHSIEWAI
+# Unique. 3276 YHYSEVDTSM
+# Not unique. 3277 YIAKYIVPYM is similar to IAKYIVPYMK 0.925345
+# Unique. 3278 YIAQFKGAW
+# Not unique. 3279 YIAQFKGAWIL is similar to AQFKGAWIL 0.920239
+# Not unique. 3280 YIAQFKGAWIL is similar to AQFKGAWIL 0.920239
+# Not unique. 3281 YIASFFIETEF is similar to FISIFFFLEI 0.810855
+# Not unique. 3282 YIFQLSSLNL is similar to IFQLSSLNL 0.956195
+# Unique. 3283 YIHGRGWAL
+# Not unique. 3284 YIIFFVLVIF is similar to FISIFFFLEI 0.830863
+# Unique. 3285 YILKYSVFL
+# Unique. 3286 YIMMKTHLL
+# Not unique. 3287 YIPSNDLRAF is similar to NYIPSNDLRAF 0.959653
+# Not unique. 3288 YIPSNDLRAFV is similar to NYIPSNDLRAF 0.934803
+# Not unique. 3289 YIPTVLDQV is similar to FLSTVMDRV 0.815363
+# Not unique. 3290 YIRARIFLI is similar to KEIRAIFLF 0.803270
+# Unique. 3291 YISGWNPTL
+# Unique. 3292 YISKCWDYA
+# Not unique. 3293 YIVAASRLFFV is similar to AIDAALTFV 0.805800
+# Not unique. 3294 YKLVVVGAV is similar to FLLLVAAMI 0.803044
+# Not unique. 3295 YLACERLLYL is similar to LACERLLYL 0.948675
+# Not unique. 3296 YLAINEILGQL is similar to FIAKNLIQSA 0.812743
+# Unique. 3297 YLAMISEGYL
+# Unique. 3298 YLAPQESYGA
+# Unique. 3299 YLCAGAVYF
+# Unique. 3300 YLCLQNNFI
+# Unique. 3301 YLCTASNFL
+# Unique. 3302 YLDDRNTFRHI
+# Unique. 3303 YLDELIRNT
+# Not unique. 3304 YLDLKGPKV is similar to LLDEKGPEV 0.822134
+# Unique. 3305 YLDTDVILM
+# Not unique. 3306 YLDYQIQATV is similar to LYLDYQIQATV 0.965976
+# Not unique. 3307 YLDYQIQATVM is similar to LYLDYQIQATV 0.944418
+# Unique. 3308 YLEPGPVTV
+# Unique. 3309 YLFFIQGYK
+# Unique. 3310 YLFRGRINPEV
+# Not unique. 3311 YLGSSTAFDFL is similar to EKTSSGLYVFR 0.800914
+# Unique. 3312 YLHKHYNNL
+# Not unique. 3313 YLIIALGIHL is similar to KLFAIVVGRGI 0.812295
+# Not unique. 3314 YLIIDSNSTI is similar to FLLINSSV 0.819662
+# Unique. 3315 YLIPCYFHA
+# Unique. 3316 YLIRREKV
+# Not unique. 3317 YLKLMVEL is similar to HIIRLMLEY 0.805825
+# Not unique. 3318 YLLAIFSGL is similar to LLIGFLSGSL 0.802218
+# Not unique. 3319 YLLDAQIREI is similar to ALSDQVRDV 0.803146
+# Not unique. 3320 YLLEVNLQNGI is similar to KLFAQLINNKA 0.805525
+# Not unique. 3321 YLLFMIGYT is similar to YLFFIQGYK 0.805564
+# Unique. 3322 YLLFQNTDL
+# Unique. 3323 YLLNIPGPIYI
+# Unique. 3324 YLLSKSFRK
+# Unique. 3325 YLLTDCNPA
+# Not unique. 3326 YLMILSANW is similar to FLLLVAAMI 0.801056
+# Not unique. 3327 YLMILSANWAY is similar to LMILSANWAY 0.971798
+# Not unique. 3328 YLMILSANWAY is similar to LMILSANWAY 0.971798
+# Not unique. 3329 YLNELVVFV is similar to ALNVVVVM 0.806015
+# Unique. 3330 YLNWIVRNL
+# Unique. 3331 YLPGEPEGI
+# Unique. 3332 YLQAHQRVHTV
+# Unique. 3333 YLQDSMATT
+# Not unique. 3334 YLQTDVFLV is similar to YLDTDVILM 0.851533
+# Not unique. 3335 YLRKRQVLIFL is similar to AMQKRRLHLSV 0.809067
+# Unique. 3336 YLRTAKFLEM
+# Not unique. 3337 YLSELLQTV is similar to FLNDLLSVL 0.805046
+# Unique. 3338 YLSKFSGK
+# Unique. 3339 YLSNIIPAL
+# Not unique. 3340 YLSNTTVTSL is similar to ALTASTVPL 0.813684
+# Unique. 3341 YLTDKDFEF
+# Not unique. 3342 YLTDKDFEFA is similar to YLTDKDFEF 0.953443
+# Unique. 3343 YLTPQSNHLSV
+# Not unique. 3344 YLVDSVAKM is similar to FILDAVQRV 0.819439
+# Not unique. 3345 YLVDSVAKM is similar to FILDAVQRV 0.819439
+# Not unique. 3346 YLVKNTFTK is similar to LLVRNSFEV 0.815377
+# Unique. 3347 YLVYQMLKV
+# Unique. 3348 YLWKAENTL
+# Unique. 3349 YLWPPVQLA
+# Unique. 3350 YLWWVNGQSLL
+# Unique. 3351 YLYDRLLRV
+# Not unique. 3352 YLYHRVDVI is similar to RYLYHRVDVI 0.947415
+# Not unique. 3353 YLYHRVDVIF is similar to FRYYRVSILL 0.802135
+# Not unique. 3354 YLYHRVDVIFC is similar to RYLYHRVDVI 0.885147
+# Unique. 3355 YLYRSYHYSEV
+# Not unique. 3356 YMAEGIFHS is similar to MAEGIFHSPGY 0.815674
+# Not unique. 3357 YMAPEVVEVFA is similar to APQVTESIEF 0.800493
+# Not unique. 3358 YMASEVVEV is similar to CLAVEEVSL 0.815588
+# Not unique. 3359 YMASEVVEVF is similar to CLAVEEVSL 0.820237
+# Unique. 3360 YMDGTMSQV
+# Not unique. 3361 YMEAVALV is similar to CYMEAVAL 0.841033
+# Unique. 3362 YMFLASPSV
+# Unique. 3363 YMHTDLQAL
+# Not unique. 3364 YMHTDLQALHM is similar to YMHTDLQAL 0.925915
+# Not unique. 3365 YMKSLEFENK is similar to ALQHFELENSL 0.801557
+# Unique. 3366 YMLTLHTKL
+# Not unique. 3367 YMMMWDCWHA is similar to MMMWDCWHA 0.943804
+# Not unique. 3368 YMMMWDCWHAV is similar to MMMWDCWHA 0.899516
+# Unique. 3369 YMMNSVQENF
+# Not unique. 3370 YMPCSAYQKV is similar to TSYMPCSAYQK 0.892958
+# Unique. 3371 YMPGGDLVKL
+# Unique. 3372 YMPTTIIAA
+# Unique. 3373 YMQRCPEDFRL
+# Unique. 3374 YMSHRELSAWV
+# Unique. 3375 YMTAVLEYL
+# Unique. 3376 YMYEAPPGA
+# Unique. 3377 YMYLRQLFHI
+# Unique. 3378 YNFEMLQQHAV
+# Unique. 3379 YNSFSSAPM
+# Unique. 3380 YNTDDIEFY
+# Not unique. 3381 YPAPQPPVL is similar to APAPPAPAF 0.800989
+# Unique. 3382 YPFNAKQPTDV
+# Unique. 3383 YPFQFVPGL
+# Unique. 3384 YPHSLSSKL
+# Not unique. 3385 YPHSLSSKL is similar to YPHSLSSKL 1.000000
+# Unique. 3386 YPPPPPALL
+# Not unique. 3387 YPPRGFSPY is similar to PPRGFSPYL 0.863192
+# Not unique. 3388 YPPRGFSPYL is similar to PPRGFSPYL 0.938635
+# Not unique. 3389 YPVIFKSIM is similar to KEYPVIFKSI 0.855193
+# Not unique. 3390 YQDKWAEKPAF is similar to RAYQDKWAEK 0.825190
+# Unique. 3391 YQFFSDECSY
+# Not unique. 3392 YQFFSDECSYL is similar to YQFFSDECSY 0.962586
+# Not unique. 3393 YQFFSDECSYL is similar to YQFFSDECSY 0.962586
+# Unique. 3394 YQFRIIAKNDV
+# Unique. 3395 YQGRTKLVKDF
+# Not unique. 3396 YQLALSIGTSY is similar to ALSIGTSYRY 0.842545
+# Unique. 3397 YQSLKQFNV
+# Unique. 3398 YQVSCCDWLL
+# Not unique. 3399 YQVSYGFRL is similar to KTYQVSYGFR 0.867240
+# Not unique. 3400 YQYTFPDF is similar to VYQYTFPDF 0.929821
+# Not unique. 3401 YQYTFPDFLY is similar to VYQYTFPDF 0.849175
+# Unique. 3402 YRHLFKVFR
+# Unique. 3403 YRIYDIPPK
+# Not unique. 3404 YRIYSKIMDLI is similar to IYSKIMDLI 0.926584
+# Not unique. 3405 YSARIEENI is similar to MYSRAQVELNL 0.804692
+# Not unique. 3406 YSASCYSSSCY is similar to ASCYSSSCY 0.946033
+# Not unique. 3407 YSFQSLLYL is similar to AYSFQSLLY 0.903784
+# Not unique. 3408 YSFQSLLYLL is similar to AYSFQSLLY 0.883036
+# Not unique. 3409 YSFQSLLYLL is similar to AYSFQSLLY 0.883036
+# Not unique. 3410 YSFQSLLYLLL is similar to AALLQVTLLL 0.807027
+# Not unique. 3411 YSFQSLLYLLL is similar to AALLQVTLLL 0.807027
+# Not unique. 3412 YSFSISSIL is similar to DYSFSISSI 0.912570
+# Not unique. 3413 YSFSISSIL is similar to DYSFSISSI 0.912570
+# Not unique. 3414 YSKNLNSFF is similar to EYYSKNLNSF 0.852217
+# Not unique. 3415 YSLVPLQIPL is similar to FIKSLPLVVKY 0.806013
+# Unique. 3416 YSMECFQFM
+# Unique. 3417 YSNAQILHF
+# Not unique. 3418 YSSHRHLHVVY is similar to SSHRHLHVVY 0.967157
+# Unique. 3419 YSSIVANRW
+# Not unique. 3420 YSWSAQRQAL is similar to LPSWGASQQAL 0.815559
+# Unique. 3421 YSYWSIILGY
+# Unique. 3422 YTAPGIVEI
+# Not unique. 3423 YTAQIILAL is similar to AALLQVTLLL 0.810252
+# Not unique. 3424 YTASTSDAV is similar to ALFTADSAQTK 0.820586
+# Unique. 3425 YTAVHYAASY
+# Unique. 3426 YTCEKPYYY
+# Unique. 3427 YTFEIQGV
+# Not unique. 3428 YTFEIQGVNGV is similar to YTFEIQGV 0.876455
+# Not unique. 3429 YTFPSTSTKHL is similar to FMSESTSNI 0.801531
+# Not unique. 3430 YTFPSTSTKHL is similar to FMSESTSNI 0.801531
+# Not unique. 3431 YTHNLIFV is similar to WYTHNLIF 0.800330
+# Unique. 3432 YTHNLIFVF
+# Not unique. 3433 YTHNLIFVFYM is similar to NLIFVFYM 0.859529
+# Not unique. 3434 YTILRALEFHL is similar to LRILKVTEFK 0.811985
+# Not unique. 3435 YTILTPVLNPI is similar to AVFYTILTPV 0.814258
+# Unique. 3436 YTLDFGPL
+# Not unique. 3437 YTLSQCFQL is similar to LPALSQCSQL 0.802780
+# Unique. 3438 YTMYIFPV
+# Not unique. 3439 YTRDQIMTI is similar to PYTRDQIMTI 0.944426
+# Not unique. 3440 YTRDQIMTI is similar to PYTRDQIMTI 0.944426
+# Not unique. 3441 YTRDQIMTIL is similar to PYTRDQIMTI 0.917089
+# Not unique. 3442 YTSEILSPI is similar to QVTEILPSV 0.824077
+# Not unique. 3443 YTSEILSPI is similar to QVTEILPSV 0.824077
+# Not unique. 3444 YTTVRALTL is similar to GTYVRVTVQAR 0.807674
+# Not unique. 3445 YTVMARKSPV is similar to LMAVRSKYSEV 0.816392
+# Unique. 3446 YTWPSGNIY
+# Unique. 3447 YVAAYQRL
+# Not unique. 3448 YVAGGQEVF is similar to NYVAGGQEV 0.885812
+# Not unique. 3449 YVAGGQEVF is similar to NYVAGGQEV 0.885812
+# Unique. 3450 YVAKYTVPV
+# Not unique. 3451 YVARGGSMGV is similar to VARGGSMGV 0.955955
+# Unique. 3452 YVDFREYEYY
+# Unique. 3453 YVEYYSWLSYL
+# Unique. 3454 YVGSPLAAM
+# Not unique. 3455 YVIPLSIISV is similar to AIVVILMSMV 0.804922
+# Unique. 3456 YVLTWIVGA
+# Not unique. 3457 YVMASVFVCPL is similar to MAHVSVVPVF 0.806702
+# Not unique. 3458 YVPRFVFKL is similar to EYVPRFVFK 0.882151
+# Not unique. 3459 YVPRFVFKLYY is similar to EYVPRFVFK 0.844320
+# Unique. 3460 YVRRVFITDDL
+# Not unique. 3461 YVRVTVQARVM is similar to GTYVRVTVQAR 0.917977
+# Not unique. 3462 YVSEKDVISAK is similar to AEAERLDVKAI 0.819614
+# Unique. 3463 YVTAMDIFV
+# Not unique. 3464 YVTFAVSFYVV is similar to ALSYLVSFQR 0.813176
+# Not unique. 3465 YVTRVLVK is similar to RYVTRVLV 0.856983
+# Unique. 3466 YVVPGSPCL
+# Not unique. 3467 YVYDFGVSVS is similar to KYVYDFGVSV 0.920317
+# Not unique. 3468 YVYSVAKTDSF is similar to ALFTADSAQTK 0.812322
+# Not unique. 3469 YWSLLSHPL is similar to CYWSLLSHPL 0.938056
+# Not unique. 3470 YYADAFDFY is similar to EEYYADAFDF 0.848446
+# Unique. 3471 YYILDKKEHFK
+# Not unique. 3472 YYLEGWRFL is similar to GYYLEGWRFL 0.943701
+# Not unique. 3473 YYLEGWRFL is similar to GYYLEGWRFL 0.943701
+# Unique. 3474 YYNFEGDIALL
+# Not unique. 3475 YYPGKKEPF is similar to TYYPGKKEPF 0.948780
+# Unique. 3476 YYPPSQIAQL
+# Not unique. 3477 YYSKNLNSF is similar to EYYSKNLNSF 0.954226
+# Not unique. 3478 YYSKNLNSFF is similar to EYYSKNLNSF 0.920410
+# Not unique. 3479 YYSPQAQTL is similar to IYFPAAQTM 0.804229
+AAAAAAQQIQV
+AAFIWIISM
+AAHFTVLLY
+AALHTPRPGPL
+AALLQVTLLL
+AAMHGRKIM
+AAPAHSHAV
+AAQARLQPV
+AAQFSSDVL
+AAQSVIKAL
+AASRSVVM
+AATPVGSLY
+AAYQRLTSEK
+AEAERLDVKAI
+AEETPPFSNY
+AEHSLQVAY
+AEPINIQTW
+AEVDQDGVVM
+AEVPENVFL
+AEWRNGSTSSL
+AFLSTHLKLFL
+AFPVHSWYNF
+AFQTSEKKFYI
+AFVEFYHF
+AFWLFWGLTYI
+AGFHVTRNGK
+AGQHIAKSLF
+AHFQLQML
+AIAKFNFNA
+AIDAALTFV
+AIKESPKANK
+AILLGAEEK
+AILPFTPEF
+AISPGGVQEAL
+AIVEFPVPA
+AIVVILMSMV
+AIYHTLNLFNI
+AIYKQSQR
+AKNCGIAIPV
+AKTYETTLEK
+ALAAGSCLV
+ALADLAGFK
+ALAFTPVEQV
+ALAKETQFW
+ALALAQKGV
+ALAQERWRCLV
+ALAVIELYNA
+ALCGQCVRI
+ALCRHEYPL
+ALCVQPHYITV
+ALDGYNGTV
+ALDPHSGHF
+ALDQEAALAK
+ALESIAWFSV
+ALFAGSMQL
+ALFASRPRF
+ALFLVFGRTRK
+ALFNLIGTFPL
+ALFTADSAQTK
+ALFTWTNL
+ALGCSNNEK
+ALGGVFMML
+ALGYICKL
+ALHGGWTTK
+ALHSPRCYR
+ALHSSSSYH
+ALHWEQVAV
+ALHWVAVR
+ALIEAYVDI
+ALIHHNTYL
+ALLETPSLL
+ALLFLESEL
+ALLGSSCAPPL
+ALLPTPHCESL
+ALLQEEAHV
+ALNPTSGSL
+ALNSSEEYNL
+ALNVVVVM
+ALPILGEQV
+ALPQHLIRV
+ALQEQWLQAV
+ALQHFELENSL
+ALQNFDNKLV
+ALQQCLQGA
+ALQSQSISL
+ALRMLEVPL
+ALSDQVRDV
+ALSIGTSYRY
+ALSPDGSIRK
+ALSPGLTRT
+ALSPSALSPA
+ALSPVIPHI
+ALSVEFSEM
+ALSYLVSFQR
+ALTASTVPL
+ALVNKLYSL
+ALVRGVCMKV
+ALVVPVFEI
+ALWDRVVDL
+ALWSLSRHASL
+ALYGFVPVL
+AMAGSLVFL
+AMFWSVPTV
+AMHNQLTDMEK
+AMPFSIFYPM
+AMQCLQNENL
+AMQKRRLHLSV
+AMRLWVIRV
+AMVHYLMIL
+AMYLNYFRGL
+AMYQRAKLK
+AMYSNADIYLF
+APAPPAPAF
+APARLERRHSA
+APCLESGTCIL
+APESRERVPSV
+APFPLGDSAL
+APGLMGTEQLF
+APGLPGFSGL
+APGPLPRSL
+APKKKSIKL
+APLLQENLRL
+APLPQQFHLKI
+APNLQNQMSSL
+APPLHRRAA
+APPSAEYESL
+APQVTESIEF
+APSLKGKQKQM
+APSPGQPPAL
+APTPLPAPQQY
+APTRTVKII
+APTWRALAR
+APVFLDCLEL
+APYPHSNEL
+AQAAWLENFPL
+AQAPNNYRCF
+AQAPSLWGA
+AQCPDVLV
+AQDIYRASY
+AQFCDVRLQV
+AQFKGAWIL
+AQGTGVLGSK
+AQILHFQNPGY
+AQMCISGF
+AQPAVQSAF
+AQSWAFEQV
+AQYTLMSQAV
+ARFAVNLRL
+ARLFLGLAI
+ARLPVGAYEV
+ARLQFSCYSSL
+ARMWMTLTF
+ARRASKARL
+ARVSFTRGL
+ARWKHKTRK
+ARWTAFFGV
+ARYVPLTPWF
+ASADGTVKLW
+ASAWRNIAAR
+ASCYSSSCY
+ASFCGAVFCKY
+ASGSCGTRK
+ASISSFLLV
+ASLAPECGFGR
+ASMPSSPPL
+ASMSGRWK
+ASMTGIVYSL
+ASNASSAAK
+ASSVPTGHATF
+ASSYIILAM
+ASVTHSVDK
+ASWVVPIDIK
+ASWYRIYSK
+ATFLCPANV
+ATFRNNQMK
+ATHPIICFR
+ATIVPELNEI
+ATKNNKVIMA
+ATKPAQNALEK
+ATLDWSKNAV
+ATLNSFIHVR
+ATNLPSVEWNK
+ATPGRFLDIIK
+ATPKYSNSLK
+ATPSLHTSV
+ATTLKAFFK
+AVAAGAGK
+AVADMQVGAV
+AVAGIIPPSV
+AVCPWTWLR
+AVDDIFVKA
+AVFDVGRITEV
+AVFSDLHPF
+AVFYTILTPV
+AVGSYVYSV
+AVKRVNHK
+AVLSPQEKREL
+AVMKFKNPL
+AVMRWGMPL
+AVRWFFAHF
+AVRYDPESDTL
+AVSKPGLDYEL
+AVSLGRLKL
+AVSSCILAK
+AVYHEIHIGYL
+AYFLPRPPL
+AYLEAIHDF
+AYNVTRMVSM
+AYRDLQTRK
+AYSFQSLLY
+CCYFHFSPK
+CGILAENTALY
+CISNVFMQR
+CISSCNPNL
+CIVCTVDLEF
+CLAVEEVSL
+CLDLKILYL
+CLFFGIPWK
+CLFPQTLAA
+CLFSWHPV
+CLGQLSNA
+CLLSYELSNI
+CLLTNWPSV
+CLMHHLAQA
+CLNEYHLFL
+CLPEIPGV
+CLSIRITSI
+CLTGQRFTV
+CLYGDVTLENL
+CMFCSEEFL
+CMGENQFNV
+CMLARLEVK
+CMYEAVNEV
+CNGSEDGALAY
+CPFSQCTKSF
+CPGKPLNIF
+CPIASSPCL
+CQQWLALFFV
+CSESTSCLF
+CSMCHVHPH
+CSSHCGQGY
+CSSTLLLPHY
+CTDELLGAA
+CTFSEVAAHY
+CTFYFSNMLEF
+CTIAVVNFL
+CTYEYWPSA
+CVRVSGQGL
+CVSVMISPK
+CVVTEVFLL
+CYMEAVAL
+CYTADNEMEY
+CYWSLLSHPL
+DANSFLQSV
+DDIYPIDFY
+DEERIPVL
+DENITTIQF
+DEQIESMTY
+DEVFGSSRL
+DFLRNIPRSIF
+DGVGKSAL
+DHFETIIKY
+DHREIEGRVMF
+DHYAYSYYL
+DIFQVVKAI
+DISEYRVEHL
+DLAGGTFDV
+DLSYTWNIPV
+DMRDVTAL
+DMWSIEVICY
+DPEEVLVTV
+DPESDTLTL
+DPSQRGCFTL
+DPYALVRLGI
+DSEPLCLSY
+DSPDGSNGL
+DTSPVAVAL
+DTVEYPYTSF
+DVAAHLQPL
+DVFAWEPFV
+DVIQQDELDSY
+DVKAIGPLV
+DVSDNEPDLYR
+DVSVQVER
+DVWFQGERIAY
+DYMIHIIEKW
+DYRQDEYYNF
+DYSFSISSI
+EAAPPSTSM
+EAGNNSRVPR
+EASGITYEY
+EEADFLLAY
+EECLWMAVL
+EEDTFSYLI
+EEFWLVDLL
+EEHAQNVSCAS
+EEKLIVVLF
+EEMEPLPVM
+EENANFYKIF
+EESGGAVAFF
+EEVTPILAI
+EEYYADAFDF
+EGSLGISHTR
+EHIPESAGF
+EHLSCPDNFL
+EIGMWHAKK
+EKTSSGLYVFR
+ELAGIGILTV
+ELATRGAQM
+ELDGLFRPY
+ELDPDIQLEY
+ELFDPNQSPQV
+ELMERLNK
+ELMRDINSM
+ELNARRCSF
+ELSKEELPYYV
+EMDMHLSDY
+EMKRVFGFPV
+EMSAICQVY
+EPDKHFSHY
+EPEVVFLQF
+EPKPFLYVL
+EPKPLFPKL
+EPKWDPFPL
+EPLLIYSTHY
+EPLSYSLLQR
+EQNFVSTSDIK
+EQYDVYMYQEV
+ESAPINTPL
+ESFGCASK
+ETDESLIYSF
+ETFAPGPRLLY
+ETMQCSEL
+ETPNLDLM
+ETVKNLLEF
+EVDTSMLHF
+EVIVPLSGW
+EVLPFFLFF
+EVQQFLRY
+EYCKFSFLF
+EYESLVSEDF
+EYVPRFVFK
+EYYSKNLNSF
+FAIADTAYV
+FAKNPHLHYI
+FALGNVISA
+FARAHALMF
+FASDIPRIL
+FATDNYCHV
+FAVWTLAETI
+FAWEPFVAQF
+FCTSCPAGYYI
+FCWLPNHVIY
+FEAEFTQVA
+FEDKSVAYT
+FEFCEDDLW
+FEIRARTAA
+FFARLFVFQV
+FFCDVQQVIKL
+FFHETRQYKF
+FFKTSAQVVL
+FFLGLILFEL
+FFSIFPKCF
+FFYLLDFTF
+FGMPPCLLAL
+FGRAKLLGA
+FHASEGWL
+FHATNPLNL
+FHLKGHEDL
+FIAKNLIQSA
+FICAIIVVV
+FIDCYLLAI
+FIFPSFLRVHA
+FIFSYVVAV
+FIGPLMDAL
+FIGQQFAVGSY
+FIHGGAIATV
+FIKSLPLVVKY
+FILDAVQRV
+FILDLFRTWNI
+FILMGLPHV
+FIMDTIGGREV
+FIPKFVSFL
+FISEYCGEI
+FISIFFFLEI
+FISNTVFRK
+FIYQYYSSI
+FKLDTEKMPV
+FLAADGHPA
+FLAEHEYGL
+FLAKILKPL
+FLAPTGVPV
+FLASLNICK
+FLAYELLPAL
+FLCPGLLKEVY
+FLCRFKQLL
+FLCTLTSI
+FLDEFMEGV
+FLDFMTKINDL
+FLDPLAHEI
+FLDREQRESY
+FLEAGYICDA
+FLEEHKEFL
+FLEGNEVGKTY
+FLEIYTVTV
+FLEPQWYRV
+FLFELIPEP
+FLFLELLHWF
+FLFQDSKKI
+FLFYPLDFT
+FLGAGLFLYF
+FLGDINPQHSW
+FLGEAWAQV
+FLGEYIPTV
+FLGIFNTGF
+FLGYIPKAWII
+FLHKGLSKPV
+FLHKGYVPC
+FLHQSSVPTL
+FLHTVSKTRL
+FLIEHQRA
+FLILRGVLV
+FLIQTEQKL
+FLIYLDVSV
+FLKDSVKV
+FLKHKMPLSL
+FLKTWNPK
+FLLDDPLSTV
+FLLDEAIGL
+FLLDSCTKL
+FLLINSSV
+FLLLVAAMI
+FLLPSGMAL
+FLLQLPFRG
+FLLRFLYTQL
+FLLTDYALS
+FLLYYGQDI
+FLMASISSF
+FLMKSSNL
+FLMRVMDISY
+FLNDLLSVL
+FLNFLPTV
+FLNVLFPLL
+FLPDLNVNA
+FLPIPNWEQ
+FLPRPPLPPSV
+FLQDLKFV
+FLQEVNVCGV
+FLQFRGNEV
+FLSCPLYRFSL
+FLSDHLYLV
+FLSGGGPFSNL
+FLSIILDHL
+FLSQRVAFL
+FLSSPAYFS
+FLSTKYRGYML
+FLSTVMDRV
+FLTVFSHFM
+FLVGKPGSSM
+FLVLMPMKV
+FLVYGVRPGM
+FLWRKTSKYM
+FLWSVFMLI
+FLYEKQHEL
+FLYFRDRLGDI
+FLYNLLTRV
+FMASNDEGV
+FMDMAILVES
+FMFEGHDTTT
+FMFVNSLLL
+FMGHINIV
+FMIGYTSAL
+FMLLQACRSV
+FMMPRIVDV
+FMPDFDLHL
+FMQQGCDIL
+FMQRLLGPQRV
+FMSESTSNI
+FMVPRDPAL
+FNQLIYELYV
+FPAAAFPTA
+FPDPPSSLDL
+FPGNQWNPV
+FPKKIQMLA
+FPKQDGGTQK
+FPLPNQLEIAL
+FPQGLPNEY
+FPRKSAFSL
+FPRYAGLMV
+FPVVNSHSL
+FPYPGMTNQ
+FQANFSQTW
+FQAQHIAMA
+FQDDDQTRL
+FQDSVRTT
+FQETHLPI
+FQHPYDQAHLL
+FQLNQSFEI
+FQPSFSHLV
+FQQEIQILK
+FQYFRATYPL
+FRFFATPAL
+FRFFTRKSL
+FRHSLVVPY
+FRICPIFVF
+FRMFLTQGF
+FRQKTNLIL
+FRQSLYLKI
+FRSGLDSYV
+FRSIYLNTLL
+FRYLSLQDI
+FRYYRVSILL
+FSATLAYFL
+FSEFFIGPLM
+FSFPETQFIAV
+FSFPRSSEPF
+FSISYCPV
+FSLARQFSL
+FSLPKSVPL
+FSPEFSEFF
+FSSDVLNLV
+FSSFMFGWHV
+FSSSFPKPPSF
+FSWRDSSFTEV
+FSYLIWSNPRY
+FTDEKVKAY
+FTDFENVP
+FTDLSGFQV
+FTFEVAAK
+FTGQFVSEEV
+FTIYIFEY
+FTLEGGHRA
+FTLERRWYNEI
+FTLMYEERAV
+FTNSCVNPF
+FTNSLQLDV
+FTSKHHFSF
+FTTDNLCFVSL
+FTVPNLLPR
+FVADWAGTF
+FVALSTCHEL
+FVERYLGLY
+FVFKLYYFEI
+FVGALSFSI
+FVHLSNVKV
+FVIGYDPPSA
+FVLNGGGEV
+FVPPVSPPSY
+FVRTNSLVFR
+FVSALCMFL
+FVTETPLEV
+FVTFSCHGADK
+FVTSICARL
+FVVPYMIYLL
+FVYQCFEGYI
+FVYVFITHL
+FWYTHNLI
+FWYYAKVDL
+FYCRPHFTI
+FYGKTILWF
+FYHFQDATSW
+FYNDIILMV
+FYPGMLQRR
+GACCPVCLK
+GAQSWLWFV
+GDFGLATEK
+GEEDGAGGHSL
+GEQDHTFRV
+GEYFTHQIR
+GIIAAQPPNFL
+GIIPPSVQV
+GIKFVKHLGK
+GINYHSSFGCK
+GIPENSFNV
+GIQTFCSRV
+GITYEYRPSK
+GLAAIDLIL
+GLAEFQDNV
+GLAFDMDEI
+GLAPGLPSV
+GLAQEYTTSL
+GLAYEIEPI
+GLDGAVDMG
+GLEPTTMV
+GLFGCLFECGI
+GLFRPYGSTV
+GLGEEQNHGV
+GLGKGTYGV
+GLGPGFSSY
+GLGPKDTYV
+GLGSPTVYK
+GLIEPSPPSA
+GLKQFSFPR
+GLLDEDFYA
+GLLEPHTV
+GLLNSIWPL
+GLLPVLSWLL
+GLMSNTPTPR
+GLMVIAWFI
+GLNVPVQSNK
+GLPAEGVSEV
+GLPNHGATFKV
+GLPSGPAPRK
+GLPWSFLGWL
+GLPWWLGL
+GLRERMGLSY
+GLRHQVLK
+GLSLYTTEM
+GLSYCLPPTF
+GLVRAQPK
+GLWRPAWRCV
+GLYLELTPK
+GLYVFRNER
+GMAGQIPPL
+GMDCNREEYL
+GMFEAGDCQV
+GMGPLLAMV
+GMLCSFQTPDA
+GMMTTQQAGYV
+GMNSIEPAK
+GMNWRPILTI
+GMPKVLYST
+GPLDRKSRDL
+GPPDRCQPA
+GPPSLLWMNL
+GPQTVWTGA
+GPRGLDQLREL
+GPRLLLPCPM
+GPRWRSWLV
+GPTFNCLLDM
+GQFEPLETTA
+GQFLTPNSH
+GQKGNIGPPGF
+GQVPYNYI
+GQWGFSHGA
+GRIAFFLKY
+GRKLFGTHF
+GRMRSLEAL
+GRQSWSLYV
+GRWALHSAF
+GSAPAVPEAF
+GSKRAVTK
+GSLDVLMAV
+GSLHSGTAK
+GSSFHALEEK
+GSSIYWAY
+GSSMSLAK
+GSSPFQHLEK
+GSTEQCAFCK
+GSVSFGTVY
+GSWFSEYK
+GTAVGQYAY
+GTAWLEWWHV
+GTCKNIVGSY
+GTKKDVDVLK
+GTKPNPHVY
+GTLVRCAKAK
+GTVQTGMDTSK
+GTWSGTTK
+GTYVRVTVQAR
+GVCNLDEHLK
+GVFDGAASV
+GVITKALYK
+GVLPLSPSV
+GVRLSFSGPAL
+GVSKIIGGNPK
+GYCECFEEF
+GYWFVNFETK
+GYYLEGWRFL
+HDLGRLHSC
+HELMTLHGF
+HESRTNTAI
+HFSKKCSRALL
+HHWQSTIGM
+HIAKSLFEV
+HIDDSDSITV
+HIDKWCLDLK
+HIFKICGQHTK
+HIHCVNPPL
+HIIRLMLEY
+HIKIEPVAI
+HILTTLQK
+HIMPDTAEI
+HIQPHLASV
+HIVEISTPV
+HIVRIGDLK
+HIVTYYPGK
+HIYEGQITAL
+HIYIGIHMCV
+HLARHRHLM
+HLEDFLLHI
+HLFAEAAV
+HLGMSCHCK
+HLHCYRSSF
+HLLPYFCIIYM
+HLLSVEYQI
+HLMDGDLGL
+HLMWLERLY
+HLNGLLREV
+HLNHDSVWNFY
+HLNRAMLHK
+HLRAWFVSL
+HLRIYTGEKPY
+HLSPGELHKEV
+HLVMNLPA
+HLYAYHEEL
+HLYDIPGSTY
+HLYDLESGMCI
+HLYRCRLSSL
+HMADVSLR
+HMCVYSYIHMY
+HMHIYPIVV
+HMKVSEQK
+HMMGFRTQEV
+HMTEVVRHC
+HMYIFPVH
+HPFMTDEEY
+HPHHYTRRRI
+HPKVHLNTM
+HPLCGYHEQV
+HPLKNGDIL
+HPPEQRGMF
+HPRAVTGFLW
+HPSPDLPGTHL
+HPWLELSDVHL
+HQFHVHPLL
+HQNPVTGLLL
+HQRMHTGEK
+HRGCSIWPR
+HRYFFFVAM
+HSCVMASLR
+HSDGAILPF
+HSHFWDNSK
+HSKPEDTDAW
+HSLSSFRIHER
+HSPFTATSL
+HSRNTHLGK
+HSSKKVMRTK
+HSYSELCTW
+HTFNCRMFMK
+HTLLLWEHNR
+HTQEVYNEY
+HTRHYALYR
+HTYSVVSV
+HVHRLCAVRCL
+HVIENIYF
+HVIYLYRSY
+HVKITDFGR
+HVYYFFSKR
+HYAALRELI
+HYHLANDIYF
+IAKYIVPYMK
+IAMDVTEGL
+IASPIKEL
+IAYAPEPNQK
+IEHNIRNAKY
+IEVEVNEI
+IFQEMFDKHYK
+IFQLSSLNL
+IHYTAQIIL
+IIGAGPAEV
+IIGIHLSLMEK
+IIGSVSKEK
+IILDVCSSGL
+IILVAVPHV
+IINEPIDLK
+IIQARFEEV
+IIQEYKKFTK
+IISDGGCTCPV
+IISNIQDTQV
+IISVYYYFI
+IKLIPGVSTT
+ILAELELSRRL
+ILCETCLIV
+ILCSIQGVK
+ILDGGHEDASL
+ILDKVLVHL
+ILDSASHHCPL
+ILDTAGKEEY
+ILENPFFSI
+ILFDSLTRECV
+ILFEEANGRL
+ILGEQVVHT
+ILITGQFYDR
+ILKNLCLELYL
+ILKQNYFSV
+ILLDWAANI
+ILLLNLLPYK
+ILLRRLLSSA
+ILMHGLVSL
+ILNAMIAKI
+ILNASNVKTF
+ILNVDIFTL
+ILPDAGQTV
+ILQDGFLYV
+ILQSNPLLEV
+ILSGGRTLQI
+ILSPIDISGQV
+ILSPLQDGTK
+ILTDIEEKV
+ILTGLNYEV
+ILTPVLNPI
+ILTSSDGGEPV
+ILWIFSIYL
+ILWRQDINL
+ILWYAPESL
+ILWYVFRLAGI
+IMAHCILDL
+IMDQVPFSV
+IMPGNSFAV
+IMPNFPPQA
+IMQLMPFGSL
+IMQPSVVIPA
+IMQTLAGELY
+IMRTYTYEI
+IMSKELWPV
+IMVDGELY
+IMYLTGMVNK
+IPAEHINQA
+IPAFDQRSGL
+IPAVKLNKL
+IPDSIALIQQL
+IPEAVFSDL
+IPINPRRCL
+IPLENQDKF
+IPLSDNTIF
+IPSSQKVIF
+IPTHTQMTTSA
+IPVAIKTSP
+IQAAYVHVI
+IQANALPLM
+IQASMFDQK
+IQDQIQNCI
+IQINSHCFVV
+IQVFWIAPPV
+IQVKTLMVK
+IQVWEALLTL
+IRLYQFRLIV
+IRMKHCVMV
+ISFENLDTA
+ISIQRAQPL
+ISNEINWPEK
+ISPILENPFF
+ISVPFSAKRK
+ITAEIFMEK
+ITCQSLRSPMY
+ITDAHELGV
+ITDFGRAKL
+ITDPFVEV
+ITEEPILMTY
+ITFDDYIACFV
+ITMQLMNREK
+ITMTDNQRK
+ITNYVVEK
+ITQKYDFFFY
+ITRKNSRTPL
+IVFGVSQPDV
+IVMEYLAFL
+IVMTDAGRL
+IYDRFGQEI
+IYFPAAQTM
+IYIGVSVPI
+IYKAPCENW
+IYLLQYVTL
+IYMDGTADFSF
+IYSKIMDLI
+IYTHNTLSSL
+IYVRPFSNF
+KADAKALL
+KAEDLGMLLK
+KAFCQFSHL
+KAFPDYCTYL
+KAGECGLK
+KAIQMAQK
+KAPSDLYQF
+KCFFSGSM
+KEASSRHFL
+KEIRAIFLF
+KELLKHPFTL
+KENSLIIQF
+KEWEDSQLV
+KEYPVIFKSI
+KFARGDYTTTI
+KFGDLTNNF
+KFHPQRLQL
+KFLESCDEVI
+KFQNYSQRR
+KFRSSVYLL
+KGDADVSVPK
+KHILVWAL
+KIDIERILSV
+KIDLHKYVTV
+KIFIEWLK
+KIFNFYPRK
+KIFSEVTLK
+KIIAYQPYGK
+KIINVDDEI
+KIISFYTALL
+KINAGINTI
+KINDLEVQI
+KINHFCEILSV
+KINLSLFAL
+KIPCESPPLQV
+KIPRPVLWV
+KISEGTEFRI
+KITQNSKK
+KIVEAQSGV
+KIWFEKFK
+KIYAAGTFY
+KIYRRQIFK
+KKKVKGSPSF
+KKRLFRNFGGL
+KLAAHLRRK
+KLAALESI
+KLACADTWL
+KLADYLNVL
+KLAFGQKPPL
+KLANPLPYT
+KLARHYLIHTV
+KLATNLLK
+KLCEANQQQQF
+KLCIFAPFV
+KLCRTVIAAA
+KLCVACPMHSL
+KLDPRLAQL
+KLDSVCLLK
+KLFAIVVGRGI
+KLFAQLINNKA
+KLFEFLVYGV
+KLFEHYSQEL
+KLFESKAEL
+KLFHDMNVSY
+KLGDSCVTAL
+KLGDVITII
+KLGNRINIIV
+KLGSMQPRHLK
+KLHPKAITPR
+KLILWRGLK
+KLINECSRPI
+KLITKYNLREL
+KLKAIPTTL
+KLKNPKRYQIM
+KLKRFNLSA
+KLLENFYVT
+KLLTDMQL
+KLMNIQQKL
+KLNLIQNV
+KLNTITAVV
+KLPKYGVKV
+KLPLDIDPV
+KLPVGSQCLV
+KLQFHCMPV
+KLRRVDFETFL
+KLSELHTYI
+KLSEQILKK
+KLSHQLVLL
+KLSKFDEK
+KLTRRPIFI
+KLVEHFCPEF
+KLVFGSVFL
+KLVRGATLY
+KLWASPLHV
+KLWYASLTLV
+KLYGLDWAEL
+KLYPKLSRK
+KLYQCNECK
+KMAACPKKL
+KMANDIRFL
+KMEKKTCAL
+KMIENESPL
+KMIGNHLWV
+KMKNFFFTK
+KMPEMHFKALK
+KMPWNNQLL
+KMTNFKTTPPV
+KMVAVFYNT
+KMWAGKKLA
+KMYHHCPWV
+KNRLVNQPL
+KPFCVLISL
+KPFHSLSSF
+KPKKENLWRM
+KPLFPKLAF
+KPLLNCKIYNY
+KPPKAKPSPTY
+KPRHKNKNRL
+KPSDTPRPVM
+KPYDAPGAPT
+KQAPGDQVTEI
+KQASSAPFFML
+KQFSAMALK
+KQHGFASI
+KQKVSLLFDHL
+KQLEDEEV
+KQLHVVPL
+KQNTSCFK
+KQPEGLWPPL
+KQSKIVFSV
+KQSVSPPV
+KQWLVWLAL
+KQWSYSTGFPV
+KRFLHRQPL
+KRHEVPVPL
+KRIPLPPHLC
+KRPIPIKYKAM
+KRPTPTFHF
+KRRLLILGR
+KRTNVGILK
+KRVALLSWTK
+KSDIGWIWELW
+KSDKTGWTTF
+KSFAVWTLA
+KSFTLNGTK
+KSKIPRPVL
+KSLANFGGW
+KSMLRNERQFK
+KSPNPSTPC
+KSQREFVRR
+KSYWNRLQF
+KTFEVVPEI
+KTFSLPSLL
+KTGEQRVVTL
+KTLGPIWK
+KTLPEMRAY
+KTLQHWPHIVR
+KTNRIALI
+KTQGAVAQM
+KTTLVYPATEK
+KTVPDGNLVK
+KTYPCKIFY
+KTYQVSYGFR
+KVDPIGHVY
+KVFEHVGSR
+KVFKLGNKV
+KVFRETAK
+KVHSGESRK
+KVIDHVIET
+KVINLSPFK
+KVIQFVANYA
+KVMCRFRPV
+KVMSDDQCSK
+KVMTDPSRK
+KVQDLTPAK
+KVRCSGLHK
+KVTGHRWLK
+KVVFLFPAV
+KVYEGVWKK
+KWIHCFNDV
+KWRLSLCTV
+KYAFITWLV
+KYINKTIRV
+KYLPVKEIYSW
+KYLQCPLKF
+KYPRKGHVV
+KYSSGFCNI
+KYVYDFGVSV
+LACERLLYL
+LADFRLARLY
+LAKELIFRY
+LARQTPEPAEL
+LASYFFWGL
+LDLGKSFHF
+LDYEWGTVTF
+LEAVARNTF
+LEEEINRKM
+LEFENKQAL
+LELKAVHAY
+LEREIPLNQPF
+LFGVCIYSF
+LFHTFYELL
+LFPGALYLV
+LFQQGKDLQQY
+LFVVFQTVY
+LFYALGIVF
+LFYLGSSTAF
+LGNVWCFPY
+LGPMGGSLTL
+LGVVESAK
+LHEAQPWFEF
+LHSDFVSFLI
+LHSEAAYTL
+LIDDYGVEEV
+LIDSNTLQV
+LIFNMLYWI
+LIIPFIHLI
+LIQNVRSMK
+LIQRINLKK
+LISGPSVGV
+LIYIFEYDK
+LKHPFTLMY
+LLAELYCRA
+LLAMTVPNV
+LLARFATSAL
+LLASYDEISV
+LLCKMINLSK
+LLCRRSRAAL
+LLCSSCWDF
+LLDDECAFYT
+LLDDQILQL
+LLDEKGPEV
+LLDIWDGIPHV
+LLDNSTTGTDV
+LLDSLPMDV
+LLEPHQVGL
+LLFALHFSA
+LLFAPEYGPK
+LLFGMPPCL
+LLFGYSFAT
+LLFQRFFVI
+LLFYETFGK
+LLGCVMYTLL
+LLGGWFQSSL
+LLGPNSFEV
+LLGSVNNLL
+LLHASFVTL
+LLHGFSFYL
+LLHTELERF
+LLIGFLSGSL
+LLINRGFSK
+LLIPVPNL
+LLIQKFTDV
+LLKHIFSTG
+LLKYKIKDY
+LLLCGVQAV
+LLLCIPGL
+LLLEFGANM
+LLLEVVWHL
+LLLNAGSTV
+LLLPHYASAK
+LLLQLTTPA
+LLMGSSDLA
+LLNYFQNSHSV
+LLPALSPGL
+LLPPVYLTF
+LLQDGDIQV
+LLQICERIPTI
+LLQNITYL
+LLQVYCEMYGL
+LLRPTLDQSTM
+LLSAPPCTQHI
+LLSCSADGAV
+LLSIVPCTV
+LLSPDLIRNEV
+LLTQLRAEV
+LLVDAMHNQL
+LLVEKTTCV
+LLVRNSFEV
+LLWMNLFVGF
+LLYNDQPPR
+LLYPHSLSS
+LMAVRSKYSEV
+LMFWASSSI
+LMILSANWAY
+LMLEYQKILWK
+LMMEHPSLQAI
+LMRDHMPPV
+LMTDTQFVL
+LMTLHGFMMY
+LMVPHSPSL
+LPALAFTFFSL
+LPALKIWEEL
+LPALSQCSQL
+LPAPGGGES
+LPAPQQYIV
+LPATGWTKS
+LPEMRAYQDKW
+LPEPDKMLVAV
+LPGEKGHPGL
+LPIQYEPVL
+LPMETPLVI
+LPNEYAFVT
+LPNHVIYLY
+LPPEMTVARSL
+LPQGWKMNSTL
+LPSFRPPTAL
+LPSWGASQQAL
+LPTLPTREPK
+LPVEGNIHV
+LPVTRKNMPL
+LPWLSAHEL
+LQEEAHVPL
+LQFEYTFEI
+LQHDKLVRV
+LQINCSHFSTI
+LQQYKTLAYSF
+LQREQQHLK
+LQRIHHMAA
+LQTIKDIASPI
+LRAAFFGKCF
+LRFSIIEEF
+LRILKVTEFK
+LRLNHPAQL
+LRMRGTIFR
+LRNSGGEVF
+LRSEGSPLV
+LRTKVYAEL
+LSAQSHCSTY
+LSDSRPRHL
+LSEECYWSL
+LSGEWFTFYL
+LSHSFNWRK
+LSPLSWVSV
+LSQCSQLTTFY
+LSRLSNRLL
+LSSSVPRK
+LSYLLAMR
+LTFLERPREK
+LTFNQCYGV
+LTGNESFALPY
+LTHEVIVPL
+LTHNAVCPI
+LTINSIFY
+LTLFWAPPER
+LTLSGFFLR
+LTPKWSEKYSK
+LVFPLVMGV
+LVFVGLFAF
+LVGPAQLSHW
+LVIGMPPPV
+LVNKFSTLY
+LVRDRWQKV
+LVRGVRLSF
+LVRLGIQTF
+LVTKGEHMTEK
+LVYGPLGAGK
+LWTEMITNI
+LYCVLIESL
+LYIVDGMAQLM
+LYIWFKTACL
+LYLDYQIQATV
+LYNGMEHLI
+LYPEFIASI
+LYQFILKAL
+LYQRWEAQNKV
+LYWHVSHDF
+LYYEYWSNF
+MAASLPPTL
+MAEGIFHSPGY
+MAGPKGFQY
+MAHVSVVPVF
+MASGDHSAY
+MASILKGYRLY
+MDIQASHALM
+MEAIRLYQF
+MELKVESF
+METLHIIYLEA
+MGFFRRSVIK
+MHENFTNLL
+MIMLGDKKKTF
+MIQLCSKLRK
+MISPNSFFH
+MIYGYDTWI
+MLAPKTQR
+MLGEQLFPL
+MLICCCCTL
+MLIGIPVYV
+MLLAIPEAVF
+MLLKHDVSL
+MLLQTCQDF
+MLMKNISTK
+MLQIINIVL
+MLQQQPSPPV
+MLQYKKKAAV
+MLREEIAML
+MLRHILPK
+MLVRRTEGI
+MMDYPYPTNFL
+MMFPAQPFGL
+MMMWDCWHA
+MMPPLPGI
+MNLFVGFRF
+MPAAEEMRKNV
+MPAWRTRGA
+MPFTTVSELM
+MPIEPGDIGC
+MPSHCNTQY
+MQAFAQVFSK
+MQLLFDNEV
+MRMNQGVCC
+MRRTRPSAA
+MSCVYFLHKY
+MSQPDAQRY
+MTEHHAGRY
+MTLKEYHYV
+MTSLHLTTR
+MTSPHFIEFV
+MVDTRGGSM
+MVVHEIQNY
+MVYWTGGIPA
+MWMTLTFF
+MYLMVEHI
+MYSRAQVELNL
+NEYAFVTTF
+NFLNNSGIL
+NHARIDAAKV
+NHDETSFLL
+NIHAVLLPK
+NILFCQTPK
+NISEDVIFF
+NIYVDALFK
+NLAQTDLATV
+NLFNRYLAL
+NLGENKHYDV
+NLGNREAEL
+NLIFVFYM
+NLIQSAYNL
+NLKRVVEDSEY
+NLLNHSWLV
+NLNCCSVPV
+NLNKHRRYK
+NLNPNVDPQV
+NLQERIDYCHL
+NLQREEYTV
+NLRYFAKSL
+NLSPALGQMPL
+NLTEGPYPL
+NLWIPSSSLAK
+NLYAEPPV
+NMDVYCFL
+NMLKNNLV
+NPALCVQPHY
+NPEAIAEVV
+NPHYHENAGI
+NPLMCRLLGI
+NPMWVVLL
+NPSVATFSL
+NQMEEFTV
+NQTFISCAPY
+NRHDCWSLISL
+NSCVNPFALY
+NSKKKWFLF
+NTATNLPSV
+NTLPNYQSF
+NTVILETLK
+NTYASPRFK
+NVDMRTISF
+NVELRRNVL
+NVLEWIIYA
+NVYEVVNSKK
+NWPTRVCADV
+NYICNSSCM
+NYIPSNDLRAF
+NYNENTGEKL
+NYVAGGQEV
+NYWWRGQTL
+PIYIPSRLCK
+PLIDVNWCA
+PLLEAIDPDV
+PLMGISHQEEV
+PLYRFSLLNK
+PPEPRRGLL
+PPPSRPISPA
+PPRGFSPYL
+PPTSPVQTPL
+PSDTRQMLFY
+PVKNLPQV
+PWWNFGSLL
+PYISGPLRF
+PYMFLSEWI
+PYTRDQIMTI
+QASGNHHVW
+QATEAERSF
+QCEEVARVL
+QEFAPLGTV
+QHQPNPFEV
+QIFLSEIRWEK
+QIIHTYSNTV
+QIKLHLSPK
+QLANGAFK
+QLCDVMFYL
+QLDIIPASV
+QLDKCSAFV
+QLFARARPM
+QLHNEVLK
+QLIMQLMPF
+QLIMTFFQV
+QLIPRLFFA
+QLLCCQPGL
+QLLQDHWEI
+QLLQYEGYK
+QLLVSLWGL
+QLPDFVNQL
+QLPFGDPFAV
+QLPGPIWEFL
+QLQHILCSHV
+QLRLFQYNYSY
+QLSCISTYV
+QLWKNALQEI
+QLWVDSTPL
+QLYKCEHCGK
+QMIYSAARV
+QPAAHIISELI
+QPEPSTVL
+QPHYITVSV
+QPSGIILDY
+QPSGVPTSL
+QPYGSSFHAL
+QQFHLKILFL
+QQMGLLTRV
+QQMQVAFSA
+QQQQVVTNK
+QSAEISNNL
+QSANLVNPK
+QSAYCGWKVRK
+QSDETDQFLV
+QSLFWSIFV
+QSNHLSVSK
+QTDTRPWSGPY
+QTIDNIVFL
+QTKPASLLY
+QTNPVTLQY
+QTRLKGSLK
+QTYTLSQCF
+QVMPIACGNK
+QVTDFLAPL
+QVTEILPSV
+QVVKGDPPL
+QVWNPSFCFK
+QWINLFLQF
+QYQDLTQGSF
+QYYFECDCF
+RAAHSRVPSPR
+RAFFVKFEV
+RAFYILMEK
+RANSGFGRGL
+RARGRPRKTKL
+RATIVPEL
+RATVAPRSL
+RAYEAHNENK
+RAYQDKWAEK
+RDLRPPGLLR
+REEKIHDLAL
+REELLAATL
+REEMEVHEL
+REFDKIELA
+REHALLAYM
+REMEKGSPF
+RERHHQPQTY
+RESAFWLFW
+RESFDPSAFM
+RFHTPMYFF
+RFKDIFQEM
+RFLEYLPLRF
+RFLHDLHLL
+RFQQLDTAI
+RFREELEGPPL
+RFRHREDRPF
+RFSGVPDSF
+RFWLRGGRCW
+RGFPRDPSTEF
+RHDLPPYRVYL
+RHRLGRDPL
+RIAGKALKK
+RIAQCFLRV
+RIAQKIGLI
+RIECIFFSV
+RIKQTARK
+RILNEGHISHF
+RIMYKWIEPK
+RIQTHILK
+RIYVGGKINHI
+RKLNFRLFVI
+RLASGVYL
+RLFDEGKLKA
+RLFGEAPREL
+RLFKGYEGSLIK
+RLFNGNSRGSV
+RLFTPISAGY
+RLGRDPLLLL
+RLHAGEKPYK
+RLHDLVFPL
+RLIKHYPGI
+RLIPRVLAM
+RLKCPFYGK
+RLLRGYDQYA
+RLLVHLQVI
+RLLVNGCK
+RLMFFRPIK
+RLMVAVEEA
+RLPLHLYDI
+RLQESNSL
+RLQIALNV
+RLRKRNEYR
+RLSDFSEQL
+RLVCKAANTK
+RLVPYLEFL
+RLVSEGNLLEV
+RLWKVSDLI
+RLWLEVPDSAV
+RLYKLILWR
+RMAISIPIR
+RMARSAPY
+RMATVECV
+RMCDVQVHK
+RMIDVQNWAYF
+RMLEVPLCQIL
+RMLHWENPV
+RMQYSMECF
+RMTGLPIPPEI
+RMWDFDIFL
+RMYSGALL
+RNYRQSSNMK
+RPAARGSRV
+RPAWRCVPF
+RPCPGDTTEV
+RPCRRVCAV
+RPEFHVHAPG
+RPHHDQRSL
+RPHVPESAF
+RPISPAPNCI
+RPPIEQANVL
+RPQVRKQL
+RPRCLCTAV
+RPRKTKLGSM
+RPSDREEWEEL
+RPVLWVNTDQV
+RPYGSTVPA
+RQAEEIFENI
+RQMPLSSAV
+RRHCRSYNR
+RRHVLEVEK
+RRTQRYFMK
+RSDHVALHMK
+RSDSGQQARY
+RSELNLLV
+RSHAGAVHK
+RSKGDIGA
+RSLEGHGVK
+RSLPGKPSK
+RSLRLHRFR
+RSQWVLRGAK
+RSRTPSLPTL
+RSSEPFQGSYK
+RSSHIFPSL
+RSSSRLGVNEK
+RSTTCMTSLK
+RTAHETEK
+RTAPRPGSQK
+RTDFLIQTVAK
+RTDVHIWVFR
+RTDVKAYNVT
+RTGKAAGLL
+RTIDCLRQADK
+RTNEPQKQK
+RTPDGFLLV
+RTQDAEFLK
+RTRARESPHF
+RTSSTQQDNPK
+RTVPYILRV
+RVADETYKAFL
+RVCGPCSTY
+RVFDEQYSKK
+RVFNKYPTLK
+RVFRDSWAL
+RVHTVERPYK
+RVIKVHAK
+RVKMVWYK
+RVLHFKNSY
+RVLSHDSIFI
+RVMDISYLNL
+RVQQIVIHREY
+RVRKIKPFSEI
+RVRVMAIYK
+RVSTLRVSL
+RVSTRFKSY
+RVYISYLDCI
+RVYKCIFNH
+RWLKWQPWKM
+RWQKVLVNL
+RWVFSGMRPW
+RYAGLMVPPL
+RYLETNKYCRM
+RYLPSSVFL
+RYLYHRVDVI
+RYPRYLYKL
+RYTEGAELM
+RYVLHVVAA
+RYVTRVLV
+RYYVGHKAKF
+SADGGGLS
+SAFIEPRYHV
+SAIGGEGPQRY
+SASDLRNQL
+SASLHPATV
+SAWTDTQRL
+SCMGGMNWR
+SCSRAVPQV
+SCTCPTGIDL
+SEHGFGPSL
+SEIISFKSL
+SEKLRHMLL
+SELMKVSAM
+SELRKTLGPIW
+SFEAAAWYW
+SFHFQQKEI
+SFSSAPMPQI
+SGAPSLKGK
+SGFFLRTLY
+SHCPSAMGI
+SHLAVVGMF
+SIAECETRLGK
+SIAPEIALEL
+SIFYGLQY
+SIGDYYTCAR
+SIGPELPTPEV
+SILEQMHRK
+SIPDPSFPL
+SISCHVFCL
+SISDEIAKA
+SIYFCIYFL
+SIYWAYDNGIK
+SLADMLDHA
+SLAESYFV
+SLAHHIQLI
+SLDQPVTALNV
+SLDTAKVRL
+SLEEINCTI
+SLEKMVCLV
+SLFWQTAMV
+SLHKGSLYPR
+SLIAAFEV
+SLIHYTAQI
+SLINGNICHER
+SLKKSFNFF
+SLKQKKKP
+SLKSTNPSV
+SLKTLMSHY
+SLLMWITQA
+SLLPNNAADL
+SLLPPQDPHL
+SLLQGSPHV
+SLLSHPLPEF
+SLLTPPSTK
+SLMDKVSNGI
+SLMPQPLADGI
+SLMSQPGL
+SLMTPNTITM
+SLNDYKPPV
+SLNICKENEV
+SLNRLLKV
+SLPFQFAHRL
+SLPMKNFPV
+SLPSNVLSSL
+SLQPAPAL
+SLQPRGSFK
+SLSKGDCQTL
+SLTKKITLL
+SLVAAWYSGV
+SLVGPLPSGSV
+SLVNIPANGV
+SLYCHTYAEKV
+SLYDLDIEA
+SLYLKIHLK
+SLYLRPVLI
+SLYTTEMDLR
+SMACVGFFL
+SMEERIAY
+SMHIDNNTLL
+SMIPKAIESF
+SMIQMLFYM
+SMKGHEKIAK
+SMLHFVTSI
+SMSPVLHTENK
+SMYKDVTSV
+SNISPWWNF
+SNTSRYATAL
+SPAFTESPV
+SPAPPRRRRSA
+SPFLSQRVA
+SPGDAHRESL
+SPLYSVKSL
+SPMEKAISL
+SPPHPGRLPDL
+SPRSWGPRL
+SPSRKLAAH
+SPVPQGARWRL
+SPVTFPAAA
+SPWATSSHL
+SQDDNIVGL
+SQDQELPSV
+SQFARVPGYV
+SQGEPALLQPV
+SQGSRSSHI
+SQIAHLVQHR
+SQNSSTICCV
+SQSDYIPM
+SQSPRSPPGK
+SQSPSSFSM
+SRHCLQPL
+SRLLVRPTSF
+SSADHPGASK
+SSCAPPLHR
+SSCMGGVNR
+SSEDDGFFLGK
+SSGFCNIAVK
+SSHRHLHVVY
+SSMESRLLK
+SSRTRHYVTL
+SSSITTTK
+SSWHNADDDR
+SSYTGFANK
+STAFDFLAV
+STAKSTTWTY
+STGDATPLPV
+STIARPTIGNK
+STIMGSYLGV
+STPLPGTRVR
+STRPVLVFER
+SVACINLSFCL
+SVFNICDVPL
+SVFNTWNPM
+SVFTLTADR
+SVISQLMK
+SVIVRTSSGK
+SVKPHLCSL
+SVLLPENYITK
+SVLNYFKPY
+SVQAPVPPK
+SVQDKCVEM
+SVQDVSLFV
+SVTGYYGNWFV
+SVWILCDAHCL
+SVYSCVALPYF
+SYAVRCAFYQL
+SYEKIYLDF
+SYGVRFNSF
+SYLDSGIHF
+SYMIMEIEL
+SYSHKVDIFFL
+SYYKISSDK
+TAHLNCNLF
+TARKCTGGK
+TAYPNSIPLV
+TEATFFPPL
+TEDEHFEFY
+TEDYMIHII
+TELERFLEY
+TFITIGDTNF
+TIDVGSGNNY
+TIQKFLSLK
+TISKLYIPK
+TIVEHKYPSV
+TIYVFEIRAR
+TLAEDLNLL
+TLDECGLSYL
+TLDQSTMHI
+TLDWLLQTPK
+TLFSALWAL
+TLFTMVGTV
+TLHHLLMSQV
+TLIAIFPYARL
+TLIGLPWSFL
+TLIQCSHFT
+TLLSLPVHFNL
+TLPEEFHEF
+TLPGTLLLDEV
+TLQELSHAL
+TLQRNTFLGL
+TLSQQLPREPV
+TLWCSPIKV
+TLWEGGLFKL
+TLYMDVML
+TLYSPRGEK
+TMFGLPFAT
+TMIEEYDSG
+TMLTKTWHSSA
+TMSFSHLFYL
+TPEPAELSL
+TPITMTLPF
+TPLVIKIDKPY
+TPTDVTARHL
+TPTVPSSSF
+TQFLYIWFK
+TQFNAWWHIL
+TQFWCAVAL
+TRARNEYLLSL
+TRNIIKYNL
+TSDYLSQSY
+TSLSGIAHK
+TSNHESQVTF
+TSYMPCSAYQK
+TTEGIWKDVY
+TTSGTSQY
+TTWQRPIMESV
+TVIEYWSQK
+TVITEEFEV
+TVNMHRLHVK
+TVPSKFTFEV
+TVSPFLSQR
+TVTECLNTFCK
+TWSTPHFYF
+TYIIKSVGF
+TYLPSAWNF
+TYSGKFLIL
+TYYPGKKEPF
+VADINDHAL
+VAFCDMLLNV
+VAKGFISRM
+VALPYFHSF
+VARGGSMGV
+VARLSQRFPK
+VAWHSEVGLPL
+VDNPLMCRL
+VENQKHSL
+VERASAIAW
+VEWLGRCIL
+VFKDLSVTL
+VFLRTLEKGDW
+VFYRAWHQV
+VHDYFSVI
+VIDAAFNGGV
+VIDSVNAK
+VIFLACFAPY
+VIHNFLFSLK
+VIMLNGTKK
+VIRRDFSMADK
+VISEGSLK
+VISKKDFHK
+VLANDPDAHRL
+VLDGFIPGT
+VLDHKLEWV
+VLDKAGSFK
+VLEFEQMNLY
+VLENFTIFLV
+VLFEDAVAY
+VLFHRAFLV
+VLFTCVPAA
+VLHPQTEGM
+VLKNHKLLSK
+VLLRFQPRV
+VLLSICYLL
+VLLTSWNHSL
+VLLYAEIYA
+VLNIVRFLK
+VLNPFIYML
+VLPPCIISGGI
+VLQAGMLRI
+VLQDFIIL
+VLSNDVCAQV
+VLSQVDLPCGI
+VLSWLLKYKI
+VLVSRMPFV
+VLVTGCMFV
+VLWDYVYQL
+VLWHVTYWV
+VLYLHITWV
+VLYVWSFFL
+VMASVDNPL
+VMDDFAAFVEK
+VMLCGHDAV
+VMLEGEQEA
+VMLENFRNLLL
+VMLRVQPDWK
+VMNNLLPTSV
+VMYNWKMVI
+VPKAYTWGAV
+VPKEHPAPPA
+VPKKTPSL
+VPRFVFKLY
+VPRVSDTI
+VQIISCQY
+VQVGGVTYI
+VQYLGMFPV
+VRRASVCLITL
+VSGHRSTRK
+VSKILPSTW
+VSQPVAPSY
+VTEKLQPTY
+VTFGSLPPA
+VTHYVRPQVRK
+VTIGPRLLL
+VTRRHASHQTF
+VVGACGVGK
+VVHKRIHLGEK
+VVMSWAPPV
+VVNMNEIVRTK
+VVSHPHLVYW
+VVVPCEPPEV
+VYFFLPDHL
+VYPPRGFSP
+VYQYTFPDF
+VYRPLHYPLL
+VYVAKLHDI
+WATSSSRVW
+WEDSQLVSHL
+WLEWWHVQPTL
+WLFGMDLNKI
+WLIDMKSLV
+WLIEGDLQVL
+WLIRETQPITK
+WLNGFSVAML
+WLRDHRMTGL
+WLSDASERHPV
+WLSQGQFLL
+WLSVLECVEL
+WLTGFLLA
+WLVDLLPST
+WLVGGIVAA
+WLWEPLRVV
+WNDINCCY
+WPVLLLNV
+WQADIVAAL
+WQLEFLQPL
+WRNSFLLRY
+WTHDNIMSK
+WTRDSCDFSY
+WVAPDSHIF
+WVLALFDEV
+WVMPVIPAL
+WVNGQSLLV
+WVYECTVFL
+WVYSSHRHL
+WYLKVINLF
+WYLRINKRGKV
+WYTHNLIF
+YADPFALV
+YATALYRQGEL
+YDYVSALHPV
+YEGQVISNGF
+YEHEDVKEA
+YFFWGLWAL
+YHGDPMPCL
+YHSIEWAI
+YHYSEVDTSM
+YIAQFKGAW
+YIHGRGWAL
+YILKYSVFL
+YIMMKTHLL
+YISGWNPTL
+YISKCWDYA
+YLAMISEGYL
+YLAPQESYGA
+YLCAGAVYF
+YLCLQNNFI
+YLCTASNFL
+YLDDRNTFRHI
+YLDELIRNT
+YLDTDVILM
+YLEPGPVTV
+YLFFIQGYK
+YLFRGRINPEV
+YLHKHYNNL
+YLIPCYFHA
+YLIRREKV
+YLLFQNTDL
+YLLNIPGPIYI
+YLLSKSFRK
+YLLTDCNPA
+YLNWIVRNL
+YLPGEPEGI
+YLQAHQRVHTV
+YLQDSMATT
+YLRTAKFLEM
+YLSKFSGK
+YLSNIIPAL
+YLTDKDFEF
+YLTPQSNHLSV
+YLVYQMLKV
+YLWKAENTL
+YLWPPVQLA
+YLWWVNGQSLL
+YLYDRLLRV
+YLYRSYHYSEV
+YMDGTMSQV
+YMFLASPSV
+YMHTDLQAL
+YMLTLHTKL
+YMMNSVQENF
+YMPGGDLVKL
+YMPTTIIAA
+YMQRCPEDFRL
+YMSHRELSAWV
+YMTAVLEYL
+YMYEAPPGA
+YMYLRQLFHI
+YNFEMLQQHAV
+YNSFSSAPM
+YNTDDIEFY
+YPFNAKQPTDV
+YPFQFVPGL
+YPHSLSSKL
+YPPPPPALL
+YQFFSDECSY
+YQFRIIAKNDV
+YQGRTKLVKDF
+YQSLKQFNV
+YQVSCCDWLL
+YRHLFKVFR
+YRIYDIPPK
+YSMECFQFM
+YSNAQILHF
+YSSIVANRW
+YSYWSIILGY
+YTAPGIVEI
+YTAVHYAASY
+YTCEKPYYY
+YTFEIQGV
+YTHNLIFVF
+YTLDFGPL
+YTMYIFPV
+YTWPSGNIY
+YVAAYQRL
+YVAKYTVPV
+YVDFREYEYY
+YVEYYSWLSYL
+YVGSPLAAM
+YVLTWIVGA
+YVRRVFITDDL
+YVTAMDIFV
+YVVPGSPCL
+YYILDKKEHFK
+YYNFEGDIALL
+YYPPSQIAQL
