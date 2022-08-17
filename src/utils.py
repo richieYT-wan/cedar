@@ -4,6 +4,91 @@ import pickle
 import pandas as pd
 from IPython.display import display_html
 from itertools import chain, cycle
+import torch
+
+
+def save_checkpoint_multiple(models, dir_path: str = './', name: str = 'checkpoint.pt'):
+    """
+    Assumes models is either a dict or a list of dict/list/models
+    The subfunction save_dict_list_loop will iterate within and save the submodels within and give them
+    the appropriate name (e.g. test, validation folds as tX_vZ for the test fold X and val fold Z)
+
+    Args:
+        models (list, dict): list or dict containing list/dict/models to be saved
+        dir_path: path to the directory where the models should be saved
+        name: the name itself (ex: CNN_model) The loop itself will give it the appropriate test/val fold names
+
+    Returns:
+
+    """
+    base_name = name.rstrip('.pt')
+    # First if it's a dict
+    if type(models) == dict:
+        for num1, val1 in models.items():
+            save_dict_list_loop(num1, val1, dir_path, base_name)
+
+    # If it's a list:
+    elif type(models) == list:
+        for num1, val1 in enumerate(models):
+            save_dict_list_loop(num1, val1, dir_path, base_name)
+
+
+def save_dict_list_loop(num1, val1, dir_path, base_name):
+    """
+    Does the loop which checks and save every submodel within a dictionary or a list
+    `num1` should be the outer fold, given by either enumerate or dict.keys()
+    `val1` should be the inner item, either a list, another dict, or the model itself
+
+    Args:
+        num1: the key/iteration of the outer fold
+              (i.e. returned by num1, item in enumerate(list) or num1, val1 in dict.items())
+        val1: The item within the list or dict
+        dir_path: path to the directory where the models should be saved
+        base_name: the name itself (ex: CNN_model) The loop itself will give it the appropriate test/val fold names
+
+    Returns:
+
+    """
+    # If it's a dict of dict: two levels, much easier
+    if type(val1) == dict:
+        for num2, val2 in val1.items():
+            if hasattr(val2, 'state_dict'):
+                name = f'{base_name}_t{num1}_v{num2}'
+                save_checkpoint_single(val2, dir_path, name)
+    # If it's a list in the dict, then enumerate instead
+    if type(val1) == list:
+        for num2, val2 in enumerate(val1):
+            if hasattr(val2, 'state_dict'):
+                name = f'{base_name}_t{num1}_v{num2}'
+                save_checkpoint_single(val2, dir_path, name)
+
+    # If dict only has one level, i.e. it's a standard crossvalidation output and not nested
+    elif hasattr(val1, 'state_dict'):
+        save_checkpoint_single(val1, dir_path, name)
+
+
+def save_checkpoint_single(model, dir_path: str = './', name: str = 'checkpoint.pt'):
+    """
+    Saves a single torch model, with some sanity checks
+    Args:
+        model: torch model (i.e. anything that inherits from nn.Module and has a state_dict())
+        dir_path: path to the directory where the models should be saved
+        name: the name itself (ex: CNN_model_t0_v1 for a CNN model from the test fold 0, validation fold 1)
+
+    Returns:
+        nothing.
+    """
+    # Small sanity checks
+    assert hasattr(model, 'state_dict'), f'Object of type {type(model)} has no state_dict and can\'t be saved!'
+    # Bad practice but fuck it
+    if not os.path.exists(dir_path):
+        mkdirs(dir_path)
+        print(f'Creating {dir_path}; The provided dir path {dir_path} did not exist!')
+    if not name.endswith('.pt'):
+        name = name + '.pt'
+    savepath = os.path.join(dir_path, name)
+    torch.save(model.state_dict(), savepath)
+    print(f'Model saved at {savepath}')
 
 
 def display_side(*args, titles=cycle([''])):
@@ -65,6 +150,8 @@ def flatten_level_columns(df: pd.DataFrame, levels=[0, 1]):
 def convert_path(path):
     return path.replace('\\', '/')
 
+
+### Reading NetMHCpan output fcts
 
 def parse_netmhcpan_header(df_columns: pd.core.indexes.multi.MultiIndex):
     """

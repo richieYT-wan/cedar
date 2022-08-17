@@ -1,7 +1,12 @@
 import numpy as np
 import pandas as pd
 import torch
-import sklearn
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+mpl.rcParams['figure.dpi'] = 180
+sns.set_style('darkgrid')
 from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, recall_score, precision_score
 
 
@@ -13,10 +18,9 @@ def get_pred_df(y_pred, y_scores, y_true):
     Use test sets as data_dict, target_labels_dict, load trained model into model_dict,
     then call this method
     Args:
-        model_dict:
-        data_dict:
-        target_labels_dict:
-
+        y_scores:
+        y_true:
+        y_pred:
     Returns:
 
     """
@@ -41,7 +45,7 @@ def get_pred_df(y_pred, y_scores, y_true):
     return df
 
 
-def get_metrics(y_true, y_score, y_pred=None, threshold=0.5):
+def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
     """
     Computes all classification metrics & returns a dictionary containing the various key/metrics
     incl. ROC curve, AUC, AUC_01, F1 score, Accuracy, Recall
@@ -54,26 +58,59 @@ def get_metrics(y_true, y_score, y_pred=None, threshold=0.5):
         metrics (dict): Dictionary containing all results
     """
     metrics = {}
-    # If no y_pred is provided, will threshold score (y in [0, 1])
+    # DETACH & PASS EVERYTHING TO CPU
     if threshold is not None and y_pred is None:
-        y_pred = (y_score>threshold).cpu().detach().numpy()
-        if type(y_pred)==torch.tensor:
+        # If no y_pred is provided, will threshold score (y in [0, 1])
+        y_pred = (y_score > threshold)
+        if type(y_pred) == torch.Tensor:
             y_pred = y_pred.cpu().detach().numpy()
-        elif type(y_pred)==np.ndarray:
+        elif type(y_pred) == np.ndarray:
             y_pred = y_pred.astype(int)
-
-    elif y_pred is not None:
+    elif y_pred is not None and type(y_pred) == torch.Tensor:
         y_pred = y_pred.int().cpu().detach().numpy()
-    y_true, y_score = y_true.int().cpu().detach().numpy(), y_score.cpu().detach().numpy()
+
+    if type(y_true) == torch.Tensor and type(y_score) == torch.Tensor:
+        y_true, y_score = y_true.int().cpu().detach().numpy(), y_score.cpu().detach().numpy()
     fpr, tpr, _ = roc_curve(y_true, y_score)
     metrics['roc_curve'] = fpr, tpr
     try:
         metrics['auc'] = roc_auc_score(y_true, y_score)
     except:
-        print(all(y_true==0), all(y_true==1))
+        print(all(y_true == 0), all(y_true == 1))
     metrics['auc_01'] = roc_auc_score(y_true, y_score, max_fpr=0.1)
     metrics['f1'] = f1_score(y_true, y_pred)
     metrics['accuracy'] = accuracy_score(y_true, y_pred)
     metrics['precision'] = precision_score(y_true, y_pred)
     metrics['recall'] = recall_score(y_true, y_pred)
+    if keep:
+        metrics['y_true'] = y_true
+        metrics['y_score'] = y_score
     return metrics
+
+
+def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=None,
+                      title='ROC AUC plot\nPerformance for average prediction from models of each fold',
+                      bbox_to_anchor=(0.9, -0.1)):
+    n_colors = len(results_dict.keys()) if n_colors is None else n_colors
+    sns.set_palette(palette, n_colors=n_colors)
+    if fig is None and ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    print(results_dict.keys())
+    for k in results_dict:
+        fpr = results_dict[k]['roc_curve'][0]
+        tpr = results_dict[k]['roc_curve'][1]
+        auc = results_dict[k]['auc']
+        auc_01 = results_dict[k]['auc_01']
+        # print(k, auc, auc_01)
+        style = '--' if type(k) == np.int32 else '-'
+        alpha = 0.75 if type(k) == np.int32 else .9
+        lw = .8 if type(k) == np.int32 else 1.5
+        sns.lineplot(fpr, tpr, ax=ax, label=f'{k}, AUC={auc.round(4)}, AUC_01={auc_01.round(4)}',
+                     n_boot=50, ls=style, lw=lw, alpha=alpha)
+
+    sns.lineplot([0, 1], [0, 1], ax=ax, ls='--', color='k', label='random', lw=0.5)
+    if bbox_to_anchor is not None:
+        ax.legend(bbox_to_anchor=bbox_to_anchor)
+
+    ax.set_title(f'{title}')
+    return fig, ax

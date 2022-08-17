@@ -3,13 +3,12 @@ import random
 import os, sys
 import argparse
 from tqdm import tqdm
-import math
-
+from datetime import datetime as dt
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 
-from src.utils import mkdirs, convert_path, read_netmhcpan_results, set_hla, str2bool
+from src.utils import mkdirs, convert_path, str2bool
 from joblib import Parallel, delayed
 from functools import partial
 from tqdm.auto import tqdm
@@ -33,7 +32,7 @@ def args_parser():
                         Default is "all" which will list and subsample for all HLAs present \
                         in the data directory. Else, format should be like in the txt filenames.')
     parser.add_argument('-outdir', type=str, default='../output_xls/subsampled/')
-    parser.add_argument('-n', type=int, default=10000, help='Subsampling N sequences from each file')
+    parser.add_argument('-n', type=int, default=100, help='Subsampling N sequences from each file')
     parser.add_argument('-seed', type=int, default=13, help='Seed for the random sampling')
     parser.add_argument('-conserved', type=str2bool, default=False,
                         help='Whether to randomly sample or sample conserved peptides (default False)')
@@ -41,10 +40,7 @@ def args_parser():
                         help='How many occurrences in human proteome file to define a peptide as "conserved"')
     parser.add_argument('-rank_weighting', dest='rw', type=str2bool, default=False,
                         help='Whether to use weighting to try and follow a HLA rank distribution.')
-    # parser.add_argument('-rank_weighting', dest='rw', type=str, default='../data/cedar_neoepitope_220701_scored.csv',
-    #                     help = 'Whether to use weighting to try and follow a HLA rank distribution.'
-    #                            'Is of type str (path) to the file (in txt or csv) with the target rank distribution'
-    #                            'Default: ../data/cedar_neoepitope_220701_scored.csv')
+    parser.add_argument('-rank_range', nargs='+', default = [0, 0.5], help='Rank-range (inclusive) in which to select peptide. [0, 0.5] by default')
     return parser.parse_args()
 
 
@@ -54,12 +50,16 @@ def weight_peps(k, hla, args):
 
     tmp = pd.concat([pd.read_csv(os.path.join(args['datadir'],x), sep='\t', skiprows=1) \
                      for x in os.listdir(args['datadir']) if hla in x and f'{k}mer' in x])
-    tmp['HLA']=hla
+    tmp['HLA'] = hla
+    lower = float(args['rank_range'][0])
+    upper = float(args['rank_range'][1])
+    tmp = tmp.query("EL_Rank>=@lower and EL_Rank<=@upper")
     # Here first does a downsampling wrt. len proportions
     if args['rw']:
         tmp['wt'] = 1 / tmp['EL_Rank']
         return tmp.sample(int(LEN_WEIGHTS[k] * len(tmp)), weights='wt', random_state=args['seed'])
     else:
+        tmp['wt'] = 1
         return tmp.sample(int(LEN_WEIGHTS[k] * len(tmp)), random_state=args['seed'])
 
 
@@ -69,6 +69,7 @@ def sample_peps(hla, args):
     :param hla:
     :return:
     """
+
     weight_peps_ = partial(weight_peps, hla=hla, args=args)
     output = Parallel(n_jobs=N_CORES_K)(delayed(weight_peps_)(k) for k in [8, 9, 10, 11, 12])
     return pd.concat(output).sample(n=args['n'], weights='wt', random_state=args['seed'])
@@ -77,6 +78,7 @@ def sample_peps(hla, args):
 def main():
     args = vars(args_parser())
     args['outdir'], args['datadir'] = convert_path(args['outdir']), convert_path(args['datadir'])
+    assert len(args['rank_range'])==2, f'Rank range does not contain 2 numbers! {args["rank_range"]} with numbers of type {type(args["rank_range"][0])}.'
     mkdirs(args['outdir'])
     hlas = sorted(set(hla.strip('.txt') for z in os.listdir(args['datadir']) \
                       for i, hla in enumerate(z.split('_')) if "HLA" in hla)) if args['hla'] == 'all' else [args['hla']]
@@ -92,7 +94,9 @@ def main():
     sample_peps_ = partial(sample_peps, args=args)
     df_results = Parallel(n_jobs=N_CORES_HLA)(delayed(sample_peps_)(hla) for hla in tqdm(hlas))
     df_results = pd.concat(df_results, ignore_index=True)
-    fname = f"humanprot_sub_N{args['n']}_seed{args['seed']}{add_name}_scored.txt"
+    now = dt.now().microsecond
+    id = str(now)+str(int(random.random()*1e5))
+    fname = f"humanprot_sub_N{args['n']}_seed{args['seed']}{add_name}_{id}_scored.txt"
     df_results.to_csv(os.path.join(args['outdir'], fname), index=False)
 
 
