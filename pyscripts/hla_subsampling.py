@@ -97,6 +97,11 @@ def main():
     now = dt.now().microsecond
     id = str(now)+str(int(random.random()*1e5))
     fname = f"humanprot_sub_N{args['n']}_seed{args['seed']}{add_name}_{id}_scored.txt"
+    df_results['len'] = df_results.Peptide.apply(len)
+    df_results['agg_label'] = 0
+    df_results['percentage_pos'] = 0
+    df_results['dataset'] = 'hp'
+    df_results['total_count'] = int(args['conserved_threshold'])
     df_results.to_csv(os.path.join(args['outdir'], fname), index=False)
 
 

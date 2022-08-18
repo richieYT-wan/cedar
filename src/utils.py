@@ -7,6 +7,24 @@ from itertools import chain, cycle
 import torch
 
 
+def flatten_product(container):
+    """
+    Flattens a product or container into a flat list, useful when product/chaining many conditions
+    Looks into each sub-element & recursively calls itself
+    Args:
+        container:
+    Returns:
+
+    """
+    for i in container:
+        if isinstance(i, list) or isinstance(i, tuple):
+            for j in flatten_product(i):
+                yield j
+        else:
+            yield i
+
+
+
 def save_checkpoint_multiple(models, dir_path: str = './', name: str = 'checkpoint.pt'):
     """
     Assumes models is either a dict or a list of dict/list/models

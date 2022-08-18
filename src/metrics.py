@@ -114,3 +114,51 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
 
     ax.set_title(f'{title}')
     return fig, ax
+
+
+def get_mean_roc_curve(roc_curves_dict, extra_key=None):
+    """
+    Assumes a single-level dict, i.e. roc_curves_dict has all the outer folds, and no inner folds
+    Or it is the sub-dict that contains all the inner folds for a given outer fold.
+    i.e. to access a given fold's curve, should use `roc_curves_dict[number]['roc_curve']`
+    Args:
+        roc_curves_dict:
+        extra_key (str) : Extra_key in case it's nested, like train_metrics[fold]['valid']['roc_curve']
+    Returns:
+        base_fpr
+        mean_curve
+        std_curve
+    """
+
+    if extra_key is not None:
+        max_n = max([len(v[extra_key]['roc_curve'][0]) for k, v in roc_curves_dict.items()])
+    else:
+        max_n = max([len(v['roc_curve'][0]) for k, v in roc_curves_dict.items()])
+    # Base fpr to interpolate
+    tprs = []
+    base_fpr = np.linspace(0, 1, max_n)
+    if extra_key is not None:
+        for k, v in roc_curves_dict.items():
+            fpr = v[extra_key]['roc_curve'][0]
+            tpr = v[extra_key]['roc_curve'][1]
+            # Interp TPR so it fits the right shape for base_fpr
+            tpr = np.interp(base_fpr, fpr, tpr)
+            tpr[0] = 0
+            # Saving to the list so we can stack and compute the mean and std
+            tprs.append(tpr)
+    else:
+        for k, v in roc_curves_dict.items():
+            fpr = v['roc_curve'][0]
+            tpr = v['roc_curve'][1]
+            # Interp TPR so it fits the right shape for base_fpr
+            tpr = np.interp(base_fpr, fpr, tpr)
+            tpr[0] = 0
+            # Saving to the list so we can stack and compute the mean and std
+            tprs.append(tpr)
+
+    tprs = np.stack(tprs)
+    mean_tprs = tprs.mean(axis=0)
+    std_tprs = tprs.std(axis=0)
+    upper = np.minimum(mean_tprs+std_tprs, 1)
+    lower = mean_tprs - std_tprs
+    return base_fpr, mean_tprs, lower, upper

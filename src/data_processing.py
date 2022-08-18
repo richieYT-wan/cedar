@@ -296,7 +296,7 @@ def get_tensor_dataset(df, ics_dict, device, max_len=12, encoding='onehot', blos
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                      rank_thr=0.25, mask=False, add_rank=False, add_aaprop=False, remove_pep=False):
+                      rank_thr=0.25, mask=False, add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
     """
         Computes the frequencies as the main features
         Takes as input a df containing sequence, len, HLA;
@@ -317,6 +317,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         mask:
         add_aaprop:
         remove_pep: Boolean switch to discard the AA sequence/freq in features (e.g. keep only rank or only chem props)
+        standardize: Exists here because I'm bad at coding so it doesn't throw an error if I had thought about this in a better way
 
     Returns:
         tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
@@ -324,20 +325,15 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     df = verify_df_(df, seq_col, hla_col, target_col)
     x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
                                                       seq_col, hla_col, target_col, rank_thr, mask).numpy())
-    print(x[0], x.shape)
 
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
-        print(ranks.shape)
         x = np.concatenate([x, ranks], axis=1)
-        print(x.shape)
 
     if add_aaprop:
         df_props, columns = get_aa_properties(df, seq_col)
         aa_props = df_props[columns].values
-        print(aa_props.shape)
         x = np.concatenate([x, aa_props], axis=1)
-        print(x.shape)
 
     y = df[target_col].values
     # Queries whatever is above 20, and only keeps that as feature
