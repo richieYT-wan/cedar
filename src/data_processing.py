@@ -45,7 +45,7 @@ def _init(DATADIR):
     BL62_VALUES = dict((x, BL62_VALUES.loc[x].values) for x in BL62_VALUES.index)
 
     # BLOSUMS 62 FREQS
-    _blosum62 = np.loadtxt(f'{DATADIR}blosum62.freq_rownorm', dtype=float).T
+    _blosum62 = np.loadtxt(f'{DATADIR}BLOSUM62.freq_rownorm', dtype=float).T
     BL62FREQ = {}
     BL62FREQ_VALUES = {}
     for i, letter_1 in enumerate(AA_KEYS):
