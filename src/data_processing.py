@@ -22,7 +22,7 @@ def _init(DATADIR):
     VAL = math.floor(4 + (multiprocessing.cpu_count() / 1.5))
     N_CORES = VAL if VAL <= multiprocessing.cpu_count() else int(multiprocessing.cpu_count() - 2)
 
-    DATADIR = f'{DATADIR}/Matrices/'
+    DATADIR = f'{DATADIR}Matrices/'
     AA_KEYS = [x for x in 'ARNDCQEGHILKMFPSTWYV']
 
     CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
