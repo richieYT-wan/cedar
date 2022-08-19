@@ -74,9 +74,12 @@ def tune_wrapper(args, model, hyperparams, train_dataset, ics_dict, ics_name,
     # HERE CONDITION TO EARLY EXIT IF REMOVE_PEP IS TRUE, AS WE DON'T NEED 100 CONDITIONS with
     # IC dicts, blosum, etc.
     # If remove_pep is true, we should just keep a single condition with Onehot and no weight and no blosum
+    # This drops 176 conditions for each of the 576 loops per model
+    # --> Leaves 400 runs per model
     if remove_pep:
-        if encoding != 'onehot' and blosum_matrix is not None and ics_dict is not None:
+        if encoding != 'onehot' or ics_name != 'None':
             return [pd.DataFrame(), 0, 0]
+
     # Here sets the output tag (names, variables and their values)
     # quickly rename the model name so it's shorter
     mapping = {'RandomForestClassifier': 'RF',
@@ -131,10 +134,11 @@ def main():
     dataset_cedar = pd.read_csv(f'{args["datadir"]}cedar_10fold.csv')
     dataset_cedar['trainset'] = 'dataset_cedar'.strip('dataset_')
 
-    dataset_cedar_hp_rank_low = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_10fold.csv')
+    dataset_cedar_hp_rank_low = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_10fold.csv').query('Peptide!="YTKDGIGL"')
     dataset_cedar_hp_rank_low['trainset'] = 'dataset_cedar_hp_rank_low'.strip('dataset_')
 
-    dataset_cedar_hp_rank_uni = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_rank120_10fold.csv')
+    xl = ['HAGLLQTV', 'KSISALPV', 'VLDASKAL']
+    dataset_cedar_hp_rank_uni = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_rank120_10fold.csv').query('Peptide not in @xl')
     dataset_cedar_hp_rank_uni['trainset'] = 'dataset_cedar_hp_rank_uni'.strip('dataset_')
 
     dataset_cedar_virus = pd.read_csv(f'{args["datadir"]}cedar_viral_10fold.csv')

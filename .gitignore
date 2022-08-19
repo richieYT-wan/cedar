@@ -170,12 +170,12 @@ output/15mers_humanproteome.txt
 output/8mers_humanproteome.txt
 output/9mers_humanproteome.txt
 output_xls/
-output/*scored*.txt
+output/hp_chunks/*scored*.txt
 output/whole_proteome/
 output_xls.zip
 notebook/cedar_filtered_results.txt
 notebook/cedar_filtered_results_1.txt
 notebook/filt_cedar.txt
 notebook/rank_2_a0101.txt
-output/human_proteome_8to12mers.pep
+output/hp_chunks/human_proteome_8to12mers.pep
 data/immunopeptidome/
