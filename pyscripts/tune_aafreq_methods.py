@@ -32,10 +32,10 @@ def args_parser():
     parser = argparse.ArgumentParser(
         description='Script to crossvalidate and evaluate methods that use aa frequency as encoding')
 
-    parser.add_argument('-datadir', type=str, default='../data/script_traindata/',
+    parser.add_argument('-datadir', type=str, default='../data/partitioned_traindata/',
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str, default='../output/tuning/')
-    parser.add_argument('-icsdir', type=str, default='../output/', help='Path containing the pre-computed ICs dicts.')
+    parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/', help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-debug', type=str2bool, default=False)
 
     return parser.parse_args()
