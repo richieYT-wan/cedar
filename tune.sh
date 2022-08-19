@@ -5,7 +5,7 @@ source activate phd
 
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=${HOMEDIR}pyscripts/
-DATADIR=../data/script_traindata/
+DATADIR=../data/partitioned_traindata/
 OUTDIR=../output/tuning/
 ICSDIR=../output/
 cd ${PYDIR}

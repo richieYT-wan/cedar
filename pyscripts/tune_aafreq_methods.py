@@ -194,6 +194,7 @@ def main():
                                    'reg_alpha': np.logspace(-9, -1, 4), 'reg_lambda': np.logspace(-9, -1, 4)},
                                   {'C': [0.01, 0.1, 1, 10]}])
         tune_results_model = {}
+    print(f'\n\n\n\tCPU COUNT:\t{multiprocessing.cpu_count()}\n\n\n')
     # Loop with parallelized jobs
     for model, hyperparameters in tqdm(models_params_grid, desc='models', leave=False):
         tune_results = []
