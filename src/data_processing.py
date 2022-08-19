@@ -22,30 +22,31 @@ def _init(DATADIR):
     VAL = math.floor(4 + (multiprocessing.cpu_count() / 1.5))
     N_CORES = VAL if VAL <= multiprocessing.cpu_count() else int(multiprocessing.cpu_count() - 2)
 
-    DATADIR = f'{DATADIR}Matrices/'
+    MATRIXDIR = f'{DATADIR}Matrices/'
+    ICSDIR = f'{DATADIR}ic_dicts/'
     AA_KEYS = [x for x in 'ARNDCQEGHILKMFPSTWYV']
 
     CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
     INT_TO_CHAR = dict((i, c) for i, c in enumerate(AA_KEYS))
 
-    BG = np.loadtxt(f'{DATADIR}bg.freq.fmt', dtype=float)
+    BG = np.loadtxt(f'{MATRIXDIR}bg.freq.fmt', dtype=float)
     BG = dict((k, v) for k, v in zip(AA_KEYS, BG))
 
     # BLOSUMS 50
     BL50 = {}
-    _blosum50 = np.loadtxt(f'{DATADIR}BLOSUM50', dtype=float).T
+    _blosum50 = np.loadtxt(f'{MATRIXDIR}BLOSUM50', dtype=float).T
     for i, letter_1 in enumerate(AA_KEYS):
         BL50[letter_1] = {}
         for j, letter_2 in enumerate(AA_KEYS):
             BL50[letter_1][letter_2] = _blosum50[i, j]
     # BLOSUMS 62
-    BL62_DF = pd.read_csv(f'{DATADIR}BLOSUM62', sep='\s+', comment='#', index_col=0)
+    BL62_DF = pd.read_csv(f'{MATRIXDIR}BLOSUM62', sep='\s+', comment='#', index_col=0)
     BL62 = BL62_DF.to_dict()
     BL62_VALUES = BL62_DF.drop(columns=['B', 'Z', 'X', '*'], index=['B', 'Z', 'X', '*'])
     BL62_VALUES = dict((x, BL62_VALUES.loc[x].values) for x in BL62_VALUES.index)
 
     # BLOSUMS 62 FREQS
-    _blosum62 = np.loadtxt(f'{DATADIR}BLOSUM62.freq_rownorm', dtype=float).T
+    _blosum62 = np.loadtxt(f'{MATRIXDIR}BLOSUM62.freq_rownorm', dtype=float).T
     BL62FREQ = {}
     BL62FREQ_VALUES = {}
     for i, letter_1 in enumerate(AA_KEYS):
@@ -53,7 +54,7 @@ def _init(DATADIR):
         BL62FREQ_VALUES[letter_1] = _blosum62[i]
         for j, letter_2 in enumerate(AA_KEYS):
             BL62FREQ[letter_1][letter_2] = _blosum62[i, j]
-    HLAS = pkl_load(DATADIR.strip('Matrices/')+'ic_dicts/' + 'ics_shannon.pkl')[9].keys()
+    HLAS = pkl_load(ICSDIR+'ics_shannon.pkl')[9].keys()
     return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL62, BL62_VALUES, HLAS
 
 
