@@ -355,12 +355,13 @@ def kcv_tune_sklearn(dataframe, base_model, ics_dict, encoding_kwargs, hyperpara
     if encoding_kwargs is None:
         encoding_kwargs = {'max_len': 12,
                            'encoding': 'onehot',
-                           'blosum_matrix': BL62_VALUES,
+                           'blosum_matrix': None,
                            'standardize': False}
 
     essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
-    assert all([x in encoding_kwargs.keys() for x in essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
-                                 f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
 
     folds = sorted(dataframe.fold.unique())
     # Here in "tune" mode, keep 20% of the dataset as test set
@@ -441,10 +442,14 @@ def kcv_tune_sklearn(dataframe, base_model, ics_dict, encoding_kwargs, hyperpara
         # Saving metrics into the dict containing the hyperparams
         hyperparameter_selection['score_avg_valid_auc'] = np.mean([v['valid']['auc'] for k, v in train_metrics.items()])
         hyperparameter_selection['score_avg_train_auc'] = np.mean([v['train']['auc'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_valid_auc_01'] = np.mean([v['valid']['auc_01'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_train_auc_01'] = np.mean([v['train']['auc_01'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_valid_f1score'] = np.mean([v['valid']['f1'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_train_f1score'] = np.mean([v['train']['f1'] for k, v in train_metrics.items()])
+        hyperparameter_selection['score_avg_valid_auc_01'] = np.mean(
+            [v['valid']['auc_01'] for k, v in train_metrics.items()])
+        hyperparameter_selection['score_avg_train_auc_01'] = np.mean(
+            [v['train']['auc_01'] for k, v in train_metrics.items()])
+        hyperparameter_selection['score_avg_valid_f1score'] = np.mean(
+            [v['valid']['f1'] for k, v in train_metrics.items()])
+        hyperparameter_selection['score_avg_train_f1score'] = np.mean(
+            [v['train']['f1'] for k, v in train_metrics.items()])
         hyperparameter_selection['score_test_auc'] = test_metrics['tune']['auc']
         hyperparameter_selection['score_test_auc_01'] = test_metrics['tune']['auc_01']
         hyperparameter_selection['score_test_f1'] = test_metrics['tune']['f1']
@@ -460,12 +465,12 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
     if encoding_kwargs is None:
         encoding_kwargs = {'max_len': 12,
                            'encoding': 'onehot',
-                           'blosum_matrix': BL62_VALUES,
+                           'blosum_matrix': None,
                            'standardize': False}
-    assert {'max_len', 'encoding', 'blosum_matrix', 'standardize'} == set(
-        encoding_kwargs.keys()), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
-                                 f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required." \
-
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
     models_dict = {}
     test_metrics = {}
     train_metrics = {}
@@ -475,7 +480,7 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
     for fold_out in tqdm(folds):
         # Get test set & init models list to house all models trained in inner fold
         test = dataframe.query('fold == @fold_out').reset_index(drop=True)
-        x_test, y_test = get_array_dataset(test, ics_dict, **encoding_kwargs)
+        x_test_base, y_test = get_array_dataset(test, ics_dict, **encoding_kwargs)
         train_metrics[fold_out] = {}
         # For a given fold, all the models that are trained should be appended to this list
         models_dict[fold_out] = []
@@ -493,11 +498,17 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
             # Get datasets
             x_train, y_train = get_array_dataset(train, ics_dict, **encoding_kwargs)
             x_valid, y_valid = get_array_dataset(valid, ics_dict, **encoding_kwargs)
+
             if encoding_kwargs['standardize']:
-                x_train, x_valid, x_test = standardize(x_train, x_valid, x_test)
+                x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
                 # Saving the mean and std to be re-used when evaluating on another test-set
                 train_metrics[fold_out][fold_in]['mu'] = x_train.mean(axis=0)
                 train_metrics[fold_out][fold_in]['sigma'] = x_train.std(axis=0)
+            else:
+                # Here copy it every time, this is a workaround because of how standardize overwrites it
+                # i.e. I save the output of standardize into the same variable x_test lol.
+                x_test = copy.deepcopy(x_test_base)
+
             # Fit the model and append it to the list
             model.fit(x_train, y_train)
             models_dict[fold_out].append(model)
@@ -518,7 +529,8 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
     return models_dict, train_metrics, test_metrics
 
 
-def evaluate_trained_models_sklearn(dataframe, models_dict, ics_dict, train_metrics=None,
+def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
+                                    train_dataframe=None, train_metrics=None,
                                     encoding_kwargs: dict = None,
                                     concatenated=False, only_concat=False):
     """
@@ -544,9 +556,17 @@ def evaluate_trained_models_sklearn(dataframe, models_dict, ics_dict, train_metr
                            'hla_col': 'HLA',
                            'target_col': 'agg_label',
                            'rank_col': 'trueHLA_EL_rank'}
-    assert {'max_len', 'encoding', 'blosum_matrix', 'standardize'} == set(
-        encoding_kwargs.keys()), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
-                                 f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+    # This garbage code makes me want to cry
+    if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+        encoding_kwargs.update({'seq_col': 'Peptide',
+                                'hla_col': 'HLA',
+                                'target_col': 'agg_label',
+                                'rank_col': 'trueHLA_EL_rank'})
+
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
 
     if encoding_kwargs['standardize'] and train_metrics is None:
         raise ValueError('Standardize is enabled but no train_metrics provided!' \
@@ -557,29 +577,47 @@ def evaluate_trained_models_sklearn(dataframe, models_dict, ics_dict, train_metr
         concat_true = []
 
     for fold_out, models_list_out in models_dict.items():
-        if 'fold' in dataframe.columns:
-            test_df = dataframe.query('fold==@fold_out')
+        # If no train dataframe provided and test_dataframe is partitioned,
+        # It will eval on each of the folds
+        if 'fold' in test_dataframe.columns and train_dataframe is None:
+            test_df = test_dataframe.query('fold==@fold_out')
         else:
-            test_df = dataframe.copy()
+            test_df = test_dataframe.copy().reset_index(drop=True)
         x_test, y_test = get_array_dataset(test_df, ics_dict, **encoding_kwargs)
 
-        # if fold is in df's columns, then do the evaluation on each of the inner and outer folds
-        # Evaluate each models in the fold list, stack, and
-        # take the average to get average prediction (sigmoid score)
+        # Fuck my life ; Here to make sure the test fold evaluated doesn't overlap with with training peptides
+        inner_folds = [x for x in range(len(models_dict.keys())) if x != fold_out]
+
+        # One of the worst garbage code (top 5) I've written this week
+        if train_dataframe is not None:
+            tmp = train_dataframe.query('fold != @fold_out')  # Not sure why but I need to add this or it breaks
+            train_peps = [tmp.query('fold!=@fold_in')[encoding_kwargs['seq_col']].values for fold_in in inner_folds]
+            tmp_index = [test_df.query('Peptide not in @peps').index for peps in train_peps]
+            index_keep = tmp_index[0]
+            for index in tmp_index[1:]:
+                index_keep = index_keep.join(index, how='inner')
+        else:
+            index_keep = range(len(x_test))
+
         if encoding_kwargs['standardize']:
             # Very convoluted list comprehension, but basically predict_proba and the standardize operation
             # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
+            # One of the worst garbage code (top 5) I've written this week
             avg_prediction = [model.predict_proba(
-                ((x_test - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in]['sigma']))[:, 1] \
-                              for fold_in, model in enumerate(models_list_out)]
+                ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
+                    'sigma']))[:, 1] \
+                              for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
         else:
-            avg_prediction = [model.predict_proba(x_test)[:, 1] for model in models_list_out]
+            avg_prediction = [model.predict_proba(x_test[index_keep])[:, 1] for i, model in
+                              enumerate(models_list_out)]
+
         avg_prediction = np.mean(np.stack(avg_prediction), axis=0)
-        test_results[fold_out] = get_metrics(y_test, avg_prediction)
+
+        test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction)
 
         if concatenated:
             concat_pred.append(avg_prediction)
-            concat_true.append(y_test)
+            concat_true.append(y_test[index_keep])
     if concatenated:
         concat_pred = np.concatenate(concat_pred)
         concat_true = np.concatenate(concat_true)

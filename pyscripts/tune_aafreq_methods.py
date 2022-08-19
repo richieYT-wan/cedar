@@ -132,31 +132,35 @@ def main():
     mkdirs(args['outdir'])
     # Read data and assign train set name
     dataset_cedar = pd.read_csv(f'{args["datadir"]}cedar_10fold.csv')
-    dataset_cedar['trainset'] = 'dataset_cedar'.strip('dataset_')
+    dataset_cedar['trainset'] = 'cedar'
 
     dataset_cedar_hp_rank_low = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_10fold.csv').query('Peptide!="YTKDGIGL"')
-    dataset_cedar_hp_rank_low['trainset'] = 'dataset_cedar_hp_rank_low'.strip('dataset_')
+    dataset_cedar_hp_rank_low['trainset'] = 'cedar_hp_rank_low'
 
     xl = ['HAGLLQTV', 'KSISALPV', 'VLDASKAL']
     dataset_cedar_hp_rank_uni = pd.read_csv(f'{args["datadir"]}cedar_hp_mixed_rank120_10fold.csv').query('Peptide not in @xl')
-    dataset_cedar_hp_rank_uni['trainset'] = 'dataset_cedar_hp_rank_uni'.strip('dataset_')
+    dataset_cedar_hp_rank_uni['trainset'] = 'cedar_hp_rank_uni'
 
     dataset_cedar_virus = pd.read_csv(f'{args["datadir"]}cedar_viral_10fold.csv')
-    dataset_cedar_virus['trainset'] = 'dataset_cedar_virus'.strip('dataset_')
+    dataset_cedar_virus['trainset'] = 'cedar_virus'
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
     ics_none = None  # bit stupid but need to have the variable name somewhere :-)
     if args["debug"]:
         encode_blosum_zip = zip(['onehot', 'blosum'], [None, BL62FREQ_VALUES])
-        ics_mask_zip = zip([ics_shannon, ics_none], ['Shannon', 'None'], [False, False])
+        ics_mask_zip = zip([ics_shannon, ics_none, ics_shannon],
+                           ['Shannon', 'None', 'Mask'],
+                           [False, False, True])
         features_zip = zip([True], [True], [False])
-        train_datasets = [dataset_cedar]
+        train_datasets = [dataset_cedar, dataset_cedar_hp_rank_low, dataset_cedar_hp_rank_uni, dataset_cedar_virus]
         standardize_ = [True]
     else:
         # Creating the condition/products/zips
+
+        # encoding, blosum matrix
         encode_blosum_zip = zip(['onehot', 'blosum', 'blosum'], [None, BL62FREQ_VALUES, BL62_VALUES])
-        # Weighting zip
+        # Weighting zip (ic dict, ic name, mask bool)
         ics_mask_zip = zip([ics_shannon, ics_kl, ics_none, ics_shannon], ['Shannon', 'KL', 'None', 'Mask'],
                            [False, False, False, True])
         # True/False zips for add_rank, add_aaprop, remove_pep
@@ -210,7 +214,7 @@ def main():
         tune_results_model[model.__class__.__name__] = tune_results
     pkl_dump(tune_results_model, os.path.join(args['outdir'], 'tune_results_models.pkl'))
     end = dt.now()
-    elapsed = (end - start).second
+    elapsed = (end - start).seconds
     minutes, seconds = divmod(elapsed, 60)
     hours, minutes = divmod(minutes, 60)
     print(f'Time elapsed: {hours} hours, {minutes} minutes, {seconds} seconds.')
