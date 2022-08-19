@@ -506,5 +506,5 @@ def compute_ic(sequences, how='shannon', seq_weighting=True, beta=50):
     return ic_array
 
 
-def get_mia(ic_array, threshold=0.3):
+def get_mia(ic_array, threshold=1/3):
     return np.where(ic_array < threshold)[0]
