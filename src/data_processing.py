@@ -53,7 +53,7 @@ def _init(DATADIR):
         BL62FREQ_VALUES[letter_1] = _blosum62[i]
         for j, letter_2 in enumerate(AA_KEYS):
             BL62FREQ[letter_1][letter_2] = _blosum62[i, j]
-    HLAS = pkl_load(DATADIR+'ic_dicts/' + 'ics_shannon.pkl')[9].keys()
+    HLAS = pkl_load(DATADIR.strip('Matrices/')+'ic_dicts/' + 'ics_shannon.pkl')[9].keys()
     return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL62, BL62_VALUES, HLAS
 
 
