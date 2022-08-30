@@ -179,3 +179,5 @@ notebook/filt_cedar.txt
 notebook/rank_2_a0101.txt
 output/hp_chunks/human_proteome_8to12mers.pep
 data/immunopeptidome/
+output/tuning/
+output/train_eval/

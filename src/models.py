@@ -104,6 +104,26 @@ class LinearBlock(NetParent):
         return x
 
 
+class FFN(NetParent):
+    def __init__(self, n_in, n_hidden=32, n_layers=1, act=nn.SELU(), dropout=0.3):
+        super(FFN, self).__init__()
+        self.in_layer = nn.Linear(n_in, n_hidden)
+        self.dropout = nn.Dropout(dropout)
+        self.activation = act
+        hidden_layers = [nn.Linear(n_hidden, n_hidden), self.dropout, self.activation]*n_layers
+        self.hidden = nn.Sequential(*hidden_layers)
+        # Either use Softmax with 2D output or Sigmoid with 1D output
+        self.out_layer = nn.Linear(n_hidden, 1)
+
+    def forward(self, x):
+        if len(x.shape) == 3:
+            x = x.flatten(start_dim=1, end_dim=2)
+        x = self.activation(self.in_layer(x))
+        x = self.hidden(x)
+        out = F.sigmoid(self.out_layer(x))
+        return out
+
+
 """
 Could introduce a IC weight block here that uses some linear layer
 Then in Net could multiply output of Convblock with output of IC_linear block

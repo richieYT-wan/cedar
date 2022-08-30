@@ -295,6 +295,18 @@ def get_tensor_dataset(df, ics_dict, device, max_len=12, encoding='onehot', blos
     return dataset
 
 
+def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                     seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
+                     rank_thr=0.25, mask=False, add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
+
+    x,y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
+                            seq_col, hla_col, target_col, rank_col,
+                            rank_thr, mask, add_rank, add_aaprop, remove_pep, standardize)
+
+    x, y = torch.from_numpy(x).float().to(device), torch.from_numpy(y).float().to(device).unsqueeze(1)
+    return x,y
+
+
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
                       rank_thr=0.25, mask=False, add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
@@ -341,6 +353,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     if remove_pep and (add_rank or add_aaprop):
         x = x[:, 20:]
     return x, y
+
 
 
 def compute_frequency(encoded_sequence):

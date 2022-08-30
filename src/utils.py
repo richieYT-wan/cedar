@@ -7,6 +7,9 @@ from itertools import chain, cycle
 import torch
 
 
+def recover_kwargs(string):
+    pass
+
 def flatten_product(container):
     """
     Flattens a product or container into a flat list, useful when product/chaining many conditions

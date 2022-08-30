@@ -148,6 +148,7 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
     ics_none = None  # bit stupid but need to have the variable name somewhere :-)
     if args["debug"]:
+        N_CORES = 2
         encode_blosum_zip = zip(['onehot', 'blosum'], [None, BL62FREQ_VALUES])
         ics_mask_zip = zip([ics_shannon, ics_none, ics_shannon],
                            ['Shannon', 'None', 'Mask'],
@@ -156,6 +157,7 @@ def main():
         train_datasets = [dataset_cedar, dataset_cedar_hp_rank_low, dataset_cedar_hp_rank_uni, dataset_cedar_virus]
         standardize_ = [True]
     else:
+        N_CORES = multiprocessing.cpu_count()-2
         # Creating the condition/products/zips
 
         # encoding, blosum matrix
@@ -184,9 +186,10 @@ def main():
 
     # Manual tuning and their hyperparameters to tune
     if args['debug']:
-        models_params_grid = zip([RandomForestClassifier()],
-                                 [{'n_estimators': [100], 'max_depth': [3, None],
-                                   'ccp_alpha': [1e-10]}])
+        models_params_grid = zip([RandomForestClassifier(), XGBClassifier()],
+                                 [{'n_estimators': [20], 'max_depth': [3, None],
+                                   'ccp_alpha': [1e-10]},
+                                  {'n_estimators':[20], 'max_depth':[3,None]}])
         tune_results_model = {}
 
     else:
@@ -197,14 +200,23 @@ def main():
                                    'learning_rate': [0.1, 0.3, 0.7],
                                    'reg_alpha': np.logspace(-9, -1, 4), 'reg_lambda': np.logspace(-9, -1, 4)},
                                   {'C': [0.01, 0.1, 1, 10]}])
+        # models_params_grid = zip([LogisticRegression(tol=1e-5, max_iter=250, solver='saga')],
+        #                          [{'C': np.logspace(-4,2,7), 'penalty': ['l1', 'elasticnet', 'l2'], 'l1_ratio':[0.25, 0.5]}])
+
+
+        # models_params_grid = zip([XGBClassifier()],
+        #                          [{'n_estimators': [100, 200, 300], 'max_depth': [3, 5, 7, 9, None],
+        #                            'learning_rate': [0.1, 0.3],
+        #                            'reg_alpha': np.logspace(-9, -1, 4), 'reg_lambda': np.logspace(-9, -1, 4)}])
+
         tune_results_model = {}
-    print(f'\n\n\n\tCPU COUNT:\t{multiprocessing.cpu_count()}\n\n\n')
+    print(f'\n\n\n\tCPU COUNT: {multiprocessing.cpu_count()}, using {N_CORES}\n\n\n')
     # Loop with parallelized jobs
     for model, hyperparameters in tqdm(models_params_grid, desc='models', leave=False):
         tune_results = []
         wrapper = partial(tune_wrapper, args=args, model=model, hyperparams=hyperparameters)
 
-        output = Parallel(n_jobs=multiprocessing.cpu_count()-1)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
+        output = Parallel(n_jobs=multiprocessing.cpu_count()-2)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
                                                       blosum_matrix=blosum_matrix, ics_dict=ics_dict, ics_name=ics_name,
                                                       mask=mask, add_rank=add_rank, add_aaprop=add_aaprop,
                                                       remove_pep=remove_pep, standardize=standardize) for \

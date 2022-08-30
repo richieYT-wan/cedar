@@ -85,6 +85,7 @@ def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
     if keep:
         metrics['y_true'] = y_true
         metrics['y_score'] = y_score
+
     return metrics
 
 
@@ -97,6 +98,7 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
         fig, ax = plt.subplots(1, 1, figsize=(6, 6))
     print(results_dict.keys())
     for k in results_dict:
+        if k =='kwargs': continue
         fpr = results_dict[k]['roc_curve'][0]
         tpr = results_dict[k]['roc_curve'][1]
         auc = results_dict[k]['auc']
@@ -129,7 +131,6 @@ def get_mean_roc_curve(roc_curves_dict, extra_key=None):
         mean_curve
         std_curve
     """
-
     if extra_key is not None:
         max_n = max([len(v[extra_key]['roc_curve'][0]) for k, v in roc_curves_dict.items()])
     else:
@@ -139,6 +140,7 @@ def get_mean_roc_curve(roc_curves_dict, extra_key=None):
     base_fpr = np.linspace(0, 1, max_n)
     if extra_key is not None:
         for k, v in roc_curves_dict.items():
+            if k=='kwargs':continue
             fpr = v[extra_key]['roc_curve'][0]
             tpr = v[extra_key]['roc_curve'][1]
             # Interp TPR so it fits the right shape for base_fpr
@@ -148,6 +150,7 @@ def get_mean_roc_curve(roc_curves_dict, extra_key=None):
             tprs.append(tpr)
     else:
         for k, v in roc_curves_dict.items():
+            if k=='kwargs':continue
             fpr = v['roc_curve'][0]
             tpr = v['roc_curve'][1]
             # Interp TPR so it fits the right shape for base_fpr
