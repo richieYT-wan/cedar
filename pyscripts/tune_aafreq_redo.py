@@ -32,7 +32,7 @@ def args_parser():
     parser = argparse.ArgumentParser(
         description='Script to crossvalidate and evaluate methods that use aa frequency as encoding')
 
-    parser.add_argument('-datadir', type=str, default='../data/partitioned_traindata/',
+    parser.add_argument('-datadir', type=str, default='../data/partitioned_traindata_redo/',
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str, default='../output/tuning/')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/', help='Path containing the pre-computed ICs dicts.')
@@ -137,8 +137,11 @@ def main():
     dataset_cedar = pd.read_csv(f'{args["datadir"]}cedar_10fold.csv')
     dataset_cedar['trainset'] = 'cedar'
     # Read data and assign train set name
-    dataset_viral = pd.read_csv(f'{args["datadir"]}prime_5fold.csv')
+    dataset_viral = pd.read_csv(f'{args["datadir"]}viral_only_5fold.csv')
     dataset_viral['trainset'] = 'virus'
+
+    dataset_cedar = pd.read_csv(f'{args["datadir"]}new_cedar_viral_5fold.csv')
+    dataset_cedar['trainset'] = 'cedar'
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -200,7 +203,7 @@ def main():
         tune_results = []
         wrapper = partial(tune_wrapper, args=args, model=model, hyperparams=hyperparameters)
 
-        output = Parallel(n_jobs=multiprocessing.cpu_count()-10)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
+        output = Parallel(n_jobs=multiprocessing.cpu_count()-6)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
 
                                                      blosum_matrix=blosum_matrix, ics_dict=ics_dict, ics_name=ics_name,
                                                      mask=mask, add_rank=add_rank, add_aaprop=add_aaprop,

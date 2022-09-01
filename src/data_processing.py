@@ -353,8 +353,8 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
 
         # New way of doing it already  saves the aa props to the df to
         # not re-compute them everytime, here for now because I
-        if ['aliphatic_index', 'boman', 'hydrophobicity',
-        'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8'] in df.columns:
+        if all([x in df.columns for x in ['aliphatic_index', 'boman', 'hydrophobicity',
+        'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']]):
             aa_props = df[['aliphatic_index', 'boman', 'hydrophobicity',
                             'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']].values
         else:
