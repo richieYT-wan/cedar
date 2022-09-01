@@ -185,21 +185,11 @@ def main():
         tune_results_model = {}
 
     else:
-        # models_params_grid = zip([RandomForestClassifier(), XGBClassifier(), LogisticRegression()],
-        #                          [{'n_estimators': [100, 200, 300], 'max_depth': [3, 5, 7, 9, None],
-        #                            'ccp_alpha': np.logspace(-9, -1, 4)},
-        #                           {'n_estimators': [100, 200, 300], 'max_depth': [3, 5, 7, 9, None],
-        #                            'learning_rate': [0.1, 0.3, 0.7],
-        #                            'reg_alpha': np.logspace(-9, -1, 4), 'reg_lambda': np.logspace(-9, -1, 4)},
-        #                           {'C': [0.01, 0.1, 1, 10]}])
-        # models_params_grid = zip([LogisticRegression(tol=1e-5, max_iter=250, solver='saga')],
-        #                          [{'C': np.logspace(-4,2,7), 'penalty': ['l1', 'elasticnet', 'l2'], 'l1_ratio':[0.25, 0.5]}])
-
         models_params_grid = zip([XGBClassifier(tree_method='gpu_hist')],
-                                 [{'n_estimators': [200, 250], 'max_depth': [3, 4],
+                                 [{'n_estimators': [200, 250], 'max_depth': [3, 6, None],
                                    'learning_rate': [0.1],
-                                   'reg_alpha': np.logspace(-9, -1, 3),
-                                   'reg_lambda': np.logspace(-9, -1, 3)}])
+                                   'reg_alpha': np.logspace(-9, -1, 4),
+                                   'reg_lambda': np.logspace(-9, -1, 4)}])
         tune_results_model = {}
     print(f'\n\n\n\tCPU COUNT: {multiprocessing.cpu_count()}, using {multiprocessing.cpu_count() - 1}\n\n\n')
     # Loop with parallelized jobs
@@ -207,7 +197,7 @@ def main():
         tune_results = []
         wrapper = partial(tune_wrapper, args=args, model=model, hyperparams=hyperparameters)
 
-        output = Parallel(n_jobs=6)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
+        output = Parallel(n_jobs=8)(delayed(wrapper)(train_dataset=train_dataset, encoding=encoding,
                                                       blosum_matrix=blosum_matrix, ics_dict=ics_dict, ics_name=ics_name,
                                                       mask=mask, add_rank=add_rank, add_aaprop=add_aaprop,
                                                       remove_pep=remove_pep, standardize=standardize) for \

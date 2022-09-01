@@ -4,7 +4,8 @@ import random
 from sklearn.model_selection import StratifiedKFold
 
 
-def read_hobohm(filename, original_df, pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank'):
+def read_hobohm(filename, original_df, pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank',
+                target_col='agg_label'):
     """
     Reads the output of a hobohm reduced file
     (ex would read "dataset.out" from ./hobohm1_pepkernel input.pep > dataset.out
@@ -28,9 +29,9 @@ def read_hobohm(filename, original_df, pep_col='Peptide', hla_col='HLA', elrank_
     # Given Hobohm, all identical sequences with different HLA should re-appear and will need to be
     # addressed later in another function
     unique_df = pd.read_csv(filename, header=None, comment='#')
-    unique_df.columns = ['Peptide']
-    unique_df = unique_df.merge(original_df[[pep_col, hla_col, elrank_col, 'agg_label']],
-                                left_on='Peptide', right_on='Peptide')
+    unique_df.columns = [pep_col]
+    unique_df = unique_df.merge(original_df[[pep_col, hla_col, elrank_col, target_col]],
+                                left_on=pep_col, right_on=pep_col)
 
     with open(filename, 'r') as f:
         lines = [l.strip('\n') for l in f.readlines()]
@@ -66,7 +67,7 @@ def manually_reassign_identical(k, unique_df, pep_col='Peptide'):
 
     assignment_counts = {x: 0 for x in range(k)}
     # Go through all the duplicated peps
-    for pep in unique_df.loc[unique_df.duplicated(pep_col, keep=False)].Peptide.unique():
+    for pep in unique_df.loc[unique_df.duplicated(pep_col, keep=False)][pep_col].unique():
         tmp = unique_df.loc[unique_df[pep_col] == pep]
         # if already all the same fold then it's fine, continue
         if len(tmp.fold.unique()) == 1: continue
@@ -78,7 +79,8 @@ def manually_reassign_identical(k, unique_df, pep_col='Peptide'):
     return unique_df
 
 
-def manually_reassign_related(unique_df, not_unique_df, pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank'):
+def manually_reassign_related(unique_df, not_unique_df, pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank',
+                              target_col='agg_label'):
     """
     Manually reassigns non-unique (discarded) peptide to the same fold as their related pep
     Args:
@@ -93,25 +95,28 @@ def manually_reassign_related(unique_df, not_unique_df, pep_col='Peptide', hla_c
     # Re-assigning
     not_unique_df['fold'] = not_unique_df.apply(lambda x: unique_df.query(f'{pep_col}==@x.similar')['fold'].unique()[0],
                                                 axis=1)
-    not_unique_df = not_unique_df[['discarded', 'agg_label', hla_col, elrank_col, 'fold']].rename(
+    not_unique_df = not_unique_df[['discarded', target_col, hla_col, elrank_col, 'fold']].rename(
         columns={'discarded': pep_col})
     return not_unique_df
 
 
 def stratified_kfold_unique(unique_df, not_unique_df, original_df,
                      k=5, shuffle=True, seed=13,
-                     pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank'):
+                     pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank', target_col='agg_label'):
     # Stratify KFold on the unique set, based on duplicated counts as stratifying group.
     # Then repopulate the folds with
     not_unique_df['drop_idx'] = not_unique_df['drop_idx'].astype(int)
     # Get the strat KF object
     stratkf = StratifiedKFold(k, shuffle=shuffle, random_state=seed)
     # Merge the not unique (to get agg_label, i.e. "y" for stratkf to split and get the duplicated counts
-    not_unique_df = not_unique_df.merge(original_df.reset_index()[['index', 'agg_label', hla_col, elrank_col]],
+    not_unique_df = not_unique_df.merge(original_df.reset_index()[['index', target_col, hla_col, elrank_col]],
                                      left_on='drop_idx', right_on='index')
-    dup_counts = not_unique_df.groupby('similar').agg({'self': 'count'}).sort_values('self', ascending=False).reset_index()
-    dup_counts = dup_counts.merge(unique_df[[pep_col, 'agg_label']], left_on='similar',
-                                  right_on=pep_col).drop_duplicates(['similar', 'agg_label'])
+
+    dup_counts = not_unique_df.groupby('similar').agg({'self': 'count'})\
+                              .sort_values('self', ascending=False).reset_index()
+
+    dup_counts = dup_counts.merge(unique_df[[pep_col, target_col]], left_on='similar',
+                                  right_on=pep_col).drop_duplicates(['similar', target_col])
     # Merge and assign the duplicated counts, to be used as stratify groups
     unique_df['counts'] = 0
     tmp = unique_df.reset_index().merge(dup_counts[[pep_col, 'self']], left_on=pep_col, right_on=pep_col)
@@ -120,14 +125,14 @@ def stratified_kfold_unique(unique_df, not_unique_df, original_df,
     # Ready to stratify and set the folds
     unique_df['fold'] = np.nan
     for i, (train_idx, test_idx) in enumerate(
-            stratkf.split(unique_df[pep_col].values, unique_df['agg_label'], groups=unique_df['counts'])):
+            stratkf.split(unique_df[pep_col].values, unique_df[target_col], groups=unique_df['counts'])):
         unique_df.iloc[test_idx, unique_df.columns.get_loc('fold')] = i
     unique_df.fold = unique_df.fold.astype(int)
     return unique_df, not_unique_df
 
 
 def pipeline_stratified_kfold(hobohm_filename, original_df, k=5, shuffle=True, seed=13,
-                              pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank'):
+                              pep_col='Peptide', hla_col='HLA', elrank_col='trueHLA_EL_rank', target_col='agg_label'):
     """
 
     Args:
@@ -143,13 +148,13 @@ def pipeline_stratified_kfold(hobohm_filename, original_df, k=5, shuffle=True, s
     Returns:
         dataset (pd.DataFrame): dataset with assigned folds
     """
-    unique_df, not_unique_df = read_hobohm(hobohm_filename, original_df, pep_col, hla_col, elrank_col)
+    original_df = original_df.sort_values(pep_col).reset_index(drop=True)
+    unique_df, not_unique_df = read_hobohm(hobohm_filename, original_df, pep_col, hla_col, elrank_col, target_col)
+
     unique_df, not_unique_df = stratified_kfold_unique(unique_df, not_unique_df, original_df, k, shuffle, seed,
-                                                pep_col, hla_col, elrank_col)
-
+                                                pep_col, hla_col, elrank_col, target_col )
     unique_df = manually_reassign_identical(k, unique_df, pep_col)
-    not_unique_df = manually_reassign_related(unique_df, not_unique_df, pep_col, hla_col, elrank_col)
-
+    not_unique_df = manually_reassign_related(unique_df, not_unique_df, pep_col, hla_col, elrank_col, target_col)
     dataset = pd.concat([unique_df, not_unique_df], ignore_index=True) \
         .sort_values(pep_col, ascending=True).reset_index(drop=True).drop(columns=['counts'])
 

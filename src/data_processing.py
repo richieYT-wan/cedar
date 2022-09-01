@@ -70,6 +70,9 @@ VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ
 def get_aa_properties(df, seq_col='Peptide'):
     """
     Compute some AA properties that I have selected
+    keep = ['aliphatic_index', 'boman', 'hydrophobicity',
+        'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
+    THIS KEEP IS BASED ON SOME FEATURE DISTRIBUTION AND CORRELATION ANALYSIS
     Args:
         df (pandas.DataFrame) : input dataframe, should contain at least the peptide sequences
         seq_col (str) : column name containing the peptide sequences
@@ -81,13 +84,15 @@ def get_aa_properties(df, seq_col='Peptide'):
     out = df.copy()
     out['aliphatic_index'] = out[seq_col].apply(lambda x: peptides.Peptide(x).aliphatic_index())
     out['boman'] = out[seq_col].apply(lambda x: peptides.Peptide(x).boman())
-    out['charge_7_4'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=7.4))
-    out['charge_6_65'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=6.65))
+    # out['charge_7_4'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=7.4))
+    # out['charge_6_65'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=6.65))
     out['hydrophobicity'] = out[seq_col].apply(lambda x: peptides.Peptide(x).hydrophobicity())
     out['isoelectric_point'] = out[seq_col].apply(lambda x: peptides.Peptide(x).isoelectric_point())
-    out['PD2'] = out[seq_col].apply(lambda x: peptides.Peptide(x).physical_descriptors()[1])
+    # out['PD2'] = out[seq_col].apply(lambda x: peptides.Peptide(x).physical_descriptors()[1])
     vhse = out[seq_col].apply(lambda x: peptides.Peptide(x).vhse_scales())
-    for i in range(1, 9):
+    # for i in range(1, 9):
+    #     out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
+    for i in [1,3,7,8]:
         out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
     return out, [x for x in out.columns if x not in df.columns]
 
@@ -344,8 +349,18 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         x = np.concatenate([x, ranks], axis=1)
 
     if add_aaprop:
-        df_props, columns = get_aa_properties(df, seq_col)
-        aa_props = df_props[columns].values
+
+
+        # New way of doing it already  saves the aa props to the df to
+        # not re-compute them everytime, here for now because I
+        if ['aliphatic_index', 'boman', 'hydrophobicity',
+        'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8'] in df.columns:
+            aa_props = df[['aliphatic_index', 'boman', 'hydrophobicity',
+                            'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']].values
+        else:
+            df_props, columns = get_aa_properties(df, seq_col)
+            aa_props = df[columns].values
+
         x = np.concatenate([x, aa_props], axis=1)
 
     y = df[target_col].values

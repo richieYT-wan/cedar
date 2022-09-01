@@ -14,7 +14,7 @@ from src.data_processing import get_tensor_dataset, get_array_dataset, \
 from src.metrics import get_metrics, get_mean_roc_curve
 import sklearn
 from sklearn.model_selection import ParameterGrid
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 
 class EarlyStopping:
@@ -880,7 +880,7 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
 def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                                     train_dataframe=None, train_metrics=None,
                                     encoding_kwargs: dict = None,
-                                    concatenated=False, only_concat=False):
+                                    concatenated=False, only_concat=False, keep=False):
     """
 
     Args:
@@ -969,7 +969,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
 
         avg_prediction = np.mean(np.stack(avg_prediction), axis=0)
 
-        test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction)
+        test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction, keep=keep)
 
         if concatenated:
             concat_pred.append(avg_prediction)
@@ -977,7 +977,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     if concatenated:
         concat_pred = np.concatenate(concat_pred)
         concat_true = np.concatenate(concat_true)
-        test_results['concatenated'] = get_metrics(concat_true, concat_pred)
+        test_results['concatenated'] = get_metrics(concat_true, concat_pred, keep=keep)
 
     if only_concat:
         keys_del = [k for k in test_results if k != 'concatenated']

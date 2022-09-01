@@ -181,3 +181,4 @@ output/hp_chunks/human_proteome_8to12mers.pep
 data/immunopeptidome/
 output/tuning/
 output/train_eval/
+notebook/tmp.pkl

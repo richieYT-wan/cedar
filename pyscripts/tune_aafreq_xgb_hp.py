@@ -201,10 +201,10 @@ def main():
     else:
         models_params_grid = zip([XGBClassifier(n_jobs=1,
                                                 tree_method=tree_method)],
-                                 [{'n_estimators': [200, 250], 'max_depth': [3, 4],
+                                 [{'n_estimators': [200, 250], 'max_depth': [3, 7, None],
                                    'learning_rate': [0.1],
-                                   'reg_alpha': np.logspace(-9, -1, 3),
-                                   'reg_lambda': np.logspace(-9, -1, 3)}])
+                                   'reg_alpha': np.logspace(-9, -1, 4),
+                                   'reg_lambda': np.logspace(-9, -1, 4)}])
         tune_results_model = {}
     print(f'\n\n\n\tCPU COUNT:{multiprocessing.cpu_count()}, using {args["ncores"]}\n\n\n')
     # Loop with parallelized jobs
