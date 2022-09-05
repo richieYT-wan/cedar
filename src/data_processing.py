@@ -94,7 +94,9 @@ def get_aa_properties(df, seq_col='Peptide'):
     #     out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
     for i in [1,3,7,8]:
         out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
-    return out, [x for x in out.columns if x not in df.columns]
+    # Some hardcoded bs
+    return out, ['aliphatic_index', 'boman', 'hydrophobicity',
+                 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
 
 
 def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES):
@@ -349,8 +351,6 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         x = np.concatenate([x, ranks], axis=1)
 
     if add_aaprop:
-
-
         # New way of doing it already  saves the aa props to the df to
         # not re-compute them everytime, here for now because I
         if all([x in df.columns for x in ['aliphatic_index', 'boman', 'hydrophobicity',

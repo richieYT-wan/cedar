@@ -7,7 +7,8 @@ import seaborn as sns
 
 mpl.rcParams['figure.dpi'] = 180
 sns.set_style('darkgrid')
-from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, recall_score, precision_score
+from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score,\
+    recall_score, precision_score, precision_recall_curve, auc, average_precision_score
 
 
 def get_pred_df(y_pred, y_scores, y_true):
@@ -73,8 +74,12 @@ def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
         y_true, y_score = y_true.int().cpu().detach().numpy(), y_score.cpu().detach().numpy()
     fpr, tpr, _ = roc_curve(y_true, y_score)
     metrics['roc_curve'] = fpr, tpr
+    precision, recall, _ = precision_recall_curve(y_true, y_score)
+    metrics['pr_curve'] = recall, precision # So it follows the same x,y format as roc_curve
     try:
         metrics['auc'] = roc_auc_score(y_true, y_score)
+        metrics['prauc'] = auc(recall, precision)
+        metrics['AP'] = average_precision_score(y_true, y_score)
     except:
         print(all(y_true == 0), all(y_true == 1))
     metrics['auc_01'] = roc_auc_score(y_true, y_score, max_fpr=0.1)

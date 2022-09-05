@@ -140,8 +140,8 @@ def main():
     dataset_viral = pd.read_csv(f'{args["datadir"]}viral_only_5fold.csv')
     dataset_viral['trainset'] = 'virus'
 
-    dataset_cedar = pd.read_csv(f'{args["datadir"]}new_cedar_viral_5fold.csv')
-    dataset_cedar['trainset'] = 'cedar'
+    dataset_cedar_viral = pd.read_csv(f'{args["datadir"]}new_cedar_viral_5fold.csv')
+    dataset_cedar_viral['trainset'] = 'cedar_virus'
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -168,7 +168,7 @@ def main():
                            [False, False, False, False])
 
         # Lone conditions (to be producted so not zipped)
-        train_datasets = [dataset_cedar, dataset_prime, dataset_viral]
+        train_datasets = [dataset_cedar, dataset_prime, dataset_viral, dataset_cedar_viral]
         standardize_ = [True]
 
     # Here make the conditions that don't rely on hyperparams, i.e. all dataset and dataprocessing conditions

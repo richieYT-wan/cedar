@@ -10,7 +10,7 @@ import math
 import numpy as np
 from torch.utils.data import DataLoader
 from src.data_processing import get_tensor_dataset, get_array_dataset, \
-    BL62_VALUES, standardize, get_freq_tensors
+    BL62_VALUES, standardize, get_freq_tensors, verify_df_
 from src.metrics import get_metrics, get_mean_roc_curve
 import sklearn
 from sklearn.model_selection import ParameterGrid
@@ -927,10 +927,14 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     for fold_out, models_list_out in models_dict.items():
         # If no train dataframe provided and test_dataframe is partitioned,
         # It will eval on each of the folds
-        if 'fold' in test_dataframe.columns and train_dataframe is None:
-            test_df = test_dataframe.query('fold==@fold_out')
+        if 'fold' in test_dataframe.columns:
+            if test_dataframe.equals(train_dataframe):
+                test_df = test_dataframe.query('fold==@fold_out')
+            else:
+                test_df = test_dataframe.copy().reset_index(drop=True)
         else:
             test_df = test_dataframe.copy().reset_index(drop=True)
+
         x_test, y_test = get_array_dataset(test_df, ics_dict, **encoding_kwargs)
 
         # Fuck my life ; Here to make sure the test fold evaluated doesn't overlap with with training peptides
@@ -944,6 +948,9 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
             index_keep = tmp_index[0]
             for index in tmp_index[1:]:
                 index_keep = index_keep.join(index, how='inner')
+            # Fixes the issue with indexing length when verify_df in get_array_dataset removes some
+            index_keep = [x for x in index_keep if x in range(len(x_test))]
+
         else:
             index_keep = range(len(x_test))
         # print(len(index_keep))
@@ -951,18 +958,14 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
             # Very convoluted list comprehension, but basically predict_proba and the standardize operation
             # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
             # One of the worst garbage code (top 5) I've written this week
-
-            # avg_prediction = []
-            # for model, fold_in in zip(models_list_out, inner_folds):
-            #     x_test_std = copy.deepcopy(x_test[index_keep])
-            #     x_test_std = (x_test_std - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in]['sigma']
-            #     avg_prediction.append(model.predict_proba(x_test_std)[:,1])
-            #
-
-            avg_prediction = [model.predict_proba(
-                ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
-                    'sigma']))[:, 1] \
-                              for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
+            try:
+                avg_prediction = [model.predict_proba(
+                    ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
+                        'sigma']))[:, 1] \
+                                  for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
+            except:
+                x=0
+                raise Exception
         else:
             avg_prediction = [model.predict_proba(x_test[index_keep])[:, 1] for i, model in
                               enumerate(models_list_out)]

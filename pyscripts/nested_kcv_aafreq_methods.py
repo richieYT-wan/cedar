@@ -174,7 +174,8 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
         cedar_results = evaluate_trained_models_sklearn(cedar_dataset, models_dict, ics_dict, train_dataset,
                                                         train_metrics, encoding_kwargs=encoding_kwargs, concatenated=True)
 
-        prime_results = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict, train_metrics=train_metrics,
+        prime_results = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict,
+                                                        train_metrics=train_metrics,
                                                         encoding_kwargs=encoding_kwargs, concatenated=True)
 
     # Big mess to save results :-)
@@ -216,18 +217,18 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
 
 def main():
     start = dt.now()
-    run_id = f'run_{start.strftime(f"%y%m%d_%Hh%Mm%Ss")}/'
     args = vars(args_parser())
+    run_id = f'run_{start.strftime(f"%y%m%d_%Hh%Mm%Ss")}_{str(args["model"])}/'
+
     assert args['model'] in ['rf', 'log', 'xgb_normal', 'xgb_hp', 'nn'], f"Undefined model specified {args['model']}. Should be in ['rf', " \
                                                   f"'log', 'xgb_normal', 'xgb_hp', 'nn']! "
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
-    args['outdir'] = convert_path(os.path.join(args['outdir'], run_id+str(args['model'])))
+    args['outdir'] = convert_path(os.path.join(args['outdir'], run_id))
     args['outdir'] = args['outdir']
     # Will make all the nested dirs
     mkdirs(args['outdir'])
-    N_CORES = int(multiprocessing.cpu_count()*3/4)+int(multiprocessing.cpu_count()*0.05) if (args['ncores'] is None or 'xgb' in args['model']) else args['ncores']
-    N_CORES = 12 if args['debug'] else N_CORES
+    N_CORES = int(multiprocessing.cpu_count()*3/4)+int(multiprocessing.cpu_count()*0.05) if (args['ncores'] is None or args['debug']) else args['ncores']
 
     device = 'cuda' if (args['gpu'] and torch.cuda.is_available()) else 'cpu'
     tree_method = 'gpu_hist' if args['gpu'] else 'hist'
@@ -249,13 +250,10 @@ def main():
 
     # PRIME dataset as external test set
     cedar_peps = dataset_cedar.Peptide.values
-    prime_dataset = pd.read_excel(f'{args["datadir"]}PRIME_dataset.xlsx', skiprows=2, comment='#')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}prime_5fold.csv')
     # Filter to avoid evaluating on trained peptides
-    prime_dataset = prime_dataset.query('StudyOrigin!="Random" and Mutant not in @cedar_peps')
-    # RENAME COLUMNS to avoid re-creating a custom prime kwargs every in function call
-    prime_dataset.rename(columns={'Mutant': 'Peptide', 'Allele': 'HLA',
-                                  'Immunogenicity': 'agg_label', 'NetMHCpanEL': 'trueHLA_EL_rank'},
-                         inplace=True)
+    prime_dataset = prime_dataset.query('StudyOrigin!="Random" and Peptide not in @cedar_peps')
+
 
     # IC weights
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -314,10 +312,10 @@ def main():
     # ============ Setting up models ============= #
     # Manual tuning and their hyperparameters to tune
 
-    models = {'rf': RandomForestClassifier(),
+    models = {'rf': RandomForestClassifier(n_jobs=1),
               'log': LogisticRegression(tol=1e-5, max_iter=250, solver='saga'),
-              'xgb_hp': XGBClassifier(tree_method=tree_method),
-              'xgb_normal': XGBClassifier(tree_method=tree_method),
+              'xgb_hp': XGBClassifier(tree_method=tree_method, n_jobs=1),
+              'xgb_normal': XGBClassifier(tree_method=tree_method, n_jobs=1),
               'nn': FFN(n_in=20)}
 
     # ============ Parallel run ============ #
