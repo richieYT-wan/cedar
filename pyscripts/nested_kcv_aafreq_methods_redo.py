@@ -298,9 +298,9 @@ def main():
         ics_mask_zip = zip([ics_shannon, ics_kl, ics_none, ics_shannon], ['Shannon', 'KL', 'None', 'Mask'],
                            [False, False, False, True])
         # True/False zips for add_rank, add_aaprop, remove_pep
-        features_zip = zip([True, True, False, False],
-                           [True, False, True, False],
-                           [False, False, False, False])
+        features_zip = zip([True, True, False, False, True],
+                           [True, False, True, False, True],
+                           [False, False, False, False, True])
 
         # Lone conditions (to be producted so not zipped)
         train_datasets = [dataset_cedar, dataset_prime, dataset_viral, dataset_cedar_viral]

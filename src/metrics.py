@@ -7,7 +7,7 @@ import seaborn as sns
 
 mpl.rcParams['figure.dpi'] = 180
 sns.set_style('darkgrid')
-from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score,\
+from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, \
     recall_score, precision_score, precision_recall_curve, auc, average_precision_score
 
 
@@ -75,7 +75,7 @@ def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
     fpr, tpr, _ = roc_curve(y_true, y_score)
     metrics['roc_curve'] = fpr, tpr
     precision, recall, _ = precision_recall_curve(y_true, y_score)
-    metrics['pr_curve'] = recall, precision # So it follows the same x,y format as roc_curve
+    metrics['pr_curve'] = recall, precision  # So it follows the same x,y format as roc_curve
     try:
         metrics['auc'] = roc_auc_score(y_true, y_score)
         metrics['prauc'] = auc(recall, precision)
@@ -103,7 +103,7 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
         fig, ax = plt.subplots(1, 1, figsize=(6, 6))
     print(results_dict.keys())
     for k in results_dict:
-        if k =='kwargs': continue
+        if k == 'kwargs': continue
         fpr = results_dict[k]['roc_curve'][0]
         tpr = results_dict[k]['roc_curve'][1]
         auc = results_dict[k]['auc']
@@ -123,7 +123,7 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
     return fig, ax
 
 
-def get_mean_roc_curve(roc_curves_dict, extra_key=None):
+def get_mean_roc_curve(roc_curves, extra_key=None):
     """
     Assumes a single-level dict, i.e. roc_curves_dict has all the outer folds, and no inner folds
     Or it is the sub-dict that contains all the inner folds for a given outer fold.
@@ -136,37 +136,136 @@ def get_mean_roc_curve(roc_curves_dict, extra_key=None):
         mean_curve
         std_curve
     """
-    if extra_key is not None:
-        max_n = max([len(v[extra_key]['roc_curve'][0]) for k, v in roc_curves_dict.items()])
-    else:
-        max_n = max([len(v['roc_curve'][0]) for k, v in roc_curves_dict.items()])
+
     # Base fpr to interpolate
     tprs = []
-    base_fpr = np.linspace(0, 1, max_n)
-    if extra_key is not None:
-        for k, v in roc_curves_dict.items():
-            if k=='kwargs':continue
-            fpr = v[extra_key]['roc_curve'][0]
-            tpr = v[extra_key]['roc_curve'][1]
-            # Interp TPR so it fits the right shape for base_fpr
-            tpr = np.interp(base_fpr, fpr, tpr)
-            tpr[0] = 0
-            # Saving to the list so we can stack and compute the mean and std
-            tprs.append(tpr)
-    else:
-        for k, v in roc_curves_dict.items():
-            if k=='kwargs':continue
-            fpr = v['roc_curve'][0]
-            tpr = v['roc_curve'][1]
-            # Interp TPR so it fits the right shape for base_fpr
-            tpr = np.interp(base_fpr, fpr, tpr)
-            tpr[0] = 0
-            # Saving to the list so we can stack and compute the mean and std
-            tprs.append(tpr)
+    aucs = []
+    if type(roc_curves) == dict:
+        if extra_key is not None:
+            max_n = max([len(v[extra_key]['roc_curve'][0]) for k, v in roc_curves.items() \
+                         if k != 'kwargs' and k != 'concatenated'])
+            base_fpr = np.linspace(0, 1, max_n)
+            for k, v in roc_curves.items():
+                if k == 'kwargs' or k == 'concatenated': continue
+                fpr = v[extra_key]['roc_curve'][0]
+                tpr = v[extra_key]['roc_curve'][1]
+                # Interp TPR so it fits the right shape for base_fpr
+                tpr = np.interp(base_fpr, fpr, tpr)
+                tpr[0] = 0
+                # Saving to the list so we can stack and compute the mean and std
+                tprs.append(tpr)
+                aucs.append(v[extra_key]['auc'])
+        else:
+            max_n = max([len(v['roc_curve'][0]) for k, v in roc_curves.items() \
+                         if k != 'kwargs' and k != 'concatenated'])
+            base_fpr = np.linspace(0, 1, max_n)
 
+            for k, v in roc_curves.items():
+                if k == 'kwargs' or k == 'concatenated': continue
+                fpr = v['roc_curve'][0]
+                tpr = v['roc_curve'][1]
+                # Interp TPR so it fits the right shape for base_fpr
+                tpr = np.interp(base_fpr, fpr, tpr)
+                tpr[0] = 0
+                # Saving to the list so we can stack and compute the mean and std
+                tprs.append(tpr)
+                aucs.append(v['auc'])
+
+    elif type(roc_curves) == list:
+        # TODO FIX
+        # THIS HERE ASSUMES THE RESULTS ARE IN FORMAT [((fpr, tpr), auc) ...]
+        max_n = max([len(x[0][0]) for x in roc_curves])
+        base_fpr = np.linspace(0, 1, max_n)
+
+        for curves in roc_curves:
+            fpr = curves[0][0]
+            tpr = curves[0][1]
+            # Interp TPR so it fits the right shape for base_fpr
+            tpr = np.interp(base_fpr, fpr, tpr)
+            tpr[0] = 0
+            # Saving to the list so we can stack and compute the mean and std
+            tprs.append(tpr)
+            aucs.append(curves[1])
+
+    mean_auc = np.mean(aucs)
     tprs = np.stack(tprs)
     mean_tprs = tprs.mean(axis=0)
     std_tprs = tprs.std(axis=0)
-    upper = np.minimum(mean_tprs+std_tprs, 1)
+    upper = np.minimum(mean_tprs + std_tprs, 1)
     lower = mean_tprs - std_tprs
-    return base_fpr, mean_tprs, lower, upper
+    return base_fpr, mean_tprs, lower, upper, mean_auc
+
+
+
+def get_mean_pr_curve(pr_curves, extra_key=None):
+    """
+    Assumes a single-level dict, i.e. roc_curves_dict has all the outer folds, and no inner folds
+    Or it is the sub-dict that contains all the inner folds for a given outer fold.
+    i.e. to access a given fold's curve, should use `roc_curves_dict[number]['roc_curve']`
+    Args:
+        roc_curves_dict:
+        extra_key (str) : Extra_key in case it's nested, like train_metrics[fold]['valid']['roc_curve']
+    Returns:
+        base_recall
+        mean_curve
+        std_curve
+    """
+
+    # Base recall to interpolate
+    precisions = []
+    aucs = []
+    if type(pr_curves) == dict:
+        if extra_key is not None:
+            max_n = max([len(v[extra_key]['pr_curve'][0]) for k, v in pr_curves.items() \
+                         if k != 'kwargs' and k != 'concatenated'])
+            base_recall = np.linspace(0, 1, max_n)
+            for k, v in pr_curves.items():
+                if k == 'kwargs' or k == 'concatenated': continue
+                recall = v[extra_key]['pr_curve'][0]
+                precision = v[extra_key]['pr_curve'][1]
+                # Interp precision so it fits the right shape for base_recall
+                precision = np.interp(base_recall, recall, precision)
+                precision[0] = 0
+                # Saving to the list so we can stack and compute the mean and std
+                precisions.append(precision)
+                aucs.append(v[extra_key]['auc'])
+        else:
+            max_n = max([len(v['pr_curve'][0]) for k, v in pr_curves.items() \
+                         if k != 'kwargs' and k != 'concatenated'])
+            base_recall = np.linspace(0, 1, max_n)
+
+            for k, v in pr_curves.items():
+                if k == 'kwargs' or k == 'concatenated': continue
+                recall = v['pr_curve'][0]
+                precision = v['pr_curve'][1]
+                # Interp precision so it fits the right shape for base_recall
+                precision = np.interp(base_recall, recall, precision)
+                precision[0] = 0
+                # Saving to the list so we can stack and compute the mean and std
+                precisions.append(precision)
+                aucs.append(v['auc'])
+
+    elif type(pr_curves) == list:
+        # TODO FIX
+        # THIS HERE ASSUMES THE RESULTS ARE IN FORMAT [((recall, precision), auc) ...]
+        max_n = max([len(x[0][0]) for x in pr_curves])
+        base_recall = np.linspace(0, 1, max_n)
+
+        for curves in pr_curves:
+            recall = curves[0][0]
+            precision = curves[0][1]
+            # Interp precision so it fits the right shape for base_recall
+            precision = np.interp(base_recall, recall, precision)
+            precision[0] = 0
+            # Saving to the list so we can stack and compute the mean and std
+            precisions.append(precision)
+            aucs.append(curves[1])
+
+    mean_auc = np.mean(aucs)
+    precisions = np.stack(precisions)
+    mean_precisions = precisions.mean(axis=0)
+    std_precisions = precisions.std(axis=0)
+    upper = np.minimum(mean_precisions + std_precisions, 1)
+    lower = mean_precisions - std_precisions
+    return base_recall, mean_precisions, lower, upper, mean_auc
+

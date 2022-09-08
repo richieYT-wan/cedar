@@ -422,7 +422,7 @@ def batch_compute_frequency(encoded_sequences):
     mask = (encoded_sequences == 0).all(2)  # checking on second dim
     true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
         np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
-
+    # print(encoded_sequences.shape, true_lens.shape)
     frequencies = encoded_sequences.sum(axis=1) / true_lens
 
     return frequencies

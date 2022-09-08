@@ -41,7 +41,7 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/partitioned_traindata/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/traineval/')
+    parser.add_argument('-outdir', type=str, default='../output/train_eval/')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-tunedir', type=str, default='../output/tuning/run_220819_03h13m45s/')
@@ -182,18 +182,25 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
     outdict['score_avg_prime_auc'] = np.mean([prime_results[k]['auc'] for k in prime_results.keys() if k != 'concatenated'])
     outdict['score_avg_prime_auc_01'] = np.mean([prime_results[k]['auc_01'] for k in prime_results.keys() if k != 'concatenated'])
     outdict['score_avg_prime_f1'] = np.mean([prime_results[k]['f1'] for k in prime_results.keys() if k != 'concatenated'])
+    outdict['score_avg_prime_prauc'] = np.mean(
+        [prime_results[k]['prauc'] for k in prime_results.keys() if k != 'concatenated'])
 
     outdict['score_concat_prime_auc'] = prime_results['concatenated']['auc']
     outdict['score_concat_prime_auc_01'] = prime_results['concatenated']['auc_01']
     outdict['score_concat_prime_f1'] = prime_results['concatenated']['f1']
+    outdict['score_concat_prime_prauc'] = prime_results['concatenated']['prauc']
+
 
     outdict['score_avg_cedar_auc'] = np.mean([cedar_results[k]['auc'] for k in cedar_results.keys() if k != 'concatenated'])
     outdict['score_avg_cedar_auc_01'] = np.mean([cedar_results[k]['auc_01'] for k in cedar_results.keys() if k != 'concatenated'])
     outdict['score_avg_cedar_f1'] = np.mean([cedar_results[k]['f1'] for k in cedar_results.keys() if k != 'concatenated'])
+    outdict['score_avg_cedar_prauc'] = np.mean(
+        [cedar_results[k]['prauc'] for k in cedar_results.keys() if k != 'concatenated'])
 
     outdict['score_concat_cedar_auc'] = cedar_results['concatenated']['auc']
     outdict['score_concat_cedar_auc_01'] = cedar_results['concatenated']['auc_01']
     outdict['score_concat_cedar_f1'] = cedar_results['concatenated']['f1']
+    outdict['score_concat_cedar_prauc'] = cedar_results['concatenated']['prauc']
 
     if issubclass(model.__class__, nn.Module):
         outdict['score_avg_valid_auc'] = np.mean([v2['valid']['auc'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
@@ -209,6 +216,7 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
     train_metrics['kwargs'] = outdict
     cedar_results['kwargs'] = outdict
     prime_results['kwargs'] = outdict
+    results_df.to_csv(f'{args["outdir"]}{outname}.csv', index=False)
 
     # NOT SAVING THE TRAINED MODEL BECAUSE IT'S SHIT
     # models_dict['kwargs'] = outdict
@@ -224,8 +232,9 @@ def main():
                                                   f"'log', 'xgb_normal', 'xgb_hp', 'nn']! "
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
+
     args['outdir'] = convert_path(os.path.join(args['outdir'], run_id))
-    args['outdir'] = args['outdir']
+
     # Will make all the nested dirs
     mkdirs(args['outdir'])
     N_CORES = int(multiprocessing.cpu_count()*3/4)+int(multiprocessing.cpu_count()*0.05) if (args['ncores'] is None or args['debug']) else args['ncores']
@@ -280,12 +289,13 @@ def main():
         ics_mask_zip = zip([ics_shannon, ics_kl, ics_none, ics_shannon], ['Shannon', 'KL', 'None', 'Mask'],
                            [False, False, False, True])
         # True/False zips for add_rank, add_aaprop, remove_pep
-        features_zip = zip([True, True, True, False, False, False], [True, True, False, True, True, False],
-                           [False, True, False, False, True, False])
+        features_zip = zip([True, True, False, False, True],
+                           [True, False, True, False, True],
+                           [False, False, False, False, True])
 
         # Lone conditions (to be producted so not zipped)
         if 'xgb' not in args['model']:
-            train_datasets = [dataset_cedar, dataset_cedar_hp_rank_low, dataset_cedar_hp_rank_uni, dataset_cedar_virus]
+            train_datasets = [dataset_cedar, dataset_cedar_hp_rank_uni, dataset_cedar_virus]
         elif args['model'] == 'xgb_normal':
             train_datasets = [dataset_cedar, dataset_cedar_virus]
         elif args['model'] == 'xgb_hp':
@@ -333,7 +343,8 @@ def main():
                          remove_pep=remove_pep, standardize=standardize,
                          learning_rate=lr, weight_decay=wd ) for \
         (train_dataset, encoding, blosum_matrix, ics_dict, ics_name, mask, add_rank,
-         add_aaprop, remove_pep, standardize, lr, wd) in conditions)
+         add_aaprop, remove_pep, standardize, lr, wd) in tqdm(conditions, desc='Conditions',
+                                                              leave=True, position=0))
     output = [x for x in output if x is not None]
     print('Saving results')
     # DF

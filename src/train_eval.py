@@ -50,7 +50,6 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
         elif score > self.best_score - self.delta:
             self.counter += 1
-            # print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -335,7 +334,6 @@ def evaluate_trained_models_nn(models_dict, dataframe, ics_dict, device, encodin
         if concatenated:
             concat_pred.append(avg_prediction)
             concat_true.append(y_test)
-            # print(fold_out, len(concat_pred))
 
     if concatenated:
         concat_pred = torch.cat(concat_pred)
@@ -620,6 +618,7 @@ def evaluate_trained_models_nn_freq(test_dataframe, models_dict, ics_dict, devic
                            'rank_col': 'trueHLA_EL_rank'}
     # This garbage code makes me want to cry
     if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+        encoding_kwargs = copy.deepcopy(encoding_kwargs)
         encoding_kwargs.update({'seq_col': 'Peptide',
                                 'hla_col': 'HLA',
                                 'target_col': 'agg_label',
@@ -764,6 +763,7 @@ def kcv_tune_sklearn(dataframe, base_model, ics_dict, encoding_kwargs, hyperpara
                 # i.e. I save the output of standardize into the same variable x_test lol.
                 x_test = copy.deepcopy(x_test_base)
             # Fit the model and append it to the list
+
             model.fit(x_train, y_train)
             models_dict[fold] = model
             # Get the prediction values on both the train and validation set
@@ -809,6 +809,19 @@ def kcv_tune_sklearn(dataframe, base_model, ics_dict, encoding_kwargs, hyperpara
 
 
 def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: dict = None):
+    """
+
+    Args:
+        dataframe:
+        base_model:
+        ics_dict:
+        encoding_kwargs:
+
+    Returns:
+        models_fold
+        train_results
+        test_results
+    """
     if encoding_kwargs is None:
         encoding_kwargs = {'max_len': 12,
                            'encoding': 'onehot',
@@ -880,7 +893,8 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
 def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                                     train_dataframe=None, train_metrics=None,
                                     encoding_kwargs: dict = None,
-                                    concatenated=False, only_concat=False, keep=False):
+                                    concatenated=False, only_concat=False, keep=False,
+                                    return_scores = False):
     """
 
     Args:
@@ -893,7 +907,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
         only_concat:
 
     Returns:
-
+        test_results
     """
     if encoding_kwargs is None:
         encoding_kwargs = {'max_len': 12,
@@ -906,6 +920,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                            'rank_col': 'trueHLA_EL_rank'}
     # This garbage code makes me want to cry
     if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+        encoding_kwargs = copy.deepcopy(encoding_kwargs)
         encoding_kwargs.update({'seq_col': 'Peptide',
                                 'hla_col': 'HLA',
                                 'target_col': 'agg_label',
@@ -934,14 +949,12 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                 test_df = test_dataframe.copy().reset_index(drop=True)
         else:
             test_df = test_dataframe.copy().reset_index(drop=True)
-
         x_test, y_test = get_array_dataset(test_df, ics_dict, **encoding_kwargs)
-
         # Fuck my life ; Here to make sure the test fold evaluated doesn't overlap with with training peptides
         inner_folds = [x for x in range(len(models_dict.keys())) if x != fold_out]
-
-        # One of the worst garbage code (top 5) I've written this week
-        if train_dataframe is not None:
+        # TODO One of the worst garbage code (top 5) I've written this week
+        # TODO Actually after coming back this is TOP 1 GARBAGE
+        if train_dataframe is not None and not train_dataframe.equals(test_dataframe):
             tmp = train_dataframe.query('fold != @fold_out')  # Not sure why but I need to add this or it breaks
             train_peps = [tmp.query('fold!=@fold_in')[encoding_kwargs['seq_col']].values for fold_in in inner_folds]
             tmp_index = [test_df.query('Peptide not in @peps').index for peps in train_peps]
@@ -953,42 +966,42 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
 
         else:
             index_keep = range(len(x_test))
-        # print(len(index_keep))
         if encoding_kwargs['standardize']:
             # Very convoluted list comprehension, but basically predict_proba and the standardize operation
             # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
             # One of the worst garbage code (top 5) I've written this week
-            try:
-                avg_prediction = [model.predict_proba(
-                    ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
-                        'sigma']))[:, 1] \
-                                  for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
-            except:
-                x=0
-                raise Exception
+            # try:
+            avg_prediction = [model.predict_proba(
+                ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
+                    'sigma']))[:, 1] \
+                              for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
+            # except:
+            #     x=0
+            #     raise Exception
         else:
             avg_prediction = [model.predict_proba(x_test[index_keep])[:, 1] for i, model in
                               enumerate(models_list_out)]
-
         avg_prediction = np.mean(np.stack(avg_prediction), axis=0)
-
         test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction, keep=keep)
-
         if concatenated:
             concat_pred.append(avg_prediction)
             concat_true.append(y_test[index_keep])
+
     if concatenated:
+        # "PRED" HERE IS ACTUALLY THE SCORES
         concat_pred = np.concatenate(concat_pred)
         concat_true = np.concatenate(concat_true)
         test_results['concatenated'] = get_metrics(concat_true, concat_pred, keep=keep)
 
     if only_concat:
         keys_del = [k for k in test_results if k != 'concatenated']
-
         for k in keys_del:
             del test_results[k]
 
-    return test_results
+    if return_scores:
+        return test_results, concat_pred, concat_true
+    else:
+        return test_results
 
 
 #####################################################################################
@@ -1023,7 +1036,6 @@ def nested_kcv_train(dataframe, ics_dict, model, criterion, optimizer, device, b
     test_results = {}
     train_results = {}
     folds = sorted(dataframe.fold.unique())
-    # print(f'Using {device}')
     seed = 0
     for fold_out in folds:
         # Get test set & init models list to house all models trained in inner fold
@@ -1152,7 +1164,6 @@ def evaluate_trained_models(models_dict, dataframe, ics_dict, device, encoding='
         if concatenated:
             concat_pred.append(avg_prediction)
             concat_true.append(y_test)
-            # print(fold_out, len(concat_pred))
 
     if concatenated:
         concat_pred = torch.cat(concat_pred)
