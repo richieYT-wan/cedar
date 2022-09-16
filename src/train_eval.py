@@ -837,7 +837,7 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
     folds = sorted(dataframe.fold.unique())
     # if mode == 'train':
     seed = 0
-    for fold_out in tqdm(folds, leave=True, desc='Outer fold'):
+    for fold_out in tqdm(folds, leave=False, desc='Outer fold', position=2):
         # Get test set & init models list to house all models trained in inner fold
         test = dataframe.query('fold == @fold_out').reset_index(drop=True)
         x_test_base, y_test = get_array_dataset(test, ics_dict, **encoding_kwargs)
@@ -908,6 +908,8 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
 
     Returns:
         test_results
+        concat_pred (if return_scores==True)
+        concat_true (if return_scores==True)
     """
     if encoding_kwargs is None:
         encoding_kwargs = {'max_len': 12,
@@ -938,7 +940,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     if concatenated:
         concat_pred = []
         concat_true = []
-
+    preds_df = []
     for fold_out, models_list_out in models_dict.items():
         # If no train dataframe provided and test_dataframe is partitioned,
         # It will eval on each of the folds
@@ -966,26 +968,32 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
 
         else:
             index_keep = range(len(x_test))
+        # test_df = test_df.loc[index_keep]
+        x_test = x_test[index_keep]
         if encoding_kwargs['standardize']:
             # Very convoluted list comprehension, but basically predict_proba and the standardize operation
             # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
             # One of the worst garbage code (top 5) I've written this week
             # try:
             avg_prediction = [model.predict_proba(
-                ((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
+                ((x_test - train_metrics[fold_out][fold_in]['mu']) / train_metrics[fold_out][fold_in][
                     'sigma']))[:, 1] \
                               for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
             # except:
             #     x=0
             #     raise Exception
         else:
-            avg_prediction = [model.predict_proba(x_test[index_keep])[:, 1] for i, model in
+            avg_prediction = [model.predict_proba(x_test)[:, 1] for i, model in
                               enumerate(models_list_out)]
         avg_prediction = np.mean(np.stack(avg_prediction), axis=0)
         test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction, keep=keep)
+
+        # test_df['prediction_score'] = avg_prediction
+        # preds_df.append(test_df)
         if concatenated:
             concat_pred.append(avg_prediction)
             concat_true.append(y_test[index_keep])
+    # Here get the mean results
 
     if concatenated:
         # "PRED" HERE IS ACTUALLY THE SCORES
@@ -998,8 +1006,13 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
         for k in keys_del:
             del test_results[k]
 
-    if return_scores:
-        return test_results, concat_pred, concat_true
+    if return_scores and concatenated:
+        # preds_df = pd.concat(preds_df).sort_values('Peptide')
+        # all_cols = [x for x in preds_df.columns if x != 'prediction_score']
+        # preds_df.groupby(all_cols).agg(mean_pred=('prediction_score', 'mean')).reset_index()
+        # return test_results,  preds_df# concat_pred, concat_true
+        return test_results, concat_pred, concat_true# preds_df  # concat_pred, concat_true
+
     else:
         return test_results
 

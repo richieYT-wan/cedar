@@ -184,6 +184,7 @@ output/train_eval/
 output/traineval/
 output/220906_analysis/
 notebook/tmp.pkl
+output/bootstrapping/
 output/traineval/run_220905_11h48m21s_log_redo/train_metrics_log.pkl
 output/traineval/run_220905_11h48m21s_log_redo/prime_results_log.pkl
 output/traineval/run_220905_11h48m21s_log_redo/df_results_log.csv

@@ -196,7 +196,6 @@ def get_mean_roc_curve(roc_curves, extra_key=None):
     return base_fpr, mean_tprs, lower, upper, mean_auc
 
 
-
 def get_mean_pr_curve(pr_curves, extra_key=None):
     """
     Assumes a single-level dict, i.e. roc_curves_dict has all the outer folds, and no inner folds
@@ -269,3 +268,52 @@ def get_mean_pr_curve(pr_curves, extra_key=None):
     lower = mean_precisions - std_precisions
     return base_recall, mean_precisions, lower, upper, mean_auc
 
+
+def get_nested_feature_importance(models):
+    feat_importances = []
+    for k in models.keys():
+        inner_mean_fi = np.mean([x.feature_importances_ for x in models[k]], axis=0)
+        feat_importances.append(inner_mean_fi)
+    return np.mean(np.stack(feat_importances), axis=0)
+
+
+def plot_feature_importance(importance, names, title='', ax=None, label_number=False):
+    # Create arrays from feature importance and feature names
+    feature_importance = np.array(importance)
+    feature_names = np.array(names)
+
+    # Create a DataFrame using a Dictionary
+    data = {'feature_names': feature_names, 'feature_importance': feature_importance}
+    fi_df = pd.DataFrame(data)
+
+    # Sort the DataFrame in order decreasing feature importance
+    fi_df.sort_values(by=['feature_importance'], ascending=False, inplace=True)
+
+    sns.set_palette('viridis')
+    if ax is None:
+        # Define size of bar plot
+        f, ax = plt.subplots(1, 1, figsize=(7, 6))
+        # Plot Searborn bar chart
+        sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'],
+                    ax=ax, palette='viridis_r')
+        # Add chart labels
+        plt.xticks(ax.get_xticks(), (ax.get_xticks() * 100).round(1))
+        plt.xlabel('Percentage importance [%]', fontsize=12)
+        plt.ylabel('Feature name', fontsize=12)
+        if title != '':
+            ax.set_title(title, fontweight='semibold', fontsize=14)
+    else:
+        sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'],
+                    ax=ax, palette='viridis_r')
+        # Add chart labels
+        # ax.set_xticks((ax.get_xticks() * 100).round(1))
+        ax.set_xticklabels((ax.get_xticks() * 100).round(1))
+        ax.set_xlabel('Percentage importance [%]', fontsize=12)
+        ax.set_ylabel('Feature name', fontsize=12)
+        if title != '':
+            ax.set_title(title, fontweight='semibold', fontsize=14)
+        f = None
+    if label_number:
+        values = [f'{(100*x).round(1)}%' for x in ax.containers[0].datavalues]
+        ax.bar_label(ax.containers[0], labels = values)
+    return f, ax
