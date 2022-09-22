@@ -14,6 +14,10 @@ from src.data_processing import get_tensor_dataset, get_array_dataset, \
 from src.metrics import get_metrics, get_mean_roc_curve
 import sklearn
 from sklearn.model_selection import ParameterGrid
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from joblib import Parallel, delayed
+from functools import partial
 from tqdm.auto import tqdm
 
 
@@ -126,8 +130,8 @@ def train_loop(model, criterion, optimizer, train_loader, valid_loader, device, 
     model = model.to(device)
     train_losses, valid_losses, train_metrics, valid_metrics = [], [], [], []
     early_stop = EarlyStopping(delta=delta, patience=patience, name=filename)
-    valid_auc = [] # Used to check early stopping.
-    range_ = tqdm(range(1, n_epochs + 1), leave=False) if verbosity>0 else range(1, n_epochs + 1)
+    valid_auc = []  # Used to check early stopping.
+    range_ = tqdm(range(1, n_epochs + 1), leave=False) if verbosity > 0 else range(1, n_epochs + 1)
     for epoch in range_:
         train_loss, train_metrics_ = train_model_step(model, criterion, optimizer, train_loader)
         valid_loss, valid_metrics_ = eval_model_step(model, criterion, valid_loader)
@@ -141,12 +145,12 @@ def train_loop(model, criterion, optimizer, train_loader, valid_loader, device, 
         valid_metrics.append(valid_metrics_)
         valid_auc.append(valid_metrics_['auc'])
         # print losses/metrics if verbose
-        if (epoch % (n_epochs // 10) == 0 or epoch == 1) and verbosity==2:
+        if (epoch % (n_epochs // 10) == 0 or epoch == 1) and verbosity == 2:
             tqdm.write(f'Train Epoch: {epoch}\tTrain Loss: {train_loss:.5f}\tEval Loss:{valid_loss:.5f}\n' \
                        f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                        f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
         # If not verbose, only show start, middle, end.
-        elif (epoch % (n_epochs // 2) == 0 or epoch == 1 or epoch == n_epochs+1) and (verbosity==1):
+        elif (epoch % (n_epochs // 2) == 0 or epoch == 1 or epoch == n_epochs + 1) and (verbosity == 1):
             print(f'\nTrain Epoch: {epoch}\tTrain Loss: {train_loss:.5f}\tEval Loss:{valid_loss:.5f}\n' \
                   f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
@@ -346,6 +350,33 @@ def evaluate_trained_models_nn(models_dict, dataframe, ics_dict, device, encodin
 ###################
 ##KCV AAFREQ FCTS##
 ###################
+def get_predictions(df, models, ics_dict, encoding_kwargs):
+    """
+
+    Args:ll the models for a given fold. Should be a LIST
+        ics_dict (dict): weights or None
+        encoding_kwargs: the kwargs needed to process the df
+        metrics (dict):
+
+    Returns:
+        predictions_df (pd
+        df (pd.DataFrame): DataFrame containing the Peptide-HLA pairs to evaluate
+        models (list): A.DataFrame): Original DataFrame + a column predictions which are the scores + y_true
+    """
+    df = verify_df_(df, encoding_kwargs['seq_col'], encoding_kwargs['hla_col'],
+                    encoding_kwargs['target_col'])
+    x, y = get_array_dataset(df, ics_dict, **encoding_kwargs)
+    # print(x.shape)
+    average_predictions = [model.predict_proba(x)[:, 1] \
+                           for model in models]
+    # print(len(average_predictions))
+    average_predictions = np.mean(np.stack(average_predictions), axis=0)
+    # assert len(average_predictions)==len(df), f'Wrong shapes passed preds:{len(average_predictions)},df:{len(df)}'
+    output_df = df.copy(deep=True)
+    output_df['pred'] = average_predictions
+
+    return output_df
+
 
 # NN
 def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hyperparams,
@@ -439,7 +470,7 @@ def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hy
                                                filename=filename, verbosity=0)
             models_dict[fold] = model
             # Delete the saved tmp.pt afterwards
-            os.remove(filename+'.pt')
+            os.remove(filename + '.pt')
             # Get the prediction values on both the train and validation set
             y_train_score = model(x_train)
             y_val_score = model(x_valid)
@@ -532,7 +563,7 @@ def nested_kcv_train_nn_freq(dataframe, model_constructor, ics_dict, encoding_kw
         models_list = []
         train_results[fold_out] = {}
         for fold_in in sorted([f for f in folds if f != fold_out]):
-            train_results[fold_out][fold_in]={}
+            train_results[fold_out][fold_in] = {}
             print(f'folds: Outer:\t{fold_out}\tInner:\t{fold_in}')
             # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
             # Also resets the optimizer so that it houses the new weights
@@ -562,7 +593,6 @@ def nested_kcv_train_nn_freq(dataframe, model_constructor, ics_dict, encoding_kw
             train_loader = DataLoader(torch.utils.data.TensorDataset(x_train, y_train), batch_size=256)
             valid_loader = DataLoader(torch.utils.data.TensorDataset(x_valid, y_valid), batch_size=256)
             # Some checks
-
 
             # Training loop
             model, result_metrics = train_loop(model, criterion, optimizer, train_loader, valid_loader,
@@ -810,7 +840,6 @@ def kcv_tune_sklearn(dataframe, base_model, ics_dict, encoding_kwargs, hyperpara
 
 def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: dict = None):
     """
-
     Args:
         dataframe:
         base_model:
@@ -849,6 +878,8 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
             # Copy the base model, resets the seed
             model = sklearn.base.clone(base_model)
             model.set_params(random_state=seed)
+            if encoding_kwargs['standardize']:
+                model = Pipeline([('scaler', StandardScaler()), ('model', model)])
             # Create the sub-dict and put the model into the models dict
             train_metrics[fold_out][fold_in] = {}
             # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
@@ -858,17 +889,7 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
             # Get datasets
             x_train, y_train = get_array_dataset(train, ics_dict, **encoding_kwargs)
             x_valid, y_valid = get_array_dataset(valid, ics_dict, **encoding_kwargs)
-
-            if encoding_kwargs['standardize']:
-                # Saving the mean and std to be re-used when evaluating on another test-set
-                train_metrics[fold_out][fold_in]['mu'] = x_train.mean(axis=0)
-                train_metrics[fold_out][fold_in]['sigma'] = x_train.std(axis=0)
-                x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
-
-            else:
-                # Here copy it every time, this is a workaround because of how standardize overwrites it
-                # i.e. I save the output of standardize into the same variable x_test lol.
-                x_test = copy.deepcopy(x_test_base)
+            x_test, y_test = get_array_dataset(test, ics_dict, **encoding_kwargs)
 
             # Fit the model and append it to the list
             model.fit(x_train, y_train)
@@ -879,7 +900,6 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
             # Get the metrics and save them
             train_metrics[fold_out][fold_in]['train'] = get_metrics(y_train, y_train_score, y_train_pred)
             train_metrics[fold_out][fold_in]['valid'] = get_metrics(y_valid, y_val_score, y_val_pred)
-
             # seed increment
             seed += 1
             avg_prediction.append(model.predict_proba(x_test)[:, 1])
@@ -894,7 +914,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                                     train_dataframe=None, train_metrics=None,
                                     encoding_kwargs: dict = None,
                                     concatenated=False, only_concat=False, keep=False,
-                                    return_scores = False):
+                                    return_scores=False):
     """
 
     Args:
@@ -1011,7 +1031,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
         # all_cols = [x for x in preds_df.columns if x != 'prediction_score']
         # preds_df.groupby(all_cols).agg(mean_pred=('prediction_score', 'mean')).reset_index()
         # return test_results,  preds_df# concat_pred, concat_true
-        return test_results, concat_pred, concat_true# preds_df  # concat_pred, concat_true
+        return test_results, concat_pred, concat_true  # preds_df  # concat_pred, concat_true
 
     else:
         return test_results
@@ -1184,3 +1204,193 @@ def evaluate_trained_models(models_dict, dataframe, ics_dict, device, encoding='
         test_results['concatenated'] = get_metrics(concat_true, concat_pred)
 
     return test_results, train_results
+
+
+#################################################
+#################### DEBUG ######################
+#################################################
+
+# TRAIN WITH PARALLEL WRAPPER
+def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
+                                 encoding_kwargs, fold_out, fold_in):
+    seed = fold_out * 10 + fold_in
+    # Copy the base model, resets the seed
+    model = sklearn.base.clone(base_model)
+    model.set_params(random_state=seed)
+    if encoding_kwargs['standardize']:
+        model = Pipeline([('scaler', StandardScaler()), ('model', model)])
+
+    # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
+    # Query subset dataframe and get encoded data and targets
+    train = train_dataframe.query('fold != @fold_out and fold != @fold_in').reset_index(drop=True)
+    valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
+    # Get datasets
+    x_train, y_train = get_array_dataset(train, ics_dict, **encoding_kwargs)
+    x_valid, y_valid = get_array_dataset(valid, ics_dict, **encoding_kwargs)
+
+    # Fit the model and append it to the list
+    model.fit(x_train, y_train)
+
+    # Get the prediction values on both the train and validation set
+    y_train_pred, y_train_score = model.predict(x_train), model.predict_proba(x_train)[:, 1]
+    y_val_pred, y_val_score = model.predict(x_valid), model.predict_proba(x_valid)[:, 1]
+    # Get the metrics and save them
+    train_metrics = get_metrics(y_train, y_train_score, y_train_pred)
+    valid_metrics = get_metrics(y_valid, y_val_score, y_val_pred)
+    y_pred_test = model.predict_proba(x_test)[:, 1]
+
+    return model, train_metrics, valid_metrics, y_pred_test
+
+
+def nested_kcv_train_tmp(dataframe, base_model, ics_dict, encoding_kwargs: dict = None):
+    """
+    Args:
+        dataframe:
+        base_model:
+        ics_dict:
+        encoding_kwargs:
+
+    Returns:
+        models_fold
+        train_results
+        test_results
+    """
+    if encoding_kwargs is None:
+        encoding_kwargs = {'max_len': 12,
+                           'encoding': 'onehot',
+                           'blosum_matrix': None,
+                           'standardize': False}
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+    models_dict = {}
+    test_metrics = {}
+    train_metrics = {}
+    folds = sorted(dataframe.fold.unique())
+    for fold_out in tqdm(folds, leave=False, desc='Outer fold', position=2):
+        # Get test set & init models list to house all models trained in inner fold
+        test = dataframe.query('fold == @fold_out').reset_index(drop=True)
+        x_test, y_test = get_array_dataset(test, ics_dict, **encoding_kwargs)
+        # For a given fold, all the models that are trained should be appended to this list
+        inner_folds = sorted([f for f in folds if f != fold_out])
+        # Create the sub-dict and put the model into the models dict
+        train_wrapper_ = partial(parallel_inner_train_wrapper, train_dataframe=dataframe, x_test=x_test,
+                                 base_model=base_model, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
+                                 fold_out=fold_out)
+        output = Parallel(n_jobs=len(inner_folds))(
+            delayed(train_wrapper_)(fold_in=fold_in) for fold_in in tqdm(inner_folds,
+                                                                         desc='Inner Folds',
+                                                                         leave=False, position=1))
+        models_dict[fold_out] = [x[0] for x in output]
+        train_tmp = [x[1] for x in output]
+        valid_tmp = [x[2] for x in output]
+        avg_prediction = [x[3] for x in output]
+        avg_prediction = np.mean(np.stack(avg_prediction), axis=0)
+        train_metrics[fold_out] = {k: {'train': v_train,
+                                       'valid': v_valid} for k, v_train, v_valid in
+                                   zip(inner_folds, train_tmp, valid_tmp)}
+        test_metrics[fold_out] = get_metrics(y_test, avg_prediction)
+
+    return models_dict, train_metrics, test_metrics
+
+
+# EVAL WITH PARALLEL WRAPPER
+def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
+                          train_dataframe, encoding_kwargs, fold_out):
+    # If no train dataframe provided and test_dataframe is partitioned,
+    # It will eval on each of the folds
+    if 'fold' in test_dataframe.columns:
+        if test_dataframe.equals(train_dataframe):
+            test_df = test_dataframe.query('fold==@fold_out')
+        else:
+            test_df = test_dataframe.copy().reset_index(drop=True)
+    else:
+        test_df = test_dataframe.copy().reset_index(drop=True)
+
+    if train_dataframe is not None and not train_dataframe.equals(test_dataframe):
+        tmp = train_dataframe.query('fold != @fold_out')  # Not sure why but I need to add this or it breaks
+        train_peps = tmp[encoding_kwargs['seq_col']].unique()
+        test_df = test_df.query(f'{encoding_kwargs["seq_col"]} not in @train_peps')
+    else:
+        pass
+    # test_df = test_df.loc[index_keep]
+    predictions_df = get_predictions(test_df, models_list, ics_dict, encoding_kwargs)
+    test_metrics = get_metrics(predictions_df[encoding_kwargs['target_col']].values,
+                               predictions_df['pred'].values)
+    return predictions_df, test_metrics
+
+
+def evaluate_trained_models_tmp(test_dataframe, models_dict, ics_dict,
+                                train_dataframe=None,
+                                encoding_kwargs: dict = None,
+                                concatenated=False, only_concat=False):
+    """
+
+    Args:
+        dataframe:
+        models_dict:
+        ics_dict:
+        train_metrics (dict): Should be used if standardize in encoding_kwargs is True...
+        encoding_kwargs:
+        concatenated:
+        only_concat:
+
+    Returns:
+        test_results
+        concat_pred (if return_scores==True)
+        concat_true (if return_scores==True)
+    """
+    if encoding_kwargs is None:
+        encoding_kwargs = {'max_len': 12,
+                           'encoding': 'onehot',
+                           'blosum_matrix': BL62_VALUES,
+                           'standardize': False,
+                           'seq_col': 'Peptide',
+                           'hla_col': 'HLA',
+                           'target_col': 'agg_label',
+                           'rank_col': 'trueHLA_EL_rank'}
+    # This garbage code makes me want to cry
+    if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+        encoding_kwargs = copy.deepcopy(encoding_kwargs)
+        encoding_kwargs.update({'seq_col': 'Peptide',
+                                'hla_col': 'HLA',
+                                'target_col': 'agg_label',
+                                'rank_col': 'trueHLA_EL_rank'})
+
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+
+    # Wrapper and parallel evaluation
+    eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
+                            train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
+
+    output = Parallel(n_jobs=len(models_dict.keys()))(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
+                                                      for (fold_out, models_list) in tqdm(models_dict.items(),
+                                                                                          desc='Eval Folds', leave=False,
+                                                                                          position=2))
+    predictions_df = [x[0] for x in output]
+    test_metrics = [x[1] for x in output]
+
+    test_results = {k: v for k, v in zip(models_dict.keys(), test_metrics)}
+
+    # Here simply concatenates it to get all the predictions from the folds
+    predictions_df = pd.concat(predictions_df)
+    # Here get the concat results
+    if concatenated:
+        test_results['concatenated'] = get_metrics(predictions_df[encoding_kwargs['target_col']].values,
+                                                   predictions_df['pred'].values)
+    # Either concatenated, or mean predictions
+    else:
+        cols = [encoding_kwargs['seq_col'], encoding_kwargs['hla_col'], encoding_kwargs['target_col']]
+        mean_preds = predictions_df.groupby(cols).agg(mean_pred=('pred', 'mean'))
+        predictions_df = test_dataframe.merge(mean_preds, left_on=cols, right_on=cols, suffixes=[None, None])
+
+    if only_concat and concatenated:
+        keys_del = [k for k in test_results if k != 'concatenated']
+        for k in keys_del:
+            del test_results[k]
+
+    return test_results, predictions_df
