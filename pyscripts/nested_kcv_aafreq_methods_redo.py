@@ -176,15 +176,13 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
                                                                             encoding_kwargs)
         print('Evaluating models')
         # Evaluation part of the wrapper
-        tmp = train_dataset if outdict['trainset'] == 'prime' else None
 
-        cedar_results = evaluate_trained_models_sklearn(cedar_dataset, models_dict, ics_dict, train_dataset,
-                                                        train_metrics, encoding_kwargs=encoding_kwargs,
-                                                        concatenated=True)
+        cedar_results, _ = evaluate_trained_models_sklearn(cedar_dataset, models_dict, ics_dict, train_dataset,
+                                                           encoding_kwargs=encoding_kwargs,
+                                                           concatenated=True)
 
-        prime_results = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict, train_dataset,
-                                                        train_metrics=train_metrics,
-                                                        encoding_kwargs=encoding_kwargs, concatenated=True)
+        prime_results, _ = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict, train_dataset,
+                                                           encoding_kwargs=encoding_kwargs, concatenated=True)
 
     # Big mess to save results :-)
     outdict['score_avg_prime_auc'] = np.mean(
@@ -256,7 +254,7 @@ def main():
     # Will make all the nested dirs
     mkdirs(args['outdir'])
     N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
-                args['ncores'] is None) else args['ncores']
+            args['ncores'] is None) else args['ncores']
     N_CORES = 12 if args['debug'] else N_CORES
 
     device = 'cuda' if (args['gpu'] and torch.cuda.is_available()) else 'cpu'

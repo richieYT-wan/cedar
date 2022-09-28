@@ -15,6 +15,9 @@ warnings.filterwarnings('ignore')
 
 DATADIR = '../data/' if os.path.exists('../data/') else './data/'
 OUTDIR = '../output/' if os.path.exists('../output/') else './output/'
+# Stupid hardcoded variable
+CNN_FEATS = ['EL_ratio','anchor_mutation','delta_VHSE1','delta_VHSE3','delta_VHSE7','delta_VHSE8','delta_aliphatic_index',
+             'delta_boman','delta_hydrophobicity','delta_isoelectric_point','delta_rank']
 
 
 def _init(DATADIR):
@@ -273,6 +276,7 @@ def verify_df_(df, seq_col, hla_col, target_col):
     assert ([int(x) for x in sorted(unique_labels)]) in [[0, 1], [0], [1]], f'Labels are not 0, 1! {unique_labels}'
     # Checks if any seq not in alphabet
     df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS for z in x]))].index)
+    # print(df[hla_col])
     # Checks if HLAs have correct format
     if all(df[hla_col].apply(lambda x: not x.startswith('HLA-'))):
         df[hla_col] = df[hla_col].apply(lambda x: 'HLA-' + x)
@@ -313,6 +317,26 @@ def get_tensor_dataset(df, ics_dict, device, max_len=12, encoding='onehot', blos
     return dataset
 
 
+def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                         mutant_col='Peptide', wt_col='wild_type', target_col='agg_label', hla_col='HLA',
+                         device='cuda', mask=False, invert=False, standardize=True):
+
+    x_mutant, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
+                                   seq_col=mutant_col, hla_col=hla_col, target_col=target_col,
+                                   rank_col='trueHLA_EL_rank', mask=mask, invert=invert, add_rank=False,
+                                   add_aaprop=False, remove_pep=False, standardize=standardize)
+
+    x_wt, _ = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
+                               seq_col=wt_col, hla_col=hla_col, target_col=target_col,
+                               rank_col='trueHLA_EL_rank', mask=mask, invert=invert, add_rank=False,
+                               add_aaprop=False, remove_pep=False, standardize=standardize)
+
+    x_props = torch.from_numpy(df[CNN_FEATS].values).to(device)
+
+    dataset = TensorDataset(x_mutant, x_wt, x_props, y)
+    return dataset
+
+
 def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                      seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
                      rank_thr=0.25, mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
@@ -323,6 +347,9 @@ def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot',
 
     x, y = torch.from_numpy(x).float().to(device), torch.from_numpy(y).float().to(device).unsqueeze(1)
     return x,y
+
+
+
 
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,

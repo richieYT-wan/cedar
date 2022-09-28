@@ -46,9 +46,11 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-tunedir', type=str, default='../output/tuning/run_220819_03h13m45s/')
     parser.add_argument('-model', type=str, default='', help='"rf", "log" or "xgb_normal", "xgb_hp" or "nn"')
-    parser.add_argument('-namesuffix', type=str, default='', help='Additional suffix that may be added to your filenames, '
-                                                                  'ex _NN ; Otherwise won\'t be able to properly read your files.')
-    parser.add_argument('-ncores', type=int, default=None, help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+    parser.add_argument('-namesuffix', type=str, default='',
+                        help='Additional suffix that may be added to your filenames, '
+                             'ex _NN ; Otherwise won\'t be able to properly read your files.')
+    parser.add_argument('-ncores', type=int, default=None,
+                        help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-gpu', type=str2bool, default=False, help='Enable GPU (default False)')
     parser.add_argument('-debug', type=str2bool, default=False)
 
@@ -91,7 +93,6 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
         learning_rate = None
         weight_decay = None
 
-
     # Creating the encoding kwargs dict
     encoding_kwargs = {'max_len': 12,
                        'encoding': encoding,
@@ -121,20 +122,20 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
     outdict.update({k: v for k, v in encoding_kwargs.items() if k != 'blosum_matrix'})
     # Merging each tag into one single string
     if weight_decay not in [-1, None] and learning_rate not in [-1, None]:
-        outdict['lr']=learning_rate
-        outdict['wd']=weight_decay
+        outdict['lr'] = learning_rate
+        outdict['wd'] = weight_decay
 
-    outname = '_'.join([f'{k}{v}' for k, v in outdict.items()])+args['namesuffix']
+    outname = '_'.join([f'{k}{v}' for k, v in outdict.items()]) + args['namesuffix']
 
     # Here use the outname to look for the corresponding filename for the best hyperparams
     try:
-        pkl_name = convert_path(os.path.join(args['tunedir'],(outname+'.pkl')).replace('//','/'))
+        pkl_name = convert_path(os.path.join(args['tunedir'], (outname + '.pkl')).replace('//', '/'))
         hyperparams = pkl_load(pkl_name)
         if 'max_depth' in hyperparams:
             if np.isnan(hyperparams['max_depth']):
-                hyperparams['max_depth']=None
+                hyperparams['max_depth'] = None
             else:
-                hyperparams['max_depth']=int(hyperparams['max_depth'])
+                hyperparams['max_depth'] = int(hyperparams['max_depth'])
 
         for k in [x for x in hyperparams.keys() if x.startswith('n_')]:
             # converts n_estimators, n_layers, n_in, n_hidden, to int
@@ -151,8 +152,10 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
         # Variable n_in so this is fine to just give the class constructor as it is
         model_constructor = model.__class__
         models_dict, train_metrics, test_metrics = nested_kcv_train_nn_freq(train_dataset, model_constructor, ics_dict,
-                                                                            encoding_kwargs, hyperparams, criterion=nn.BCELoss(),
-                                                                            optimizer=optim.Adam(model.parameters()), device=device,
+                                                                            encoding_kwargs, hyperparams,
+                                                                            criterion=nn.BCELoss(),
+                                                                            optimizer=optim.Adam(model.parameters()),
+                                                                            device=device,
                                                                             filename=outname)
         print('Evaluating models')
         # Evaluation part of the wrapper
@@ -171,17 +174,19 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
                                                                             encoding_kwargs)
         print('Evaluating models')
         # Evaluation part of the wrapper
-        cedar_results = evaluate_trained_models_sklearn(cedar_dataset, models_dict, ics_dict, train_dataset,
-                                                        train_metrics, encoding_kwargs=encoding_kwargs, concatenated=True)
+        cedar_results, _ = evaluate_trained_models_sklearn(cedar_dataset, models_dict, ics_dict, train_dataset,
+                                                           encoding_kwargs=encoding_kwargs, concatenated=True)
 
-        prime_results = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict,
-                                                        train_metrics=train_metrics,
-                                                        encoding_kwargs=encoding_kwargs, concatenated=True)
+        prime_results, _ = evaluate_trained_models_sklearn(prime_dataset, models_dict, ics_dict,
+                                                           encoding_kwargs=encoding_kwargs, concatenated=True)
 
     # Big mess to save results :-)
-    outdict['score_avg_prime_auc'] = np.mean([prime_results[k]['auc'] for k in prime_results.keys() if k != 'concatenated'])
-    outdict['score_avg_prime_auc_01'] = np.mean([prime_results[k]['auc_01'] for k in prime_results.keys() if k != 'concatenated'])
-    outdict['score_avg_prime_f1'] = np.mean([prime_results[k]['f1'] for k in prime_results.keys() if k != 'concatenated'])
+    outdict['score_avg_prime_auc'] = np.mean(
+        [prime_results[k]['auc'] for k in prime_results.keys() if k != 'concatenated'])
+    outdict['score_avg_prime_auc_01'] = np.mean(
+        [prime_results[k]['auc_01'] for k in prime_results.keys() if k != 'concatenated'])
+    outdict['score_avg_prime_f1'] = np.mean(
+        [prime_results[k]['f1'] for k in prime_results.keys() if k != 'concatenated'])
     outdict['score_avg_prime_prauc'] = np.mean(
         [prime_results[k]['prauc'] for k in prime_results.keys() if k != 'concatenated'])
 
@@ -190,10 +195,12 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
     outdict['score_concat_prime_f1'] = prime_results['concatenated']['f1']
     outdict['score_concat_prime_prauc'] = prime_results['concatenated']['prauc']
 
-
-    outdict['score_avg_cedar_auc'] = np.mean([cedar_results[k]['auc'] for k in cedar_results.keys() if k != 'concatenated'])
-    outdict['score_avg_cedar_auc_01'] = np.mean([cedar_results[k]['auc_01'] for k in cedar_results.keys() if k != 'concatenated'])
-    outdict['score_avg_cedar_f1'] = np.mean([cedar_results[k]['f1'] for k in cedar_results.keys() if k != 'concatenated'])
+    outdict['score_avg_cedar_auc'] = np.mean(
+        [cedar_results[k]['auc'] for k in cedar_results.keys() if k != 'concatenated'])
+    outdict['score_avg_cedar_auc_01'] = np.mean(
+        [cedar_results[k]['auc_01'] for k in cedar_results.keys() if k != 'concatenated'])
+    outdict['score_avg_cedar_f1'] = np.mean(
+        [cedar_results[k]['f1'] for k in cedar_results.keys() if k != 'concatenated'])
     outdict['score_avg_cedar_prauc'] = np.mean(
         [cedar_results[k]['prauc'] for k in cedar_results.keys() if k != 'concatenated'])
 
@@ -203,13 +210,19 @@ def train_eval_wrapper(args, model, train_dataset, cedar_dataset, prime_dataset,
     outdict['score_concat_cedar_prauc'] = cedar_results['concatenated']['prauc']
 
     if issubclass(model.__class__, nn.Module):
-        outdict['score_avg_valid_auc'] = np.mean([v2['valid']['auc'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
-        outdict['score_avg_valid_auc_01'] = np.mean([v2['valid']['auc_01'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
-        outdict['score_avg_valid_f1'] = np.mean([v2['valid']['f1'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_auc'] = np.mean(
+            [v2['valid']['auc'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_auc_01'] = np.mean(
+            [v2['valid']['auc_01'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_f1'] = np.mean(
+            [v2['valid']['f1'][-1] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
     else:
-        outdict['score_avg_valid_auc'] = np.mean([v2['valid']['auc'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
-        outdict['score_avg_valid_auc_01'] = np.mean([v2['valid']['auc_01'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
-        outdict['score_avg_valid_f1'] = np.mean([v2['valid']['f1'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_auc'] = np.mean(
+            [v2['valid']['auc'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_auc_01'] = np.mean(
+            [v2['valid']['auc_01'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
+        outdict['score_avg_valid_f1'] = np.mean(
+            [v2['valid']['f1'] for _, v1 in train_metrics.items() for _, v2 in v1.items()])
 
     # Single line dataframe
     results_df = pd.DataFrame(outdict, index=[0])
@@ -228,8 +241,9 @@ def main():
     args = vars(args_parser())
     run_id = f'run_{start.strftime(f"%y%m%d_%Hh%Mm%Ss")}_{str(args["model"])}/'
 
-    assert args['model'] in ['rf', 'log', 'xgb_normal', 'xgb_hp', 'nn'], f"Undefined model specified {args['model']}. Should be in ['rf', " \
-                                                  f"'log', 'xgb_normal', 'xgb_hp', 'nn']! "
+    assert args['model'] in ['rf', 'log', 'xgb_normal', 'xgb_hp',
+                             'nn'], f"Undefined model specified {args['model']}. Should be in ['rf', " \
+                                    f"'log', 'xgb_normal', 'xgb_hp', 'nn']! "
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
 
@@ -237,7 +251,8 @@ def main():
 
     # Will make all the nested dirs
     mkdirs(args['outdir'])
-    N_CORES = int(multiprocessing.cpu_count()*3/4)+int(multiprocessing.cpu_count()*0.05) if (args['ncores'] is None or args['debug']) else args['ncores']
+    N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
+                args['ncores'] is None or args['debug']) else args['ncores']
 
     device = 'cuda' if (args['gpu'] and torch.cuda.is_available()) else 'cpu'
     tree_method = 'gpu_hist' if args['gpu'] else 'hist'
@@ -262,7 +277,6 @@ def main():
     prime_dataset = pd.read_csv(f'{args["datadir"]}prime_5fold.csv')
     # Filter to avoid evaluating on trained peptides
     prime_dataset = prime_dataset.query('StudyOrigin!="Random" and Peptide not in @cedar_peps')
-
 
     # IC weights
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -302,9 +316,7 @@ def main():
             train_datasets = [dataset_cedar_hp_rank_low, dataset_cedar_hp_rank_uni]
         standardize_ = [True, False]
         lrs = [5e-4, 1e-3] if args['model'] == 'nn' else [-1]
-        wds = [ 1e-6, 1e-2] if args['model'] == 'nn' else [-1]
-
-
+        wds = [1e-6, 1e-2] if args['model'] == 'nn' else [-1]
 
     # Here make the conditions that don't rely on hyperparams, i.e. all dataset and dataprocessing conditions
     conditions = product(train_datasets,
@@ -341,7 +353,7 @@ def main():
                          blosum_matrix=blosum_matrix, ics_dict=ics_dict, ics_name=ics_name,
                          mask=mask, add_rank=add_rank, add_aaprop=add_aaprop,
                          remove_pep=remove_pep, standardize=standardize,
-                         learning_rate=lr, weight_decay=wd ) for \
+                         learning_rate=lr, weight_decay=wd) for \
         (train_dataset, encoding, blosum_matrix, ics_dict, ics_name, mask, add_rank,
          add_aaprop, remove_pep, standardize, lr, wd) in tqdm(conditions, desc='Conditions',
                                                               leave=True, position=0))
@@ -359,7 +371,6 @@ def main():
     pkl_dump(train_metrics, f'train_metrics_{args["model"]}.pkl', dirname=args['outdir'])
     pkl_dump(cedar_results, f'cedar_results_{args["model"]}.pkl', dirname=args['outdir'])
     pkl_dump(prime_results, f'prime_results_{args["model"]}.pkl', dirname=args['outdir'])
-
 
     # pkl_dump(tune_results_model, os.path.join(args['outdir'], 'tune_results_models.pkl'))
     end = dt.now()

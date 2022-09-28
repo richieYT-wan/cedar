@@ -269,9 +269,19 @@ def find_rank_HLA(row, df_xls, dummy=None):
     assert tmp[colpp] == pep, f'{tmp[colpp]},{pep}'
     return tmp[colhl]
 
+def find_core(row, df_xls, dummy=None):
+    hla = row['HLA']
+    pep = row['Peptide']
+    colpp = ('base', 'Peptide')
+    colcore = (f'{hla}', 'core')
+    tmp = df_xls.iloc[row.name]
+    assert tmp[colpp] == pep, f'{tmp[colpp]},{pep}'
+    return tmp[colcore]
+
 
 def get_trueHLA_EL_rank(input_df, df_xls):
     df = input_df.copy()
     df.reset_index(inplace=True, drop=True)
     df['trueHLA_EL_rank'] = df.apply(find_rank_HLA, args=(df_xls, None), axis=1)
+    df['core'] = df.apply(find_core, args=(df_xls, None), axis=1)
     return df
