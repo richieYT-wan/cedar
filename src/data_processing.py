@@ -16,8 +16,9 @@ warnings.filterwarnings('ignore')
 DATADIR = '../data/' if os.path.exists('../data/') else './data/'
 OUTDIR = '../output/' if os.path.exists('../output/') else './output/'
 # Stupid hardcoded variable
-CNN_FEATS = ['EL_ratio','anchor_mutation','delta_VHSE1','delta_VHSE3','delta_VHSE7','delta_VHSE8','delta_aliphatic_index',
-             'delta_boman','delta_hydrophobicity','delta_isoelectric_point','delta_rank']
+CNN_FEATS = ['EL_ratio', 'anchor_mutation', 'delta_VHSE1', 'delta_VHSE3', 'delta_VHSE7', 'delta_VHSE8',
+             'delta_aliphatic_index',
+             'delta_boman', 'delta_hydrophobicity', 'delta_isoelectric_point', 'delta_rank']
 
 
 def _init(DATADIR):
@@ -42,6 +43,7 @@ def _init(DATADIR):
         BL50[letter_1] = {}
         for j, letter_2 in enumerate(AA_KEYS):
             BL50[letter_1][letter_2] = _blosum50[i, j]
+    BL50_VALUES = {k: np.array([v for v in BL50[k].values()]) for k in BL50}
     # BLOSUMS 62
     BL62_DF = pd.read_csv(f'{MATRIXDIR}BLOSUM62', sep='\s+', comment='#', index_col=0)
     BL62 = BL62_DF.to_dict()
@@ -57,12 +59,64 @@ def _init(DATADIR):
         BL62FREQ_VALUES[letter_1] = _blosum62[i]
         for j, letter_2 in enumerate(AA_KEYS):
             BL62FREQ[letter_1][letter_2] = _blosum62[i, j]
-    HLAS = pkl_load(ICSDIR+'ics_shannon.pkl')[9].keys()
-    return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL62, BL62_VALUES, HLAS
+    HLAS = pkl_load(ICSDIR + 'ics_shannon.pkl')[9].keys()
+
+    return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, HLAS
 
 
-VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL62, BL62_VALUES, HLAS = _init(
+VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, HLAS = _init(
     DATADIR)
+
+
+######################################
+####      assertion / checks      ####
+######################################
+
+def verify_df(df, seq_col, hla_col, target_col):
+    df = copy.deepcopy(df)
+    unique_labels = sorted(df[target_col].dropna().unique())
+    # Checks binary label
+    assert ([int(x) for x in sorted(unique_labels)]) in [[0, 1], [0], [1]], f'Labels are not 0, 1! {unique_labels}'
+    # Checks if any seq not in alphabet
+    df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS for z in x]))].index)
+    # print(df[hla_col])
+    # Checks if HLAs have correct format
+    if all(df[hla_col].apply(lambda x: not x.startswith('HLA-'))):
+        df[hla_col] = df[hla_col].apply(lambda x: 'HLA-' + x)
+    df[hla_col] = df[hla_col].apply(lambda x: x.replace('*', '').replace(':', ''))
+    # Check HLA only in subset
+    df = df.query(f'{hla_col} in @HLAS')
+
+    return df
+
+
+def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
+    """
+    Assertion / checks for encoding kwargs and verify all the necessary key-values 
+    are in
+    """
+    # Making a deep copy since dicts are mutable between fct calls
+    encoding_kwargs = copy.deepcopy(encoding_kwargs)
+    if encoding_kwargs is None:
+        encoding_kwargs = {'max_len': 12,
+                           'encoding': 'onehot',
+                           'blosum_matrix': None,
+                           'standardize': False}
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    assert all([x in encoding_kwargs.keys() for x in
+                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+
+    if mode_eval:
+        if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+            encoding_kwargs.update({'seq_col': 'Peptide',
+                                    'hla_col': 'HLA',
+                                    'target_col': 'agg_label',
+                                    'rank_col': 'trueHLA_EL_rank'})
+
+        # This KWARGS not needed in eval mode since I'm using Pipeline and Wrapper
+        del encoding_kwargs['standardize']
+    return encoding_kwargs
 
 
 ######################################
@@ -95,7 +149,7 @@ def get_aa_properties(df, seq_col='Peptide'):
     vhse = out[seq_col].apply(lambda x: peptides.Peptide(x).vhse_scales())
     # for i in range(1, 9):
     #     out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
-    for i in [1,3,7,8]:
+    for i in [1, 3, 7, 8]:
         out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
     # Some hardcoded bs
     return out, ['aliphatic_index', 'boman', 'hydrophobicity',
@@ -107,7 +161,7 @@ def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES)
     encodes a single peptide into a matrix, using 'onehot' or 'blosum'
     if 'blosum', then need to provide the blosum dictionary as argument
     """
-
+    assert (encoding=='onehot' or encoding.lower().startswith("bl")), 'wrong encoding type'
     # One hot encode by setting 1 to positions where amino acid is present, 0 elsewhere
     size = len(sequence)
     if encoding == 'onehot':
@@ -162,7 +216,7 @@ def onehot_batch_decode(onehot_sequences):
     return np.stack([onehot_decode(x) for x in onehot_sequences])
 
 
-def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col='HLA', rank_thr=0.25, mask=False,
+def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col='HLA', mask=False,
                    invert=False):
     """
 
@@ -172,7 +226,6 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
         max_len:
         seq_col:
         hla_col:
-        rank_thr:
         invert: Invert the behaviour; for KL/Shannon, will take IC instead of 1-IC as weight
                 For Mask, will amplify MIA positions (by 1.3) instead of setting to 0
 
@@ -193,7 +246,7 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
     # Using the conserved / MIAs positions instead of the ICs
     if mask:
         # Get mask for where the values should be thresholded to 0 and 1
-        weights = np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
+        weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
                             for l, hla, pad in zip(lens, hlas, pads)])
         # IC > 0.3 goes to 0 because anchor position
         # IC <= 0.3 goes to 1 because "MIA" position
@@ -207,19 +260,20 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
             weights[idx_max] = 1
     # Else we get the weight with the 1-IC depending on the IC dict provided
     else:
-        if invert :
-            weights = np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
+        if invert:
+            weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
                                 for l, hla, pad in zip(lens, hlas, pads)])
         else:
-            weights = 1 - np.stack([np.pad(ics_dict[l][hla][rank_thr], pad_width=(0, pad), constant_values=(1, 1)) \
-                                for l, hla, pad in zip(lens, hlas, pads)])
+            weights = 1 - np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
+                                    for l, hla, pad in zip(lens, hlas, pads)])
 
     weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
     return weights
 
 
 def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES,
-                          seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_thr=0.25, mask=False, invert=False):
+                          seq_col='Peptide', hla_col='HLA', target_col='agg_label', mask=False,
+                          invert=False):
     """
     Takes as input a df containing sequence, len, HLA;
     Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
@@ -234,12 +288,12 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         blosum_matrix : The blosum matrix dictionary; Should just use the BL62_VALUES that's initialized by default
         seq_col (str): Name of the column containing the Peptide sequences (default = 'Peptide')
         hla_col (str): Name of the column containing the HLA alleles (default = 'HLA')
-        rank_thr (float): %Rank threshold for the IC selection [0.25, 0.5] (default = 0.25)
+
 
     Returns:
         weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
-    df = verify_df_(df, seq_col, hla_col, target_col)
+    df = verify_df(df, seq_col, hla_col, target_col)
     if 'len' not in df.columns:
         df['len'] = df[seq_col].apply(len)
     if max_len is not None:
@@ -250,7 +304,7 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
     # Encoding the sequences
     encoded_sequences = encode_batch(df[seq_col].values, max_len, encoding=encoding, blosum_matrix=blosum_matrix)
     if ics_dict is not None:
-        weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, rank_thr, mask, invert)
+        weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, mask, invert)
     else:
         # Here, if no ics_dict is provided, the normal weight will just be ones everywhere
         # In case we are not doing weighted sequence (either for onehot-input or frequency computation)
@@ -263,99 +317,89 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         return weighted_sequences.to(device).float()
 
 
-def query_dataframe_fold(dataframe, fold_inner, fold_outer):
+def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
     train_data = dataframe.query('fold != @fold_inner and fold != @fold_outer')
     valid_data = dataframe.query('fold == @fold_inner')
     return train_data, valid_data
 
 
-def verify_df_(df, seq_col, hla_col, target_col):
-    df = copy.deepcopy(df)
-    unique_labels = sorted(df[target_col].dropna().unique())
-    # Checks binary label
-    assert ([int(x) for x in sorted(unique_labels)]) in [[0, 1], [0], [1]], f'Labels are not 0, 1! {unique_labels}'
-    # Checks if any seq not in alphabet
-    df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS for z in x]))].index)
-    # print(df[hla_col])
-    # Checks if HLAs have correct format
-    if all(df[hla_col].apply(lambda x: not x.startswith('HLA-'))):
-        df[hla_col] = df[hla_col].apply(lambda x: 'HLA-' + x)
-    df[hla_col] = df[hla_col].apply(lambda x: x.replace('*', '').replace(':', ''))
-    # Check HLA only in subset
-    df = df.query(f'{hla_col} in @HLAS')
-
-    return df
-
-
-def get_tensor_dataset(df, ics_dict, device, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_thr=0.25,
-                       mask=False, add_rank=False, add_chem=False):
+def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
+                       wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
+                       mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
     """
-        Takes as input a df containing sequence, len, HLA;
-        Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
-        Stacks it with the targets in another dimension
+
     Args:
         df:
         ics_dict:
         device:
+        dataset:
         max_len:
         encoding:
         blosum_matrix:
         seq_col:
         hla_col:
         target_col:
-        rank_thr:
+        rank_col:
+        wt_col:
+        feat_cols:
+        mask:
+        invert:
+        add_rank:
+        add_aaprop:
+        remove_pep:
 
     Returns:
-        tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
+        x, y (torch.Tensor): Tensors containing features and labels
     """
-    df = verify_df_(df, seq_col, hla_col, target_col)
-    x = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                              seq_col, hla_col, target_col, rank_thr, mask)
+    df = verify_df(df, seq_col, hla_col, target_col)
+
+    assert dataset in ['aafreq',
+                       'mutation'], f'Please provide a proper dataset name. You provided {dataset}, when it should be either "aafreq" or "mutation"'
+    if dataset == 'aafreq':
+        x, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix, seq_col,
+                                hla_col, target_col, rank_col, mask, invert, add_rank,
+                                add_aaprop, remove_pep)
+    if dataset == 'mutation':
+        # Flatten and concat all the X to return a single tensor
+        # Whatever reads it (model, wrapper, etc) should extract & reshape/view the
+        # underlying tensors back into its shape
+        x, y = get_mutation_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
+                                    seq_col, wt_col, feat_cols, target_col, hla_col, mask, invert)
+
+
+    return x, y
+
+
+def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                         mutant_col='Peptide', wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
+                         target_col='agg_label', hla_col='HLA', mask=False, invert=False):
+
+    x_mut = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
+                                  mutant_col, hla_col, target_col, mask, invert)
+    x_wt = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
+                                 wt_col, hla_col, target_col, mask, invert)
+    x_props = torch.from_numpy(df[feat_cols].values).float().to(device)
     y = torch.from_numpy(df[target_col].values).float().unsqueeze(1).to(device)
-    dataset = TensorDataset(x, y)
-    return dataset
-
-
-def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                         mutant_col='Peptide', wt_col='wild_type', target_col='agg_label', hla_col='HLA',
-                         device='cuda', mask=False, invert=False, standardize=True):
-
-    x_mutant, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                                   seq_col=mutant_col, hla_col=hla_col, target_col=target_col,
-                                   rank_col='trueHLA_EL_rank', mask=mask, invert=invert, add_rank=False,
-                                   add_aaprop=False, remove_pep=False, standardize=standardize)
-
-    x_wt, _ = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                               seq_col=wt_col, hla_col=hla_col, target_col=target_col,
-                               rank_col='trueHLA_EL_rank', mask=mask, invert=invert, add_rank=False,
-                               add_aaprop=False, remove_pep=False, standardize=standardize)
-
-    x_props = torch.from_numpy(df[CNN_FEATS].values).to(device)
-
-    dataset = TensorDataset(x_mutant, x_wt, x_props, y)
-    return dataset
-
+    x = torch.cat([x_mut.view(-1, max_len * 20), x_wt.view(-1, max_len * 20), x_props], dim=1)
+    return x,y
 
 def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                      seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                     rank_thr=0.25, mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
+                     mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
 
-    x,y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
-                            seq_col, hla_col, target_col, rank_col,
-                            rank_thr, mask,  invert,add_rank, add_aaprop, remove_pep, standardize)
+    x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
+                             seq_col, hla_col, target_col, rank_col,
+                             mask, invert, add_rank, add_aaprop, remove_pep)
 
     x, y = torch.from_numpy(x).float().to(device), torch.from_numpy(y).float().to(device).unsqueeze(1)
-    return x,y
-
-
-
+    return x, y
 
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                      rank_thr=0.25, mask=False, invert=False,
-                      add_rank=False, add_aaprop=False, remove_pep=False, standardize=False):
+                       mask=False, invert=False,
+                      add_rank=False, add_aaprop=False, remove_pep=False):
     """
         Computes the frequencies as the main features
         Takes as input a df containing sequence, len, HLA;
@@ -371,20 +415,19 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         seq_col:
         hla_col:
         target_col:
-        rank_thr:
+
         add_rank:
         mask:
         add_aaprop:
         remove_pep: Boolean switch to discard the AA sequence/freq in features (e.g. keep only rank or only chem props)
-        standardize: Exists here because I'm bad at coding so it doesn't throw an error if I had thought about this in a better way
 
     Returns:
         tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
     """
-    # df = verify_df_(df, seq_col, hla_col, target_col)
-    x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
-                                                      seq_col, hla_col, target_col, rank_thr, mask, invert).numpy())
+    # df = verify_df(df, seq_col, hla_col, target_col)
 
+    x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
+                                                      seq_col, hla_col, target_col, mask, invert).numpy())
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
         x = np.concatenate([x, ranks], axis=1)
@@ -393,9 +436,9 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         # New way of doing it already  saves the aa props to the df to
         # not re-compute them everytime, here for now because I
         if all([x in df.columns for x in ['aliphatic_index', 'boman', 'hydrophobicity',
-        'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']]):
+                                          'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']]):
             aa_props = df[['aliphatic_index', 'boman', 'hydrophobicity',
-                            'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']].values
+                           'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']].values
         else:
             df_props, columns = get_aa_properties(df, seq_col)
             aa_props = df[columns].values
@@ -407,7 +450,6 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     if remove_pep and (add_rank or add_aaprop):
         x = x[:, 20:]
     return x, y
-
 
 
 def compute_frequency(encoded_sequence):
@@ -577,5 +619,5 @@ def compute_ic(sequences, how='shannon', seq_weighting=True, beta=50):
     return ic_array
 
 
-def get_mia(ic_array, threshold=1/3):
+def get_mia(ic_array, threshold=1 / 3):
     return np.where(ic_array < threshold)[0]

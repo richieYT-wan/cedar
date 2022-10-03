@@ -19,10 +19,11 @@ class NetParent(nn.Module):
     def __init__(self):
         super(NetParent, self).__init__()
 
-    def forward(self):
-        raise NotImplementedError
+    # def forward(self):
+    #     raise NotImplementedError
 
-    def weights_init(m):
+    @staticmethod
+    def init_weights(m):
         if isinstance(m, nn.Conv2d):
             torch.nn.init.xavier_uniform(m.weight.data)
 
@@ -38,13 +39,131 @@ class NetParent(nn.Module):
             if hasattr(child, 'children'):
                 for sublayer in child.children():
                     self.reset_weight(sublayer)
-            else:
+            if hasattr(child, 'reset_parameters'):
                 self.reset_weight(child)
 
 
+class Standardizer(nn.Module):
+    def __init__(self):
+        super(Standardizer, self).__init__()
+        self.mu = 0
+        self.sigma = 1
+        self.fitted = False
+
+    def fit(self, x_train):
+        assert self.training, 'Can not fit while in eval mode. Please set model to training mode'
+        self.mu = x_train.mean(axis=0)
+        self.sigma = x_train.std(axis=0)
+        self.fitted = True
+
+    def forward(self, x):
+        assert self.fitted, 'Standardizer has not been fitted. Please fit to x_train'
+        return (x - self.mu) / self.sigma
+
+    def reset_parameters(self, **kwargs):
+        self.mu = 0
+        self.sigma = 0
+        self.fitted = False
+
+
 class ConvBlock(NetParent):
-    def __init__(self, n_filters=12, act=nn.Sigmoid()):
+    def __init__(self, input_length=12, n_filters=10,  # maxpool_ks = 4, n_embedded = 30,
+                 act=nn.ReLU()):
         super(ConvBlock, self).__init__()
+        self.conv3 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=3, padding='same')
+        self.conv5 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=5, padding='same')
+        self.conv7 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=7, padding='same')
+        # self.maxpool = nn.MaxPool1d(kernel_size=maxpool_ks)
+        self.act = act
+        # 3* n_filters because 3 conv layers
+        # FC_out here may be unecessary when using torch.max instead of maxpool with kernel size of 4
+        # self.fc_out = nn.Linear(3 * n_filters, n_embedded)
+
+    def reshape_input(self, x):
+        in_channels = self.conv3.in_channels
+        assert (len(x.shape) == 3 and x.shape[
+            -1] == in_channels), f'Provided input of shape {x.shape} has the wrong dimensions.\n' \
+                                 f'It should have 3 dimensions and have in_channels={in_channels} for the last dimension.'
+        if type(x) == np.ndarray:
+            return torch.from_numpy(np.transpose(x, [0, 2, 1])).to(self.conv3.weight.device)
+        elif type(torch.Tensor):
+            return torch.permute(x, [0, 2, 1])
+
+    def forward(self, x):
+        x = self.reshape_input(x)
+        conv3 = torch.max(self.act(self.conv3(x)), 2)[0]
+        conv5 = torch.max(self.act(self.conv5(x)), 2)[0]
+        conv7 = torch.max(self.act(self.conv7(x)), 2)[0]
+        out = torch.cat([conv3, conv5, conv7], 1)  # .flatten(start_dim=1, end_dim=2)
+        # out = self.fc_out(out)
+        return out
+
+
+class DICNN(NetParent):
+
+    def __init__(self, input_length=12, n_filters=10,  # maxpool_ks=4, n_embedded = 30,
+                 n_hidden=32, n_props=10, act=nn.ReLU()):
+        super(DICNN, self).__init__()
+        self.conv_block = ConvBlock(n_filters)
+        self.act = act
+        self.dropout = nn.Dropout(0.3)
+        self.batchnorm = nn.BatchNorm1d(n_hidden)
+        self.fc_in = nn.Linear(2 * 3 * n_filters + n_props, n_hidden)
+        self.fc_out = nn.Linear(n_hidden, 1)
+        self.sigmoid = nn.Sigmoid()
+        self.input_length = input_length
+
+    def forward(self, x_mut, x_wt, x_props):
+        conv_mut = self.conv_block(x_mut)
+        conv_wt = self.conv_block(x_wt)
+        # Concat convolution outputs and properties and feed into FC layer
+        x = torch.cat([conv_mut, conv_wt, x_props], dim=1)
+        x = self.dropout(self.batchnorm(self.act(self.fc_in(x))))
+        out = self.sigmoid(self.fc_out(x))
+        return out
+
+
+class NetWrapper(NetParent):
+    def __init__(self, input_length=12, n_filters=10, n_hidden=32, n_props=14, act=nn.ReLU()):
+        super(NetWrapper, self).__init__()
+        self.standardizer = Standardizer()
+        self.input_length = input_length
+        self.n_props = n_props
+        self.dicnn = DICNN(input_length, n_filters, n_hidden, n_props, act)
+
+    def _extract_reshape_input(self, x):
+        x_mut = x[:, :self.input_length * 20].view(-1, self.input_length, 20).view(-1, self.input_length, 20)
+        x_wt = x[:, self.input_length * 20: 2 * self.input_length * 20].view(-1, self.input_length, 20)
+        x_props = x[:, -self.n_props:]
+        return x_mut, x_wt, x_props
+
+    def forward(self, x):
+        # Takes concatenated X as input to make it easier in the
+        # Feature processing functions
+        x_mut, x_wt, x_props = self._extract_reshape_input(x)
+        # Need to do self.standardizer.fit() somewhere in the nested_kcv function
+        # Somewhere before calling train_loop()
+        x_props = self.standardizer(x_props)
+        output = self.dicnn(x_mut, x_wt, x_props)
+        return output
+
+    def reset_parameters(self, **kwargs):
+        for child in self.children():
+            if hasattr(child, 'reset_parameters'):
+                try:
+                    child.reset_parameters(**kwargs)
+                except:
+                    print('here xd', child)
+
+
+"""
+Old CNN/FFN stuff for NN_freq training
+"""
+
+
+class ConvBlockOld(NetParent):
+    def __init__(self, n_filters=12, act=nn.Sigmoid()):
+        super(ConvBlockOld, self).__init__()
         self.conv3 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=3, padding='same')
         self.conv5 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=5, padding='same')
         self.conv7 = nn.Conv1d(in_channels=20, out_channels=n_filters, kernel_size=7, padding='same')
@@ -110,7 +229,7 @@ class FFN(NetParent):
         self.in_layer = nn.Linear(n_in, n_hidden)
         self.dropout = nn.Dropout(dropout)
         self.activation = act
-        hidden_layers = [nn.Linear(n_hidden, n_hidden), self.dropout, self.activation]*n_layers
+        hidden_layers = [nn.Linear(n_hidden, n_hidden), self.dropout, self.activation] * n_layers
         self.hidden = nn.Sequential(*hidden_layers)
         # Either use Softmax with 2D output or Sigmoid with 1D output
         self.out_layer = nn.Linear(n_hidden, 1)
