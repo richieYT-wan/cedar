@@ -198,3 +198,4 @@ output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/prime_results_x
 output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/df_results_xgb_normal.csv
 output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/cedar_results_xgb_normal.pkl
 output/bootstrapping/trainset_models.pkl
+.DS_Store
