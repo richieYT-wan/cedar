@@ -161,7 +161,7 @@ def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES)
     encodes a single peptide into a matrix, using 'onehot' or 'blosum'
     if 'blosum', then need to provide the blosum dictionary as argument
     """
-    assert (encoding=='onehot' or encoding.lower().startswith("bl")), 'wrong encoding type'
+    assert (encoding == 'onehot' or encoding.lower().startswith("blosum")), 'wrong encoding type'
     # One hot encode by setting 1 to positions where amino acid is present, 0 elsewhere
     size = len(sequence)
     if encoding == 'onehot':
@@ -367,14 +367,12 @@ def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encod
         x, y = get_mutation_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
                                     seq_col, wt_col, feat_cols, target_col, hla_col, mask, invert)
 
-
     return x, y
 
 
 def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                          mutant_col='Peptide', wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
                          target_col='agg_label', hla_col='HLA', mask=False, invert=False):
-
     x_mut = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
                                   mutant_col, hla_col, target_col, mask, invert)
     x_wt = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
@@ -382,12 +380,12 @@ def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='oneh
     x_props = torch.from_numpy(df[feat_cols].values).float().to(device)
     y = torch.from_numpy(df[target_col].values).float().unsqueeze(1).to(device)
     x = torch.cat([x_mut.view(-1, max_len * 20), x_wt.view(-1, max_len * 20), x_props], dim=1)
-    return x,y
+    return x, y
+
 
 def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                      seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
                      mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
-
     x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
                              seq_col, hla_col, target_col, rank_col,
                              mask, invert, add_rank, add_aaprop, remove_pep)
@@ -398,7 +396,7 @@ def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot',
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                       mask=False, invert=False,
+                      mask=False, invert=False,
                       add_rank=False, add_aaprop=False, remove_pep=False):
     """
         Computes the frequencies as the main features
@@ -449,6 +447,45 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     # Queries whatever is above 20, and only keeps that as feature
     if remove_pep and (add_rank or add_aaprop):
         x = x[:, 20:]
+    return x, y
+
+
+def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                         seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
+                         mut_col=['blsm_mut_score', 'mutation_score', 'ratio_rank'], adaptive=False,
+                         mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
+    """
+    """
+    # df = verify_df(df, seq_col, hla_col, target_col)
+
+    # Def arguments because we only use add rank
+    if adaptive:
+        # Splitting into anchor_mutation groups
+        anchors = df.query('anchor_mutation==True')
+        non_ancs = df.query('anchor_mutation==False')
+        # Here Invert is true (so the anchors get IC instead of 1-IC)
+        x_anchors, y_anchors = get_array_dataset(anchors, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
+                                                 target_col, invert=True, add_rank=True, add_aaprop=False,
+                                                 remove_pep=False)
+        # Adding the mut columns and concatenating on columns axis (ax=1)
+        mut_anchors = anchors[mut_col].values
+        x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
+        # Here, invert is False (so using 1-IC, to up-weigh non-anchor positions for non anc mutations
+        x_non, y_non = get_array_dataset(non_ancs, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
+                                         target_col,
+                                         invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
+        # Same
+        mut_non = non_ancs[mut_col].values
+        x_non = np.concatenate([x_non, mut_non], axis=1)
+        # Joining the two Xs and Ys into single x,y vectors
+        x = np.concatenate([x_anchors, x_non], axis=0)
+        y = np.concatenate([y_anchors, y_non], axis=0)
+
+    else:
+        x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
+                                 mask, invert, add_rank=True, add_aaprop=False, remove_pep=False)
+        mut_scores = df[mut_col].values
+        x = np.concatenate([x, mut_scores], axis=1)
     return x, y
 
 

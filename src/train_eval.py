@@ -212,6 +212,7 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
     # HERE NEED TO DO SWITCH CASES
     x, y = get_array_dataset(df, ics_dict, **encoding_kwargs)
 
+    # Take the first model in the list and get its class
     model_class = models[0].__class__
 
     # If model is a scikit-learn model, get pred prob
@@ -322,6 +323,7 @@ def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hy
         # This is ONE crossvalidation loop, will do all of the 80% remaining folds available
         # Here, the model is set with the hyperparameters from the grid
         model = model_constructor(n_in, **hyperparameter_selection).to(device)
+
         for fold in train_folds:
             model, optimizer = reset_model_optimizer(model, optimizer, seed)
             # Create the sub-dict and put the model into the models dict
@@ -774,7 +776,7 @@ def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
 def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                                     train_dataframe=None,
                                     encoding_kwargs: dict = None,
-                                    concatenated=False, only_concat=False):
+                                    concatenated=False, only_concat=False, n_jobs=None):
     """
 
     Args:
@@ -794,8 +796,8 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     # Wrapper and parallel evaluation
     eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
                             train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
-
-    output = Parallel(n_jobs=len(models_dict.keys()))(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
+    n_jobs = len(models_dict.keys()) if n_jobs is None else n_jobs
+    output = Parallel(n_jobs=n_jobs)(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
                                                       for (fold_out, models_list) in tqdm(models_dict.items(),
                                                                                           desc='Eval Folds',
                                                                                           leave=False,

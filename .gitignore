@@ -199,3 +199,10 @@ output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/df_results_xgb_
 output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/cedar_results_xgb_normal.pkl
 output/bootstrapping/trainset_models.pkl
 .DS_Store
+notebook/cedar_results_related.csv
+notebook/full_results_df.csv
+notebook/len9_cedar_results_related.csv
+notebook/len9_prime_results_related.csv
+notebook/prime_results_related.csv
+notebook/results_a0201.pkl
+notebook/results_related_mutation_scorecols.pkl
