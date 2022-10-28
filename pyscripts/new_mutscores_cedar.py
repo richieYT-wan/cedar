@@ -311,6 +311,8 @@ def main():
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
     mkdirs(args['outdir'])
+    mkdirs(f'{args["outdir"]}raw/')
+    mkdirs(f'{args["outdir"]}bootstrapping/')
     N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
             args['ncores'] is None) else args['ncores']
 
@@ -321,7 +323,7 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
     # DEFINING COLS
-    aa_cols = ['aliphatic_index','boman','hydrophobicity','isoelectric_point','VHSE1','VHSE3','VHSE7','VHSE8']
+    aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
     cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score', 'ratio_rank']
     for L in range(0, len(cols_) + 1):
@@ -344,6 +346,8 @@ def main():
                        'remove_pep': False,
                        'standardize': True}
     results_related = {}
+    mega_df = pd.DataFrame()
+
     for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
         results_related[rank_col] = {}
         encoding_kwargs['rank_col'] = rank_col
@@ -383,19 +387,84 @@ def main():
                             # Make result dict
                             results_related[rank_col][pep_col][key][blsm_name][ic_name] = {}
                             # Using the same model and hyperparameters
-                            model = RandomForestClassifier(n_jobs=1, min_samples_leaf = 7, n_estimators=300,
-                                                           max_depth = 8, ccp_alpha = 9.945e-6)
+                            model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
+                                                           max_depth=8, ccp_alpha=9.945e-6)
+                            # Training model and getting feature importances
                             trained_models, train_metrics, _ = nested_kcv_train_mut(cedar_dataset, model,
                                                                                     ics_dict=ics_dict,
                                                                                     encoding_kwargs=encoding_kwargs)
-                            # Eval on cedar related subst mut
-                            test_results, preds_df = evaluate_trained_models_mut(cedar_dataset, trained_models,
-                                                                                 ics_dict, cedar_dataset,
-                                                                                 encoding_kwargs, concatenated=True,
-                                                                                 only_concat=True)
-                            preds_df.drop(columns=aa_cols + ['pred_EL_rank',
-                                                             'pred_EL_score',
-                                                             'pred_HLA', 'seq_id'], inplace=True)
                             fi = get_nested_feature_importance(trained_models)
                             fn = AA_KEYS + ['rank'] + mut_cols
+                            # Saving Feature importances as dataframe
                             df_fi = pd.DataFrame(fi, index=fn).T
+                            df_fi.to_csv(
+                                f'{args["outdir"]}raw/featimps_{encoding}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+
+                            # Eval on cedar related subst mut
+                            cedar_test_results, cedar_preds_df = evaluate_trained_models_mut(cedar_dataset,
+                                                                                             trained_models,
+                                                                                             ics_dict, cedar_dataset,
+                                                                                             encoding_kwargs,
+                                                                                             concatenated=True,
+                                                                                             only_concat=True)
+                            cedar_preds_df.drop(columns=aa_cols + ['pred_EL_rank',
+                                                                   'pred_EL_score',
+                                                                   'pred_HLA', 'seq_id'], inplace=True)
+
+                            # Pre-saving results before bootstrapping
+                            cedar_preds_df.to_csv(
+                                f'{args["outdir"]}raw/cedar_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+
+                            # Eval on Prime
+                            prime_test_results, prime_preds_df = evaluate_trained_models_mut(prime_dataset,
+                                                                                             trained_models,
+                                                                                             ics_dict, cedar_dataset,
+                                                                                             encoding_kwargs,
+                                                                                             concatenated=True,
+                                                                                             only_concat=True)
+                            # Pre-saving results before bootstrapping
+                            prime_preds_df.to_csv(
+                                f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+
+                            # Bootstrapping (CEDAR)
+                            cedar_scores = cedar_preds_df.pred.values if 'pred' in cedar_preds_df.columns else 'mean_pred'
+                            cedar_targets = cedar_preds_df.agg_label.values if 'agg_label' in cedar_preds_df.columns else 'Immunogenicity'
+
+                            cedar_bootstrapped_df, cedar_mean_rocs = bootstrap_eval(y_score=cedar_scores,
+                                                                                    y_true=cedar_targets,
+                                                                                    n_rounds=10000, n_jobs=N_CORES)
+                            cedar_bootstrapped_df['encoding'] = blsm_name
+                            cedar_bootstrapped_df['weight'] = ic_name
+                            cedar_bootstrapped_df['pep_col'] = pep_col
+                            cedar_bootstrapped_df['rank_col'] = rank_col
+                            cedar_bootstrapped_df['key'] = key
+                            cedar_bootstrapped_df['evalset'] = 'cedar'.upper()
+                            mega_df = mega_df.append(cedar_bootstrapped_df)
+                            cedar_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/cedar_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                                         index=False)
+                            pkl_dump(cedar_mean_rocs, f'{args["outdir"]}bootstrapping/cedar_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
+
+                            # Bootstrapping (PRIME)
+                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else 'mean_pred'
+                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else 'Immunogenicity'
+                            prime_bootstrapped_df, prime_mean_rocs = bootstrap_eval(y_score=prime_scores,
+                                                                                    y_true=prime_targets,
+                                                                                    n_rounds=10000, n_jobs=N_CORES)
+                            prime_bootstrapped_df['encoding'] = blsm_name
+                            prime_bootstrapped_df['weight'] = ic_name
+                            prime_bootstrapped_df['pep_col'] = pep_col
+                            prime_bootstrapped_df['rank_col'] = rank_col
+                            prime_bootstrapped_df['key'] = key
+                            prime_bootstrapped_df['evalset'] = 'prime'.upper()
+                            mega_df = mega_df.append(prime_bootstrapped_df)
+                            prime_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/prime_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                                         index=False)
+                            pkl_dump(prime_mean_rocs, f'{args["outdir"]}bootstrapping/prime_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+    mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
+    
+if __name__ == '__main__':
+    main()
