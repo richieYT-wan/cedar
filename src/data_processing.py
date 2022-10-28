@@ -232,8 +232,8 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
     Returns:
 
     """
-    if 'len' not in df.columns:
-        df['len'] = df[seq_col].apply(len)
+    # if 'len' not in df.columns:
+    df['len'] = df[seq_col].apply(len)
     if max_len is not None:
         df = df.query('len<=@max_len')
     else:

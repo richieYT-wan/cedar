@@ -354,9 +354,11 @@ def get_mutation_score(mutation_positions, mutant, wildtype):
     """
     Done as the log of the sum of mutation scores
     """
+    if mutant==wildtype:
+        return 0
     positions = [int(x) for x in mutation_positions.split(',')]
     # Here take sum and not product because might be set to zero
-    score = np.log(np.sum([MUT_MATRIX[mutant[x]][wildtype[x]] for x in positions]))
+    score = np.sum([MUT_MATRIX[mutant[x]][wildtype[x]] for x in positions])
     if score == -np.inf or score == np.nan:
         return -1
     else:

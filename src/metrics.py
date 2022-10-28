@@ -272,7 +272,7 @@ def get_mean_pr_curve(pr_curves, extra_key=None):
 def get_nested_feature_importance(models):
     feat_importances = []
     for k in models.keys():
-        inner_mean_fi = np.mean([x.feature_importances_ for x in models[k]], axis=0)
+        inner_mean_fi = np.mean([x['model'].feature_importances_ for x in models[k]], axis=0)
         feat_importances.append(inner_mean_fi)
     return np.mean(np.stack(feat_importances), axis=0)
 
