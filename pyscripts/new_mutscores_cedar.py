@@ -310,6 +310,7 @@ def main():
     args = vars(args_parser())
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
+    print('Making dirs')
     mkdirs(args['outdir'])
     mkdirs(f'{args["outdir"]}raw/')
     mkdirs(f'{args["outdir"]}bootstrapping/')
@@ -347,7 +348,7 @@ def main():
                        'standardize': True}
     results_related = {}
     mega_df = pd.DataFrame()
-
+    print('Starting loops')
     for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
         results_related[rank_col] = {}
         encoding_kwargs['rank_col'] = rank_col
@@ -390,9 +391,11 @@ def main():
                             model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                                            max_depth=8, ccp_alpha=9.945e-6)
                             # Training model and getting feature importances
+                            print('Training')
                             trained_models, train_metrics, _ = nested_kcv_train_mut(cedar_dataset, model,
                                                                                     ics_dict=ics_dict,
-                                                                                    encoding_kwargs=encoding_kwargs)
+                                                                                    encoding_kwargs=encoding_kwargs,
+                                                                                    n_jobs=10)
                             fi = get_nested_feature_importance(trained_models)
                             fn = AA_KEYS + ['rank'] + mut_cols
                             # Saving Feature importances as dataframe
