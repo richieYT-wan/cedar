@@ -275,10 +275,10 @@ def main():
 
     dataset_cedar_viral = pd.read_csv(f'{args["datadir"]}new_cedar_viral_5fold.csv')
     dataset_cedar_viral['trainset'] = 'cedar_virus'
-
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
     ics_none = None  # bit stupid but need to have the variable name somewhere :-)
+
     if args["debug"]:
         encode_blosum_zip = zip(['onehot', 'blosum'], [None, BL62FREQ_VALUES])
         ics_mask_zip = zip([ics_shannon, ics_none, ics_shannon],
