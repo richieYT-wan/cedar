@@ -468,15 +468,17 @@ def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_mat
                                                  target_col, invert=True, add_rank=True, add_aaprop=False,
                                                  remove_pep=False)
         # Adding the mut columns and concatenating on columns axis (ax=1)
-        mut_anchors = anchors[mut_col].values
-        x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
+        if len(mut_col)>0:
+            mut_anchors = anchors[mut_col].values
+            x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
         # Here, invert is False (so using 1-IC, to up-weigh non-anchor positions for non anc mutations
         x_non, y_non = get_array_dataset(non_ancs, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
                                          target_col,
                                          invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
         # Same
-        mut_non = non_ancs[mut_col].values
-        x_non = np.concatenate([x_non, mut_non], axis=1)
+        if len(mut_col)>0:
+            mut_non = non_ancs[mut_col].values
+            x_non = np.concatenate([x_non, mut_non], axis=1)
         # Joining the two Xs and Ys into single x,y vectors
         x = np.concatenate([x_anchors, x_non], axis=0)
         y = np.concatenate([y_anchors, y_non], axis=0)
@@ -484,8 +486,9 @@ def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_mat
     else:
         x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
                                  mask, invert, add_rank=True, add_aaprop=False, remove_pep=False)
-        mut_scores = df[mut_col].values
-        x = np.concatenate([x, mut_scores], axis=1)
+        if len(mut_col)>0:
+            mut_scores = df[mut_col].values
+            x = np.concatenate([x, mut_scores], axis=1)
     return x, y
 
 

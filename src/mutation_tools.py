@@ -1,6 +1,57 @@
 import pandas as pd
 import numpy as np
+from copy import deepcopy
 from src.data_processing import AA_KEYS, BL50, BL62
+
+MUT_MATRIX = {
+    'A': {'A': -1, 'C': 0, 'D': 2, 'E': 2, 'F': 0, 'G': 4, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 4,
+          'Q': 0, 'R': 0, 'S': 4, 'T': 4, 'V': 4, 'W': 0, 'Y': 0},
+    'C': {'A': 0, 'C': -1, 'D': 0, 'E': 0, 'F': 2, 'G': 2, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 2, 'S': 4, 'T': 0, 'V': 0, 'W': 2, 'Y': 2},
+    'D': {'A': 2, 'C': 0, 'D': -1, 'E': 4, 'F': 0, 'G': 2, 'H': 2, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 2, 'P': 0,
+          'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': 2, 'W': 0, 'Y': 2},
+    'E': {'A': 2, 'C': 0, 'D': 4, 'E': -1, 'F': 0, 'G': 2, 'H': 0, 'I': 0, 'K': 2, 'L': 0, 'M': 0, 'N': 0, 'P': 0,
+          'Q': 2, 'R': 0, 'S': 0, 'T': 0, 'V': 2, 'W': 0, 'Y': 0},
+    'F': {'A': 0, 'C': 2, 'D': 0, 'E': 0, 'F': -1, 'G': 0, 'H': 0, 'I': 2, 'K': 0, 'L': 6, 'M': 0, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 0, 'S': 2, 'T': 0, 'V': 2, 'W': 0, 'Y': 2},
+    'G': {'A': 4, 'C': 2, 'D': 2, 'E': 2, 'F': 0, 'G': -1, 'H': 0, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 6, 'S': 2, 'T': 0, 'V': 4, 'W': 1, 'Y': 0},
+    'H': {'A': 0, 'C': 0, 'D': 2, 'E': 0, 'F': 0, 'G': 0, 'H': -1, 'I': 0, 'K': 0, 'L': 2, 'M': 0, 'N': 2, 'P': 2,
+          'Q': 4, 'R': 2, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'Y': 2},
+    'I': {'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 2, 'G': 0, 'H': 0, 'I': -1, 'K': 1, 'L': 4, 'M': 3, 'N': 2, 'P': 0,
+          'Q': 0, 'R': 1, 'S': 2, 'T': 3, 'V': 3, 'W': 0, 'Y': 0},
+    'K': {'A': 0, 'C': 0, 'D': 0, 'E': 2, 'F': 0, 'G': 0, 'H': 0, 'I': 1, 'K': -1, 'L': 0, 'M': 1, 'N': 4, 'P': 0,
+          'Q': 2, 'R': 2, 'S': 0, 'T': 2, 'V': 0, 'W': 0, 'Y': 0},
+    'L': {'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 6, 'G': 0, 'H': 2, 'I': 4, 'K': 0, 'L': -1, 'M': 2, 'N': 0, 'P': 4,
+          'Q': 2, 'R': 4, 'S': 2, 'T': 0, 'V': 6, 'W': 1, 'Y': 0},
+    'M': {'A': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 3, 'K': 1, 'L': 2, 'M': -1, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 1, 'S': 0, 'T': 1, 'V': 1, 'W': 0, 'Y': 0},
+    'N': {'A': 0, 'C': 0, 'D': 2, 'E': 0, 'F': 0, 'G': 0, 'H': 2, 'I': 2, 'K': 4, 'L': 0, 'M': 0, 'N': -1, 'P': 0,
+          'Q': 0, 'R': 0, 'S': 2, 'T': 2, 'V': 0, 'W': 0, 'Y': 2},
+    'P': {'A': 4, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 2, 'I': 0, 'K': 0, 'L': 4, 'M': 0, 'N': 0, 'P': -1,
+          'Q': 2, 'R': 4, 'S': 4, 'T': 4, 'V': 0, 'W': 0, 'Y': 0},
+    'Q': {'A': 0, 'C': 0, 'D': 0, 'E': 2, 'F': 0, 'G': 0, 'H': 4, 'I': 0, 'K': 2, 'L': 2, 'M': 0, 'N': 0, 'P': 2,
+          'Q': -1, 'R': 2, 'S': 0, 'T': 0, 'V': 0, 'W': 0, 'Y': 0},
+    'R': {'A': 0, 'C': 2, 'D': 0, 'E': 0, 'F': 0, 'G': 6, 'H': 2, 'I': 1, 'K': 2, 'L': 4, 'M': 1, 'N': 0, 'P': 4,
+          'Q': 2, 'R': -1, 'S': 6, 'T': 2, 'V': 0, 'W': 2, 'Y': 0},
+    'S': {'A': 4, 'C': 4, 'D': 0, 'E': 0, 'F': 2, 'G': 2, 'H': 0, 'I': 2, 'K': 0, 'L': 2, 'M': 0, 'N': 2, 'P': 4,
+          'Q': 0, 'R': 6, 'S': -1, 'T': 6, 'V': 0, 'W': 1, 'Y': 2},
+    'T': {'A': 4, 'C': 0, 'D': 0, 'E': 0, 'F': 0, 'G': 0, 'H': 0, 'I': 3, 'K': 2, 'L': 0, 'M': 1, 'N': 2, 'P': 4,
+          'Q': 0, 'R': 2, 'S': 6, 'T': -1, 'V': 0, 'W': 0, 'Y': 0},
+    'V': {'A': 4, 'C': 0, 'D': 2, 'E': 2, 'F': 2, 'G': 4, 'H': 0, 'I': 3, 'K': 0, 'L': 6, 'M': 1, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 0, 'S': 0, 'T': 0, 'V': -1, 'W': 0, 'Y': 0},
+    'W': {'A': 0, 'C': 2, 'D': 0, 'E': 0, 'F': 0, 'G': 1, 'H': 0, 'I': 0, 'K': 0, 'L': 1, 'M': 0, 'N': 0, 'P': 0,
+          'Q': 0, 'R': 2, 'S': 1, 'T': 0, 'V': 0, 'W': -1, 'Y': 0},
+    'Y': {'A': 0, 'C': 2, 'D': 2, 'E': 0, 'F': 2, 'G': 0, 'H': 2, 'I': 0, 'K': 0, 'L': 0, 'M': 0, 'N': 2, 'P': 0,
+          'Q': 0, 'R': 0, 'S': 2, 'T': 0, 'V': 0, 'W': 0, 'Y': -1}}
+
+BL62_MUT = deepcopy(BL62)
+BL62_MUT.update({'-': {k: -6 for k in AA_KEYS}})
+MUT_MATRIX.update({'-': {k: -3 for k in AA_KEYS}})
+for k in AA_KEYS:
+    BL62_MUT[k]['-'] = -6
+    MUT_MATRIX[k]['-'] = -3
+
 
 # Alignment stuff used in mutation type
 def smith_waterman_alignment(query="VLLP", database="VLILP", scoring_scheme=BL62, gap_open=-2, gap_extension=-1):
@@ -197,6 +248,7 @@ def get_mutation_type(mutant, wildtype):
             aligned_query, aligned_database, matches = pipeline_align(mutant, wildtype, print_=True)
         except:
             print(mutant, wildtype)
+            raise Exception(f'Couldn\'t align; {mutant}, {wildtype}')
         len_align = len(aligned_query)
         if len_align == 0:
             return 'else'
@@ -230,7 +282,9 @@ def get_anchor(allele, ic_dict, threshold=0.1615):
     """
     try:
         info_content = ic_dict[9][allele][.25]
-    except: print(allele)
+    except:
+        raise ValueError(allele)
+
     return ','.join(np.where(info_content >= threshold)[0].astype(str))
 
 
@@ -254,7 +308,7 @@ def get_binder_type(mut_rank, wt_rank):
     Based on the fact that Improved binder should mean that the immune system hasn't
     tolerized against the wild-type peptide, i.e. wt_rank>2%
     So WT should technically be a non-binder to get improved ;
-    If WT is a non binder, can check that the ratio of of wt_rank/mut_rank > 1.35 (value decided empirically)
+    If WT is a non binder, can check that the ratio of wt_rank/mut_rank > 1.35 (value decided empirically)
 
     If WT is a binder, can still consider a 5-fold ratio to be an improvement.
     ex: wt_rank = 0.5%, mut_rank = 0.1%
@@ -270,10 +324,40 @@ def get_binder_type(mut_rank, wt_rank):
             return 'Conserved'
 
     elif wt_rank < 2:
-        if mut_rank >= 2:
+        if wt_rank <= 0.5:
             return 'Conserved'
-        elif mut_rank < 2:
-            if ratio >= 4:  # Chose 4 because this adds exactly 101 peptides to the Improved class lol
-                return 'Improved'
-            else:
+        else:
+            if mut_rank >= 2:
                 return 'Conserved'
+            elif mut_rank < 2:
+                if ratio >= 3.5:
+                    return 'Improved'
+                else:
+                    return 'Conserved'
+
+
+def get_blsm_mutation_score(mutation_positions, mutant, wildtype):
+    """
+    Done as the log of the sum of mutation scores
+    """
+    positions = [int(x) for x in mutation_positions.split(',')]
+    # print(positions, mutant, wildtype, type(positions[0]), type(mutant), mutant[positions[0]], wildtype[positions[0]])
+    # Here take sum and not product because might be set to zero
+    score = np.sum([BL62_MUT[mutant[x]][wildtype[x]] for x in positions])
+    if score == -np.inf or score == np.nan:
+        return -1
+    else:
+        return score
+
+
+def get_mutation_score(mutation_positions, mutant, wildtype):
+    """
+    Done as the log of the sum of mutation scores
+    """
+    positions = [int(x) for x in mutation_positions.split(',')]
+    # Here take sum and not product because might be set to zero
+    score = np.log(np.sum([MUT_MATRIX[mutant[x]][wildtype[x]] for x in positions]))
+    if score == -np.inf or score == np.nan:
+        return -1
+    else:
+        return score
