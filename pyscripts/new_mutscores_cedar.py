@@ -2,7 +2,7 @@ import pandas as pd
 import sklearn
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from joblib import Parallel, delayed, parallel_backend
+from joblib import Parallel, delayed
 from functools import partial
 import multiprocessing
 import itertools
@@ -18,7 +18,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 # Custom fct imports
-from src.utils import pkl_load, pkl_dump, flatten_product
+from src.utils import pkl_load, pkl_dump
 import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, get_mutation_dataset, AA_KEYS
 from src.utils import str2bool, mkdirs, convert_path
