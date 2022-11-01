@@ -51,8 +51,8 @@ MUT_MATRIX.update({'-': {k: -3 for k in AA_KEYS}})
 for k in AA_KEYS:
     BL62_MUT[k]['-'] = -6
     MUT_MATRIX[k]['-'] = -3
-
-
+MUT_MATRIX['-']['-'] = 1
+BL62_MUT['-']['-'] = 1
 # Alignment stuff used in mutation type
 def smith_waterman_alignment(query="VLLP", database="VLILP", scoring_scheme=BL62, gap_open=-2, gap_extension=-1):
     # Matrix imensions
