@@ -409,8 +409,9 @@ def main():
                                                                                              trained_models,
                                                                                              ics_dict, cedar_dataset,
                                                                                              encoding_kwargs,
-                                                                                             concatenated=False,
-                                                                                             only_concat=False)
+                                                                                             concatenated=True,
+                                                                                             only_concat=True)
+                            print(len(cedar_preds_df))
                             cedar_preds_df.drop(columns=aa_cols + ['pred_EL_rank',
                                                                    'pred_EL_score',
                                                                    'pred_HLA', 'seq_id'], inplace=True)
@@ -427,6 +428,8 @@ def main():
                                                                                              encoding_kwargs,
                                                                                              concatenated=False,
                                                                                              only_concat=False)
+                            print(len(prime_preds_df))
+
                             # Pre-saving results before bootstrapping
                             prime_preds_df.to_csv(
                                 f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
