@@ -455,8 +455,8 @@ def main():
 
 
                             # Bootstrapping (PRIME)
-                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else 'mean_pred'
-                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else 'Immunogenicity'
+                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else prime_preds_df['mean_pred'].values
+                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else prime_preds_df['Immunogenicity'].values
                             prime_bootstrapped_df, prime_mean_rocs = bootstrap_eval(y_score=prime_scores,
                                                                                     y_true=prime_targets,
                                                                                     n_rounds=10000, n_jobs=N_CORES)
