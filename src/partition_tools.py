@@ -97,6 +97,7 @@ def manually_reassign_related(unique_df, not_unique_df, pep_col='Peptide', hla_c
                                                 axis=1)
     not_unique_df = not_unique_df[['discarded', target_col, hla_col, elrank_col, 'fold']].rename(
         columns={'discarded': pep_col})
+
     return not_unique_df
 
 
@@ -150,17 +151,23 @@ def pipeline_stratified_kfold(hobohm_filename, original_df, k=5, shuffle=True, s
     """
     # original_df = original_df.sort_values(pep_col).reset_index(drop=True)
     unique_df, not_unique_df = read_hobohm(hobohm_filename, original_df, pep_col, hla_col, elrank_col, target_col)
-
+    print('read hobohm', len(unique_df), len(not_unique_df))
     unique_df, not_unique_df = stratified_kfold_unique(unique_df, not_unique_df, original_df, k, shuffle, seed,
                                                 pep_col, hla_col, elrank_col, target_col )
+    print('strat kfold unique', len(unique_df), len(not_unique_df))
     unique_df = manually_reassign_identical(k, unique_df, pep_col)
+    print('manually reassign identical', len(unique_df), len(not_unique_df))
     not_unique_df = manually_reassign_related(unique_df, not_unique_df, pep_col, hla_col, elrank_col, target_col)
+    print('manually reassign related', len(unique_df), len(not_unique_df))
     dataset = pd.concat([unique_df, not_unique_df], ignore_index=True) \
         .sort_values(pep_col, ascending=True).reset_index(drop=True).drop(columns=['counts'])
-
+    print('concat', len(dataset))
     merge_cols = [pep_col, hla_col]
     merge_cols.extend(original_df.columns.difference(dataset.columns))
     dataset = dataset.merge(original_df[merge_cols], left_on=[pep_col, hla_col], right_on=[pep_col, hla_col])
+    print('merge', len(dataset))
 
     # Bugfix: Drops some unique that were duplicated during the manual re-assignment
-    return dataset.drop(dataset.loc[dataset.duplicated(keep='first')].index)
+    dataset = dataset.drop(dataset.loc[dataset.duplicated(keep='first')].index)
+    print('drop duplicated', len(dataset))
+    return dataset

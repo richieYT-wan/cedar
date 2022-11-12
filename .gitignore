@@ -183,6 +183,10 @@ output/tuning/
 output/train_eval/
 output/traineval/
 output/220906_analysis/
+output/221102_new_core_mutscores/
+output/221028_new_core_mutscores/
+output/221112_new_core_mutscores_mergedtrainset/
+
 notebook/tmp.pkl
 output/bootstrapping/
 output/traineval/run_220905_11h48m21s_log_redo/train_metrics_log.pkl

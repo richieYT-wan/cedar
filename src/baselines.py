@@ -28,8 +28,11 @@ def plot_baseline_roc(axis, dataset, neoepi_only=True):
               linestyle='--', lw=0.75, color='c')
 
 
-def plot_related_baseline_roc(axis, dataset, binder, anchor_mutation):
-    df = dataset.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
+def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None):
+    if binder is not None and anchor_mutation is not None:
+      df = dataset.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
+    else:
+      df = dataset.copy()
 
     # EL rank
     fpr_netmhc, tpr_netmhc, _ = roc_curve(df['agg_label'].values, -1 * df['trueHLA_EL_rank'].values)
