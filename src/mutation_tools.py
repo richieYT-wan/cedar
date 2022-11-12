@@ -223,16 +223,8 @@ def pipeline_align(query, database, blosum=BL62, gap_open=-1, gap_extension=-1, 
 
 
 # Only keep Wild Type which are peptides (& not some protein name)
-def check_wt(string):
-    if ' ' in string:
-        return False
-    if any([(x not in AA_KEYS) for x in string]):
-        return False
-    if string != string.upper():
-        return False
-    else:
-        return True
-
+def check_wt(wt):
+    return wt==wt.upper() and all([x in AA_KEYS for x in wt]) and (' ' not in wt)
 
 def get_mutation_type(mutant, wildtype):
     if mutant == wildtype:

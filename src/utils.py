@@ -197,6 +197,42 @@ def read_netmhcpan_results(filepath):
     return df
 
 
+def read_xls_parse_shift(filename):
+    xls = read_netmhcpan_results(filename)
+    xls.columns = pd.MultiIndex.from_tuples([(x.replace(':', '').replace('HLA-', ''), y) for x, y in xls.columns])
+    return xls
+
+
+def parse_netmhcpan_shift(row, netmhc_xls):
+    hla = row['HLA'].replace(':', '').replace('HLA-', '')
+    # print(hla, row)
+    seq_id = row['seq_id']
+    tmp = netmhc_xls.query('@netmhc_xls.base.ID==@seq_id')
+    tmp = tmp[[x for x in tmp.columns if x[0] == hla or x[0] == 'base']]
+    argmin = tmp.iloc[tmp[(hla, 'EL_Rank')].argmin()].droplevel(0).rename({'Peptide': 'Peptide',
+                                                                           'EL_Rank': 'EL_rank'})
+    try:
+        return argmin.drop(['EL-score', 'ID'])
+
+    except:
+        print('here')
+        return argmin['Pos'], argmin['Peptide'], argmin['core'], argmin['icore'], argmin['EL_Rank']
+
+
+def pipeline_netmhcpan_xls(df, xls_or_filename, xls_suffix):
+    """
+    Assumes df and XLS have the save seq_id for parsing
+    """
+    if type(xls_or_filename) == str:
+        xls = read_xls_columns(xls_or_filename)
+    elif type(xls_or_filename) == pd.DataFrame:
+        xls = xls_or_filename
+    merged_results = df.merge(df.apply(parse_netmhcpan_shift, netmhc_xls=xls,
+                                       axis=1, result_type='expand').add_suffix(xls_suffix),
+                              left_index=True, right_index=True)
+    return merged_results
+
+
 def set_hla(df):
     """
     Assumes the DF is in the output format by NetMHCpan
