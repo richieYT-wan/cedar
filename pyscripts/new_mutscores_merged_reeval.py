@@ -423,7 +423,7 @@ def main():
                             merged_scores = merged_preds_df.pred.values if 'pred' in merged_preds_df.columns else 'mean_pred'
                             merged_targets = merged_preds_df.agg_label.values if 'agg_label' in merged_preds_df.columns else 'Immunogenicity'
 
-                            cedar_bootstrapped_df, cedar_mean_rocs = bootstrap_eval(y_score=merged_scores,
+                            merged_bootstrapped_df, merged_mean_rocs = bootstrap_eval(y_score=merged_scores,
                                                                                     y_true=merged_targets,
                                                                                     n_rounds=10000, n_jobs=N_CORES)
                             merged_bootstrapped_df['encoding'] = blsm_name
