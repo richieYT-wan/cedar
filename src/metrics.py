@@ -317,3 +317,32 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
         values = [f'{(100*x).round(1)}%' for x in ax.containers[0].datavalues]
         ax.bar_label(ax.containers[0], labels = values)
     return f, ax
+
+def get_roc(df, score='pred', target='agg_label', binder=None, anchor_mutation=None):
+    """
+
+    Args:
+        df: DF containing the prediction or scores
+        score: Name of the score columns, 'pred' by default
+        target: Name of the target column, 'pred' by default
+        binder: None, "Improved" or "Conserved" ; None by default
+        anchor_mutation: None, True, False ; None by default
+
+    Returns:
+
+    """
+    if binder is not None and anchor_mutation is not None:
+        df = df.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
+    try:
+        fpr,tpr,_ = roc_curve(df['target'].values, df[score].values)
+        auc = roc_auc_score(df['target'].values, df[score].values)
+        auc01 = roc_auc_score(df['target'].values, df[score].values, max_fpr=0.1)
+    except KeyError:
+        fpr,tpr,_ = roc_curve(df['target'].values, df['mean_pred'].values)
+        auc = roc_auc_score(df['target'].values, df['mean_pred'].values)
+        auc01 = roc_auc_score(df['target'].values, df[score].values, max_fpr=0.1)
+    output = {"roc": (fpr, tpr),
+              "auc": auc,
+              "auc01": auc01,
+              "npep":len(df)}
+    return output
