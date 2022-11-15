@@ -209,8 +209,12 @@ def parse_netmhcpan_shift(row, netmhc_xls):
     seq_id = row['seq_id']
     tmp = netmhc_xls.query('@netmhc_xls.base.ID==@seq_id')
     tmp = tmp[[x for x in tmp.columns if x[0] == hla or x[0] == 'base']]
-    argmin = tmp.iloc[tmp[(hla, 'EL_Rank')].argmin()].droplevel(0).rename({'Peptide': 'Peptide',
+    try:
+        argmin = tmp.iloc[tmp[(hla, 'EL_Rank')].argmin()].droplevel(0).rename({'Peptide': 'Peptide',
                                                                            'EL_Rank': 'EL_rank'})
+    except:
+        print(tmp, hla)
+        raise Exception
     try:
         return argmin.drop(['EL-score', 'ID'])
 
@@ -224,7 +228,7 @@ def pipeline_netmhcpan_xls(df, xls_or_filename, xls_suffix):
     Assumes df and XLS have the save seq_id for parsing
     """
     if type(xls_or_filename) == str:
-        xls = read_xls_columns(xls_or_filename)
+        xls = read_xls_parse_shift(xls_or_filename)
     elif type(xls_or_filename) == pd.DataFrame:
         xls = xls_or_filename
     merged_results = df.merge(df.apply(parse_netmhcpan_shift, netmhc_xls=xls,
