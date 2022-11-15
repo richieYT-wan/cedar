@@ -436,9 +436,8 @@ def main():
                             merged_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/merged_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                                          index=False)
                             pkl_dump(merged_mean_rocs, f'{args["outdir"]}bootstrapping/merged_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+                            
 
-
-                            mega_df = mega_df.append(ibel_bootstrapped_df)
 
     mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
 
