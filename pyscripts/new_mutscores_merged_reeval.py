@@ -431,8 +431,8 @@ def main():
                             merged_bootstrapped_df['pep_col'] = pep_col
                             merged_bootstrapped_df['rank_col'] = rank_col
                             merged_bootstrapped_df['key'] = key
-                            merged_bootstrapped_df['evalset'] = 'cedar'.upper()
-                            mega_df = mega_df.append(cedar_bootstrapped_df)
+                            merged_bootstrapped_df['evalset'] = 'merged'.upper()
+                            mega_df = mega_df.append(merged_bootstrapped_df)
                             merged_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/merged_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                                          index=False)
                             pkl_dump(merged_mean_rocs, f'{args["outdir"]}bootstrapping/merged_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
