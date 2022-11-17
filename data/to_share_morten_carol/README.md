@@ -1,5 +1,7 @@
 CEDAR : Neoepitope dump (June 2022) from Zeynep, filtered to keep only peptides with wild_type
 PRIME : From PRIME's suppl material, filtered to keep only neoepitope (removing viral+random peptides), and keeping 
+Ibel : Ibel's neoepitopes benchmark dataset
+CEDAR_PRIME_MERGED : cedar and prime merged
 only those that have HLA in common with CEDAR / exists in the IC dictionaries
 
 Columns of interest:

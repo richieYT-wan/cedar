@@ -334,13 +334,13 @@ def get_roc(df, score='pred', target='agg_label', binder=None, anchor_mutation=N
     if binder is not None and anchor_mutation is not None:
         df = df.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
     try:
-        fpr,tpr,_ = roc_curve(df['target'].values, df[score].values)
-        auc = roc_auc_score(df['target'].values, df[score].values)
-        auc01 = roc_auc_score(df['target'].values, df[score].values, max_fpr=0.1)
+        fpr,tpr,_ = roc_curve(df[target].values, df[score].values)
+        auc = roc_auc_score(df[target].values, df[score].values)
+        auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
     except KeyError:
-        fpr,tpr,_ = roc_curve(df['target'].values, df['mean_pred'].values)
-        auc = roc_auc_score(df['target'].values, df['mean_pred'].values)
-        auc01 = roc_auc_score(df['target'].values, df[score].values, max_fpr=0.1)
+        fpr,tpr,_ = roc_curve(df[target].values, df['mean_pred'].values)
+        auc = roc_auc_score(df[target].values, df['mean_pred'].values)
+        auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
     output = {"roc": (fpr, tpr),
               "auc": auc,
               "auc01": auc01,

@@ -49,11 +49,11 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
     auc_nnalign = roc_auc_score(df['agg_label'].values, df['nnalign_score'].values)
     if auc01:
         auc01_nnalign = roc_auc_score(df['agg_label'].values, df['nnalign_score'].values, max_fpr=0.1)
-    label_NetMHCrank= f'NetMHCrank: AUC={round(auc_netmhc, 3)}, AUC01={round(auc01_netmhc,3)}' if auc01 else f'NetMHCrank: AUC={round(auc_netmhc, 3),}'
+    label_NetMHCrank= f'NetMHCrank: AUC={round(auc_netmhc, 3)}, AUC01={round(auc01_netmhc,3)}' if auc01 else f'NetMHCrank: AUC={round(auc_netmhc, 3)}'
 
-    label_PRIME= f'PRIME: AUC={round(auc_prime, 3)}, AUC01={round(auc01_prime,3)}' if auc01 else f'PRIME: AUC={round(auc_prime, 3),}'
+    label_PRIME= f'PRIME: AUC={round(auc_prime, 3)}, AUC01={round(auc01_prime,3)}' if auc01 else f'PRIME: AUC={round(auc_prime, 3)}'
 
-    label_NN_Align= f'NN_Align: AUC={round(auc_nnalign, 3)}, AUC01={round(auc01_nnalign,3)}' if auc01 else f'NN_Align: AUC={round(auc_nnalign, 3),}'
+    label_NN_Align= f'NN_Align: AUC={round(auc_nnalign, 3)}, AUC01={round(auc01_nnalign,3)}' if auc01 else f'NN_Align: AUC={round(auc_nnalign, 3)}'
 
     axis.plot(fpr_netmhc, tpr_netmhc, label=label_NetMHCrank, #f'NetMHCrank: AUC = {round(auc_netmhc, 3)}',
               linestyle='--', lw=0.75, color='m')
