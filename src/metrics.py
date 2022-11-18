@@ -10,40 +10,40 @@ sns.set_style('darkgrid')
 from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, \
     recall_score, precision_score, precision_recall_curve, auc, average_precision_score
 
-
-def get_pred_df(y_pred, y_scores, y_true):
-    """
-    Evaluates each model on their targets, then returns a df containing
-    all the stats regarding the predictions.
-    example of usage :
-    Use test sets as data_dict, target_labels_dict, load trained model into model_dict,
-    then call this method
-    Args:
-        y_scores:
-        y_true:
-        y_pred:
-    Returns:
-
-    """
-
-    df = pd.DataFrame(columns=['y_true', 'predicted', 'score',
-                               'tp', 'fp', 'tn', 'fn'])
-
-    tmp_data = torch.cat((y_true.view(-1, 1).cpu(),  # y_true
-                          y_pred.detach().cpu().view(-1, 1),  # predicted
-                          y_scores.detach().cpu()[:, 1].view(-1, 1)),
-                         1)  # cat dimension
-
-    tmp = pd.DataFrame(data=tmp_data.numpy(),
-                       columns=['y_true', 'predicted', 'score'])
-    tmp['tp'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 1) else 0, axis=1)
-    tmp['fp'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 1) else 0, axis=1)
-    tmp['tn'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 0) else 0, axis=1)
-    tmp['fn'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 0) else 0, axis=1)
-    df = pd.concat([df, tmp], ignore_index=True)
-    df = df.astype({'seqlen': 'int64', 'y_true': 'int64', 'predicted': 'int64',
-                    'tp': 'int64', 'fp': 'int64', 'tn': 'int64', 'fn': 'int64'}, copy=True)
-    return df
+#
+# def get_pred_df(y_pred, y_scores, y_true):
+#     """
+#     Evaluates each model on their targets, then returns a df containing
+#     all the stats regarding the predictions.
+#     example of usage :
+#     Use test sets as data_dict, target_labels_dict, load trained model into model_dict,
+#     then call this method
+#     Args:
+#         y_scores:
+#         y_true:
+#         y_pred:
+#     Returns:
+#
+#     """
+#
+#     df = pd.DataFrame(columns=['y_true', 'predicted', 'score',
+#                                'tp', 'fp', 'tn', 'fn'])
+#
+#     tmp_data = torch.cat((y_true.view(-1, 1).cpu(),  # y_true
+#                           y_pred.detach().cpu().view(-1, 1),  # predicted
+#                           y_scores.detach().cpu()[:, 1].view(-1, 1)),
+#                          1)  # cat dimension
+#
+#     tmp = pd.DataFrame(data=tmp_data.numpy(),
+#                        columns=['y_true', 'predicted', 'score'])
+#     tmp['tp'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 1) else 0, axis=1)
+#     tmp['fp'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 1) else 0, axis=1)
+#     tmp['tn'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 0) else 0, axis=1)
+#     tmp['fn'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 0) else 0, axis=1)
+#     df = pd.concat([df, tmp], ignore_index=True)
+#     df = df.astype({'seqlen': 'int64', 'y_true': 'int64', 'predicted': 'int64',
+#                     'tp': 'int64', 'fp': 'int64', 'tn': 'int64', 'fn': 'int64'}, copy=True)
+#     return df
 
 
 def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
