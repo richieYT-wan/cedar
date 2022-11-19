@@ -10,6 +10,7 @@ sns.set_style('darkgrid')
 from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, \
     recall_score, precision_score, precision_recall_curve, auc, average_precision_score
 
+
 #
 # def get_pred_df(y_pred, y_scores, y_true):
 #     """
@@ -314,13 +315,13 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
             ax.set_title(title, fontweight='semibold', fontsize=14)
         f = None
     if label_number:
-        values = [f'{(100*x).round(1)}%' for x in ax.containers[0].datavalues]
-        ax.bar_label(ax.containers[0], labels = values)
+        values = [f'{(100 * x).round(1)}%' for x in ax.containers[0].datavalues]
+        ax.bar_label(ax.containers[0], labels=values)
     return f, ax
 
-def get_roc(df, score='pred', target='agg_label', binder=None, anchor_mutation=None):
-    """
 
+def get_roc(df, score='pred_score', target='agg_label', binder=None, anchor_mutation=None):
+    """
     Args:
         df: DF containing the prediction or scores
         score: Name of the score columns, 'pred' by default
@@ -334,15 +335,15 @@ def get_roc(df, score='pred', target='agg_label', binder=None, anchor_mutation=N
     if binder is not None and anchor_mutation is not None:
         df = df.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
     try:
-        fpr,tpr,_ = roc_curve(df[target].values, df[score].values)
+        fpr, tpr, _ = roc_curve(df[target].values, df[score].values)
         auc = roc_auc_score(df[target].values, df[score].values)
         auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
     except KeyError:
-        fpr,tpr,_ = roc_curve(df[target].values, df['mean_pred'].values)
+        fpr, tpr, _ = roc_curve(df[target].values, df['mean_pred'].values)
         auc = roc_auc_score(df[target].values, df['mean_pred'].values)
         auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
     output = {"roc": (fpr, tpr),
               "auc": auc,
               "auc01": auc01,
-              "npep":len(df)}
+              "npep": len(df)}
     return output

@@ -122,6 +122,8 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
 
     # If model is a scikit-learn model, get pred prob
     # if issubclass(model_class, sklearn.base.BaseEstimator):
+
+    # THESE ARE SCORES
     average_predictions = [model.predict_proba(x)[:, 1] \
                            for model in models]
 
