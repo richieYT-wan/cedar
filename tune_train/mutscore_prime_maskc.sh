@@ -6,9 +6,10 @@ source activate phd
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=${HOMEDIR}pyscripts/
 DATADIR=../data/mutant/
-OUTDIR=../output/221122_new_core_mutscores_trainCedar_maskcysteine/
+OUTDIR=../output/221122_mutscore_prime_maskcysteine/
 ICSDIR=../data/ic_dicts/
+TRAINSET="prime"
 cd ${PYDIR}
 pwd
-python3 -W ignore ./new_mutscores_cedar_maskcysteine.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -ncores 38
+python3 ./mutscores_train_eval_maskcysteine.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39  > 'tmp.txt'
 
