@@ -417,9 +417,7 @@ def main():
                                                                                              concatenated=True,
                                                                                              only_concat=True)
                             print(len(cedar_preds_df))
-                            cedar_preds_df.drop(columns=aa_cols + ['pred_EL_rank',
-                                                                   'pred_EL_score',
-                                                                   'pred_HLA', 'seq_id'], inplace=True)
+                            cedar_preds_df.drop(columns=aa_cols, inplace=True)
 
                             # Pre-saving results before bootstrapping
                             cedar_preds_df.to_csv(
@@ -436,7 +434,7 @@ def main():
                             print(len(prime_preds_df))
 
                             # Pre-saving results before bootstrapping
-                            prime_preds_df.to_csv(
+                            prime_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
 
@@ -451,7 +449,7 @@ def main():
                             print(len(prime_switch_preds_df))
 
                             # Pre-saving results before bootstrapping
-                            prime_switch_preds_df.to_csv(
+                            prime_switch_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
                             # Bootstrapping (CEDAR)
