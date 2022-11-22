@@ -320,7 +320,7 @@ def main():
     # LOADING DATA AND STUFF
     merged_dataset = pd.read_csv(f'{args["datadir"]}221112_cedar_prime_merged_fold.csv')
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}221028_prime_related_newcore.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
     ibel_dataset = pd.read_csv(f'{args["datadir"]}221111_ibel_neoepi_scored_merged.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -452,6 +452,20 @@ def main():
                                 f'{args["outdir"]}raw/ibel_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
 
+                            merged_test_results, merged_preds_df = evaluate_trained_models_mut(merged_dataset,
+                                                                                           trained_models,
+                                                                                           ics_dict, merged_dataset,
+                                                                                           encoding_kwargs,
+                                                                                           concatenated=True,
+                                                                                           only_concat=True)
+                            print(len(merged_preds_df))
+                            merged_preds_df.drop(columns=aa_cols, inplace=True)
+
+                            # Pre-saving results before bootstrapping
+                            merged_preds_df.to_csv(
+                                f'{args["outdir"]}raw/merged_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+
                             # Bootstrapping (CEDAR)
                             cedar_scores = cedar_preds_df.pred.values if 'pred' in cedar_preds_df.columns else 'mean_pred'
                             cedar_targets = cedar_preds_df.agg_label.values if 'agg_label' in cedar_preds_df.columns else 'Immunogenicity'
@@ -507,6 +521,27 @@ def main():
                                 index=False)
                             pkl_dump(ibel_mean_rocs,
                                      f'{args["outdir"]}bootstrapping/ibel_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
+                            # Bootstrapping (MERGED)
+                            merged_scores = merged_preds_df.pred.values if 'pred' in merged_preds_df.columns else \
+                            merged_preds_df['mean_pred'].values
+                            merged_targets = merged_preds_df.agg_label.values if 'agg_label' in merged_preds_df.columns else \
+                            merged_preds_df['Immunogenicity'].values
+                            merged_bootstrapped_df, merged_mean_rocs = bootstrap_eval(y_score=merged_scores,
+                                                                                    y_true=merged_targets,
+                                                                                    n_rounds=10000, n_jobs=N_CORES)
+                            merged_bootstrapped_df['encoding'] = blsm_name
+                            merged_bootstrapped_df['weight'] = ic_name
+                            merged_bootstrapped_df['pep_col'] = pep_col
+                            merged_bootstrapped_df['rank_col'] = rank_col
+                            merged_bootstrapped_df['key'] = key
+                            merged_bootstrapped_df['evalset'] = 'merged'.upper()
+                            mega_df = mega_df.append(merged_bootstrapped_df)
+                            merged_bootstrapped_df.to_csv(
+                                f'{args["outdir"]}bootstrapping/merged_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            pkl_dump(merged_mean_rocs,
+                                     f'{args["outdir"]}bootstrapping/merged_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
 
     mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
 

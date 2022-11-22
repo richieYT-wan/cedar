@@ -293,6 +293,31 @@ def evaluate_trained_models_mut(test_dataframe, models_dict, ics_dict,
     return test_results, predictions_df
 
 
+def final_bootstrap_wrapper(preds_df, args, blsm_name,
+                            ic_name, pep_col, rank_col, key, evalset,
+                            n_rounds=10000, n_jobs=36):
+    scores = preds_df.pred.values if 'pred' in preds_df.columns else 'mean_pred'
+    targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else 'Immunogenicity'
+
+    bootstrapped_df, mean_rocs = bootstrap_eval(y_score=scores,
+                                                y_true=targets,
+                                                n_rounds=n_rounds, n_jobs=n_jobs)
+    bootstrapped_df['encoding'] = blsm_name
+    bootstrapped_df['weight'] = ic_name
+    bootstrapped_df['pep_col'] = pep_col
+    bootstrapped_df['rank_col'] = rank_col
+    bootstrapped_df['key'] = key
+    bootstrapped_df['evalset'] = evalset.upper()
+
+    bootstrapped_df.to_csv(
+        f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+        index=False)
+    pkl_dump(mean_rocs,
+             f'{args["outdir"]}bootstrapping/{evalset}_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
+    return bootstrapped_df
+
+
 def args_parser():
     parser = argparse.ArgumentParser(
         description='Script to crossvalidate and evaluate methods that use aa frequency as encoding')
@@ -321,7 +346,9 @@ def main():
 
     # LOADING DATA AND STUFF
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}221028_prime_related_newcore.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
+    ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
+    prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
@@ -406,73 +433,85 @@ def main():
                                 f'{args["outdir"]}raw/featimps_{encoding}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
 
-                            # Eval on cedar related subst mut
-                            cedar_test_results, cedar_preds_df = evaluate_trained_models_mut(cedar_dataset,
-                                                                                             trained_models,
-                                                                                             ics_dict, cedar_dataset,
-                                                                                             encoding_kwargs,
-                                                                                             concatenated=True,
-                                                                                             only_concat=True)
-                            print(len(cedar_preds_df))
-                            cedar_preds_df.drop(columns=aa_cols + ['pred_EL_rank',
-                                                                   'pred_EL_score',
-                                                                   'pred_HLA', 'seq_id'], inplace=True)
-
-                            # Pre-saving results before bootstrapping
-                            cedar_preds_df.to_csv(
+                            # EVAL AND BOOTSTRAPPING ON CEDAR
+                            _, cedar_preds_df = evaluate_trained_models_mut(cedar_dataset,
+                                                                            trained_models,
+                                                                            ics_dict, cedar_dataset,
+                                                                            encoding_kwargs,
+                                                                            concatenated=True,
+                                                                            only_concat=True)
+                            #
+                            cedar_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/cedar_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
+                            # Bootstrapping (CEDAR)
+                            cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, blsm_name, ic_name,
+                                                                            pep_col, rank_col, key,
+                                                                            evalset='CEDAR', n_rounds=10000,
+                                                                            n_jobs=N_CORES)
+                            mega_df = mega_df.append(cedar_bootstrapped_df)
 
-                            # Eval on Prime
-                            prime_test_results, prime_preds_df = evaluate_trained_models_mut(prime_dataset,
-                                                                                             trained_models,
-                                                                                             ics_dict, cedar_dataset,
-                                                                                             encoding_kwargs,
-                                                                                             concatenated=False,
-                                                                                             only_concat=False)
-                            print(len(prime_preds_df))
+                            # EVAL AND BOOTSTRAPPING ON PRIME
+                            _, prime_preds_df = evaluate_trained_models_mut(prime_dataset,
+                                                                            trained_models,
+                                                                            ics_dict, cedar_dataset,
+                                                                            encoding_kwargs,
+                                                                            concatenated=False,
+                                                                            only_concat=False)
 
                             # Pre-saving results before bootstrapping
-                            prime_preds_df.to_csv(
+                            prime_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
-
-                            # Bootstrapping (CEDAR)
-                            cedar_scores = cedar_preds_df.pred.values if 'pred' in cedar_preds_df.columns else 'mean_pred'
-                            cedar_targets = cedar_preds_df.agg_label.values if 'agg_label' in cedar_preds_df.columns else 'Immunogenicity'
-
-                            cedar_bootstrapped_df, cedar_mean_rocs = bootstrap_eval(y_score=cedar_scores,
-                                                                                    y_true=cedar_targets,
-                                                                                    n_rounds=10000, n_jobs=N_CORES)
-                            cedar_bootstrapped_df['encoding'] = blsm_name
-                            cedar_bootstrapped_df['weight'] = ic_name
-                            cedar_bootstrapped_df['pep_col'] = pep_col
-                            cedar_bootstrapped_df['rank_col'] = rank_col
-                            cedar_bootstrapped_df['key'] = key
-                            cedar_bootstrapped_df['evalset'] = 'cedar'.upper()
-                            mega_df = mega_df.append(cedar_bootstrapped_df)
-                            cedar_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/cedar_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                                                         index=False)
-                            pkl_dump(cedar_mean_rocs, f'{args["outdir"]}bootstrapping/cedar_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
-
-
                             # Bootstrapping (PRIME)
-                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else prime_preds_df['mean_pred'].values
-                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else prime_preds_df['Immunogenicity'].values
-                            prime_bootstrapped_df, prime_mean_rocs = bootstrap_eval(y_score=prime_scores,
-                                                                                    y_true=prime_targets,
-                                                                                    n_rounds=10000, n_jobs=N_CORES)
-                            prime_bootstrapped_df['encoding'] = blsm_name
-                            prime_bootstrapped_df['weight'] = ic_name
-                            prime_bootstrapped_df['pep_col'] = pep_col
-                            prime_bootstrapped_df['rank_col'] = rank_col
-                            prime_bootstrapped_df['key'] = key
-                            prime_bootstrapped_df['evalset'] = 'prime'.upper()
+                            prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, blsm_name, ic_name,
+                                                                            pep_col, rank_col, key,
+                                                                            evalset='PRIME', n_rounds=10000,
+                                                                            n_jobs=N_CORES)
                             mega_df = mega_df.append(prime_bootstrapped_df)
-                            prime_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/prime_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                                                         index=False)
-                            pkl_dump(prime_mean_rocs, f'{args["outdir"]}bootstrapping/prime_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
+                            # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
+                            _, prime_switch_preds_df = evaluate_trained_models_mut(prime_switch_dataset,
+                                                                                   trained_models,
+                                                                                   ics_dict, cedar_dataset,
+                                                                                   encoding_kwargs,
+                                                                                   concatenated=False,
+                                                                                   only_concat=False)
+
+                            # Pre-saving results before bootstrapping
+                            prime_switch_preds_df.drop(columns=aa_cols).to_csv(
+                                f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            # Bootstrapping (PRIME)
+                            prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args,
+                                                                                   blsm_name, ic_name,
+                                                                                   pep_col, rank_col, key,
+                                                                                   evalset='PRIME_AC', n_rounds=10000,
+                                                                                   n_jobs=N_CORES)
+                            mega_df = mega_df.append(prime_switch_bootstrapped_df)
+
+                            # ///////////////////////////
+                            # EVAL AND BOOTSTRAPPING ON IBEL
+                            _, ibel_preds_df = evaluate_trained_models_mut(ibel_dataset,
+                                                                           trained_models,
+                                                                           ics_dict, cedar_dataset,
+                                                                           encoding_kwargs,
+                                                                           concatenated=False,
+                                                                           only_concat=False)
+
+                            # Pre-saving results before bootstrapping
+                            ibel_preds_df.drop(columns=aa_cols).to_csv(
+                                f'{args["outdir"]}raw/ibel_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            # Bootstrapping (PRIME)
+                            ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, blsm_name, ic_name,
+                                                                           pep_col, rank_col, key,
+                                                                           evalset='IBEL', n_rounds=10000,
+                                                                           n_jobs=N_CORES)
+                            mega_df = mega_df.append(ibel_bootstrapped_df)
+
     mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
+
 
 if __name__ == '__main__':
     main()
