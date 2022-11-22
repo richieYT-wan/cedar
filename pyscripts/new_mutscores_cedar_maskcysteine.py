@@ -116,7 +116,7 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
 
     # HERE NEED TO DO SWITCH CASES
     x, y = get_mutation_dataset(df, ics_dict, **encoding_kwargs)
-    x[:, 4]=0
+    x[:, 4] = 0
     # Take the first model in the list and get its class
     model_class = models[0].__class__
 
@@ -151,9 +151,9 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     # Get datasets
     x_train, y_train = get_mutation_dataset(train, ics_dict, **encoding_kwargs)
     x_valid, y_valid = get_mutation_dataset(valid, ics_dict, **encoding_kwargs)
-    x_train[:, 4]=0
-    x_valid[:, 4]=0
-    x_test[:, 4]=0
+    x_train[:, 4] = 0
+    x_valid[:, 4] = 0
+    x_test[:, 4] = 0
     # Fit the model and append it to the list
     model.fit(x_train, y_train)
 
@@ -301,7 +301,7 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/mutant/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/221028_new_core_mutscores/')
+    parser.add_argument('-outdir', type=str, default='../output/221122_new_core_mutscores_trainCedar_maskcysteine/')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
@@ -440,6 +440,20 @@ def main():
                                 f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
 
+                            # PRIME SWITCHED
+                            prime_switch_test_results, prime_switch_preds_df = evaluate_trained_models_mut(
+                                prime_switch_dataset,
+                                trained_models,
+                                ics_dict, cedar_dataset,
+                                encoding_kwargs,
+                                concatenated=False,
+                                only_concat=False)
+                            print(len(prime_switch_preds_df))
+
+                            # Pre-saving results before bootstrapping
+                            prime_switch_preds_df.to_csv(
+                                f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
                             # Bootstrapping (CEDAR)
                             cedar_scores = cedar_preds_df.pred.values if 'pred' in cedar_preds_df.columns else 'mean_pred'
                             cedar_targets = cedar_preds_df.agg_label.values if 'agg_label' in cedar_preds_df.columns else 'Immunogenicity'
@@ -454,14 +468,17 @@ def main():
                             cedar_bootstrapped_df['key'] = key
                             cedar_bootstrapped_df['evalset'] = 'cedar'.upper()
                             mega_df = mega_df.append(cedar_bootstrapped_df)
-                            cedar_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/cedar_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                                                         index=False)
-                            pkl_dump(cedar_mean_rocs, f'{args["outdir"]}bootstrapping/cedar_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
-
+                            cedar_bootstrapped_df.to_csv(
+                                f'{args["outdir"]}bootstrapping/cedar_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            pkl_dump(cedar_mean_rocs,
+                                     f'{args["outdir"]}bootstrapping/cedar_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
 
                             # Bootstrapping (PRIME)
-                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else prime_preds_df['mean_pred'].values
-                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else prime_preds_df['Immunogenicity'].values
+                            prime_scores = prime_preds_df.pred.values if 'pred' in prime_preds_df.columns else \
+                            prime_preds_df['mean_pred'].values
+                            prime_targets = prime_preds_df.agg_label.values if 'agg_label' in prime_preds_df.columns else \
+                            prime_preds_df['Immunogenicity'].values
                             prime_bootstrapped_df, prime_mean_rocs = bootstrap_eval(y_score=prime_scores,
                                                                                     y_true=prime_targets,
                                                                                     n_rounds=10000, n_jobs=N_CORES)
@@ -472,10 +489,36 @@ def main():
                             prime_bootstrapped_df['key'] = key
                             prime_bootstrapped_df['evalset'] = 'prime'.upper()
                             mega_df = mega_df.append(prime_bootstrapped_df)
-                            prime_bootstrapped_df.to_csv(f'{args["outdir"]}bootstrapping/prime_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                                                         index=False)
-                            pkl_dump(prime_mean_rocs, f'{args["outdir"]}bootstrapping/prime_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+                            prime_bootstrapped_df.to_csv(
+                                f'{args["outdir"]}bootstrapping/prime_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            pkl_dump(prime_mean_rocs,
+                                     f'{args["outdir"]}bootstrapping/prime_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
+                            # Bootstrapping (PRIME SWITCHED)
+                            prime_scores = prime_switch_preds_df.pred.values if 'pred' in prime_switch_preds_df.columns else \
+                                prime_switch_preds_df['mean_pred'].values
+                            prime_targets = prime_switch_preds_df.agg_label.values if 'agg_label' in prime_switch_preds_df.columns else \
+                                prime_switch_preds_df['Immunogenicity'].values
+
+                            prime_switch_bootstrapped_df, prime_switch_mean_rocs = bootstrap_eval(y_score=prime_scores,
+                                                                                    y_true=prime_targets,
+                                                                                    n_rounds=10000, n_jobs=N_CORES)
+                            prime_switch_bootstrapped_df['encoding'] = blsm_name
+                            prime_switch_bootstrapped_df['weight'] = ic_name
+                            prime_switch_bootstrapped_df['pep_col'] = pep_col
+                            prime_switch_bootstrapped_df['rank_col'] = rank_col
+                            prime_switch_bootstrapped_df['key'] = key
+                            prime_switch_bootstrapped_df['evalset'] = 'prime'.upper()
+                            mega_df = mega_df.append(prime_switch_bootstrapped_df)
+                            prime_switch_bootstrapped_df.to_csv(
+                                f'{args["outdir"]}bootstrapping/prime_switch_bootstrapped_df_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            pkl_dump(prime_switch_mean_rocs,
+                                     f'{args["outdir"]}bootstrapping/prime_switch_mean_rocs_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.pkl')
+
     mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
+
 
 if __name__ == '__main__':
     main()
