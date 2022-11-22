@@ -361,7 +361,6 @@ def main():
                 'prime': prime_dataset,
                 'merged': merged_dataset}
     train_dataset = trainmap[args['trainset']]
-    print(args['trainset'], len(train_dataset))
 
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
@@ -426,6 +425,14 @@ def main():
                                 else:
                                     ic_name = 'Inverted ' + ic_name
                             # Make result dict
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+                            print(args['trainset'], len(train_dataset))
+
                             results_related[rank_col][pep_col][key][blsm_name][ic_name] = {}
                             # Using the same model and hyperparameters
                             model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
