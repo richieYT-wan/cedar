@@ -296,8 +296,8 @@ def evaluate_trained_models_mut(test_dataframe, models_dict, ics_dict,
 def final_bootstrap_wrapper(preds_df, args, blsm_name,
                             ic_name, pep_col, rank_col, key, evalset,
                             n_rounds=10000, n_jobs=36):
-    scores = preds_df.pred.values if 'pred' in preds_df.columns else 'mean_pred'
-    targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else 'Immunogenicity'
+    scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
+    targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
 
     bootstrapped_df, mean_rocs = bootstrap_eval(y_score=scores,
                                                 y_true=targets,
