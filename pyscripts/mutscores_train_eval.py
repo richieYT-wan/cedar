@@ -325,6 +325,7 @@ def args_parser():
     parser.add_argument('-datadir', type=str, default='../data/mutant/',
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str, default='../output/221028_new_core_mutscores/')
+    parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
@@ -347,10 +348,19 @@ def main():
     # LOADING DATA AND STUFF
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
+    merged_dataset = pd.read_csv(f'{args["datadir"]}221112_cedar_prime_merged_fold.csv')
     ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
     prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
+
+    # Setting trainset
+    assert (args['trainset'].lower() in ['cedar', 'prime',
+                                         'merged']), 'please input -trainset as either "cedar", "prime" or "merged"'
+    trainmap = {'cedar': cedar_dataset,
+                'prime': prime_dataset,
+                'merged': merged_dataset}
+    train_dataset = trainmap[args['trainset']]
 
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
@@ -421,7 +431,7 @@ def main():
                                                            max_depth=8, ccp_alpha=9.945e-6)
                             # Training model and getting feature importances
                             print('Training')
-                            trained_models, train_metrics, _ = nested_kcv_train_mut(cedar_dataset, model,
+                            trained_models, train_metrics, _ = nested_kcv_train_mut(train_dataset, model,
                                                                                     ics_dict=ics_dict,
                                                                                     encoding_kwargs=encoding_kwargs,
                                                                                     n_jobs=10)
@@ -436,7 +446,7 @@ def main():
                             # EVAL AND BOOTSTRAPPING ON CEDAR
                             _, cedar_preds_df = evaluate_trained_models_mut(cedar_dataset,
                                                                             trained_models,
-                                                                            ics_dict, cedar_dataset,
+                                                                            ics_dict, train_dataset,
                                                                             encoding_kwargs,
                                                                             concatenated=True,
                                                                             only_concat=True)
@@ -454,7 +464,7 @@ def main():
                             # EVAL AND BOOTSTRAPPING ON PRIME
                             _, prime_preds_df = evaluate_trained_models_mut(prime_dataset,
                                                                             trained_models,
-                                                                            ics_dict, cedar_dataset,
+                                                                            ics_dict, train_dataset,
                                                                             encoding_kwargs,
                                                                             concatenated=False,
                                                                             only_concat=False)
@@ -473,7 +483,7 @@ def main():
                             # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
                             _, prime_switch_preds_df = evaluate_trained_models_mut(prime_switch_dataset,
                                                                                    trained_models,
-                                                                                   ics_dict, cedar_dataset,
+                                                                                   ics_dict, train_dataset,
                                                                                    encoding_kwargs,
                                                                                    concatenated=False,
                                                                                    only_concat=False)
@@ -494,7 +504,7 @@ def main():
                             # EVAL AND BOOTSTRAPPING ON IBEL
                             _, ibel_preds_df = evaluate_trained_models_mut(ibel_dataset,
                                                                            trained_models,
-                                                                           ics_dict, cedar_dataset,
+                                                                           ics_dict, train_dataset,
                                                                            encoding_kwargs,
                                                                            concatenated=False,
                                                                            only_concat=False)
@@ -509,6 +519,27 @@ def main():
                                                                            evalset='IBEL', n_rounds=10000,
                                                                            n_jobs=N_CORES)
                             mega_df = mega_df.append(ibel_bootstrapped_df)
+
+                            # /////////////////////////// only if trainset == MERGED should I evaluate on it
+                            if args['trainset'].lower() == 'merged':
+                                # EVAL AND BOOTSTRAPPING ON IBEL
+                                _, merged_preds_df = evaluate_trained_models_mut(merged_dataset,
+                                                                                 trained_models,
+                                                                                 ics_dict, train_dataset,
+                                                                                 encoding_kwargs,
+                                                                                 concatenated=False,
+                                                                                 only_concat=False)
+
+                                # Pre-saving results before bootstrapping
+                                merged_preds_df.drop(columns=aa_cols).to_csv(
+                                    f'{args["outdir"]}raw/merged_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                    index=False)
+                                # Bootstrapping (PRIME)
+                                merged_bootstrapped_df = final_bootstrap_wrapper(merged_preds_df, args, blsm_name,
+                                                                                 ic_name, pep_col, rank_col, key,
+                                                                                 evalset='MERGED', n_rounds=10000,
+                                                                                 n_jobs=N_CORES)
+                                mega_df = mega_df.append(merged_bootstrapped_df)
 
     mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
 
