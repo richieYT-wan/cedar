@@ -361,6 +361,7 @@ def main():
                 'prime': prime_dataset,
                 'merged': merged_dataset}
     train_dataset = trainmap[args['trainset']]
+    print(args['trainset'], len(train_dataset))
 
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
