@@ -318,7 +318,7 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
+    train_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -393,7 +393,7 @@ def main():
                                                            max_depth=8, ccp_alpha=9.945e-6)
                             # Training model and getting feature importances
                             print('Training')
-                            trained_models, train_metrics, _ = nested_kcv_train_mut(prime_dataset, model,
+                            trained_models, train_metrics, _ = nested_kcv_train_mut(train_dataset, model,
                                                                                     ics_dict=ics_dict,
                                                                                     encoding_kwargs=encoding_kwargs,
                                                                                     n_jobs=10)
@@ -401,7 +401,7 @@ def main():
                             # Eval on Prime
                             prime_test_results, prime_preds_df = evaluate_trained_models_mut(prime_dataset,
                                                                                              trained_models,
-                                                                                             ics_dict, prime_dataset,
+                                                                                             ics_dict, train_dataset,
                                                                                              encoding_kwargs,
                                                                                              concatenated=False,
                                                                                              only_concat=False)
