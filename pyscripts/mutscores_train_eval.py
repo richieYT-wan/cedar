@@ -394,7 +394,7 @@ def main():
         for pep_col in ['Peptide', 'icore_mut']:
             results_related[rank_col][pep_col] = {}
             encoding_kwargs['seq_col'] = pep_col
-            for mut_cols in tqdm(mcs, position=0, leave=True, desc=f'{args["trainset"]}, {len(train_dataset)}'):
+            for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
                 key = '-'.join(mut_cols)
                 if key == '':
                     key = 'only_rank'
@@ -541,7 +541,7 @@ def main():
                                                                                  n_jobs=N_CORES)
                                 mega_df = mega_df.append(merged_bootstrapped_df)
 
-    mega_df.to_csv(f'{args["outdir"]}bootstrapping/total_df.csv', index=False)
+    mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 
 if __name__ == '__main__':
