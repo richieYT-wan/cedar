@@ -346,6 +346,7 @@ def get_mutation_score(mutation_positions, mutant, wildtype):
     """
     Done as the log of the sum of mutation scores
     """
+
     if mutant==wildtype:
         return 0
     positions = [int(x) for x in mutation_positions.split(',')]
