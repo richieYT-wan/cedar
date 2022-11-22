@@ -10,5 +10,5 @@ OUTDIR=../output/221122_new_core_mutscores_trainCedar_eval_switchPRIME/
 ICSDIR=../data/ic_dicts/
 cd ${PYDIR}
 pwd
-python3 -W ignore ./new_mutscore_cedar_prime_switch.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -ncores 38
+python3 -W ignore ./new_mutscores_cedar_prime_switch.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -ncores 38
 
