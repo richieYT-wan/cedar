@@ -116,7 +116,7 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
 
     # HERE NEED TO DO SWITCH CASES
     x, y = get_mutation_dataset(df, ics_dict, **encoding_kwargs)
-
+    x[:, 4]=0
     # Take the first model in the list and get its class
     model_class = models[0].__class__
 
@@ -151,7 +151,9 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     # Get datasets
     x_train, y_train = get_mutation_dataset(train, ics_dict, **encoding_kwargs)
     x_valid, y_valid = get_mutation_dataset(valid, ics_dict, **encoding_kwargs)
-
+    x_train[:, 4]=0
+    x_valid[:, 4]=0
+    x_test[:, 4]=0
     # Fit the model and append it to the list
     model.fit(x_train, y_train)
 
@@ -322,6 +324,7 @@ def main():
     # LOADING DATA AND STUFF
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221028_prime_related_newcore.csv')
+    prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
