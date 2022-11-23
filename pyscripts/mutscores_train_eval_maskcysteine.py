@@ -23,6 +23,7 @@ import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, get_dataset, AA_KEYS
 from src.utils import str2bool, mkdirs, convert_path
 from src.metrics import get_metrics, get_mean_roc_curve, get_nested_feature_importance
+from src.bootstrap import bootstrap_eval
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from copy import deepcopy
@@ -31,39 +32,9 @@ N_CORES = 30
 
 # BOOTSTRAP FUNCTIONS
 from src.metrics import get_metrics
-
-
-def bootstrap_wrapper(y_score, y_true, seed):
-    np.random.seed(seed)
-    sample_idx = np.random.randint(0, len(y_score), len(y_score))
-    sample_score = y_score[sample_idx]
-    sample_true = y_true[sample_idx]
-
-    try:
-        test_results = get_metrics(sample_true, sample_score)
-    except:
-        return pd.DataFrame(), (None, None, None, None)
-
-    # Save to get mean curves after
-    roc_curve = (test_results.pop('roc_curve'), test_results['auc'])
-    # Same
-    pr_curve = (test_results.pop('pr_curve'), test_results['prauc'])
-    return pd.DataFrame(test_results, index=[0]), roc_curve
-
-
-def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=16):
-    wrapper = partial(bootstrap_wrapper,
-                      y_score=y_score, y_true=y_true)
-    print('Sampling')
-    output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in
-                                     tqdm(range(n_rounds), desc='Bootstrapping rounds', position=1, leave=False))
-
-    print('Making results DF and curves')
-    result_df = pd.concat([x[0] for x in output])
-    mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None])
-    # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
-    return result_df, mean_roc_curve
-
+"""
+HERE keeps custom definition to set cysteine to zero (x[:, 4]=0)
+"""
 
 def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
     """

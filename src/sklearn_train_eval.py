@@ -156,13 +156,14 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     return model, train_metrics, valid_metrics, y_pred_test
 
 
-def nested_kcv_train_mut(dataframe, base_model, ics_dict, encoding_kwargs: dict = None, n_jobs=None):
+def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: dict = None, n_jobs: int = None):
     """
     Args:
         dataframe:
         base_model:
         ics_dict:
         encoding_kwargs:
+        n_jobs (int): number of parallel processes. If None, will use len(inner_folds)
 
     Returns:
         models_fold
@@ -170,7 +171,6 @@ def nested_kcv_train_mut(dataframe, base_model, ics_dict, encoding_kwargs: dict 
         test_results
     """
     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
-    #
     models_dict = {}
     test_metrics = {}
     train_metrics = {}
@@ -182,7 +182,10 @@ def nested_kcv_train_mut(dataframe, base_model, ics_dict, encoding_kwargs: dict 
         x_test, y_test = get_dataset(test, ics_dict, **encoding_kwargs)
         # For a given fold, all the models that are trained should be appended to this list
         inner_folds = sorted([f for f in folds if f != fold_out])
-        n_jobs = len(inner_folds) if (n_jobs is None and len(inner_folds) <= multiprocessing.cpu_count()) else n_jobs
+        # N jobs must be lower than cpu_count
+        n_jobs = min(multiprocessing.cpu_count()-1, len(inner_folds)) if n_jobs is None\
+            else n_jobs if (n_jobs is not None and n_jobs <= multiprocessing.cpu_count()) \
+            else multiprocessing.cpu_count()-1
         # Create the sub-dict and put the model into the models dict
         train_wrapper_ = partial(parallel_inner_train_wrapper, train_dataframe=dataframe, x_test=x_test,
                                  base_model=base_model, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
@@ -247,7 +250,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     # Wrapper and parallel evaluation
     eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
                             train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
-    n_jobs = len(models_dict.keys()) if n_jobs is None else n_jobs
+    n_jobs = len(models_dict.keys()) if (n_jobs is None and len(models_dict.keys())<=multiprocessing.cpu_count()) else n_jobs
     output = Parallel(n_jobs=n_jobs)(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
                                      for (fold_out, models_list) in tqdm(models_dict.items(),
                                                                          desc='Eval Folds',
