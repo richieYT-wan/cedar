@@ -20,7 +20,7 @@ if module_path not in sys.path:
 # Custom fct imports
 from src.utils import pkl_load, pkl_dump
 import argparse
-from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, get_mutation_dataset, AA_KEYS
+from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, get_dataset, AA_KEYS
 from src.utils import str2bool, mkdirs, convert_path
 from src.metrics import get_metrics, get_mean_roc_curve, get_nested_feature_importance
 from sklearn.pipeline import Pipeline
@@ -115,7 +115,7 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
     df = df.copy()
 
     # HERE NEED TO DO SWITCH CASES
-    x, y = get_mutation_dataset(df, ics_dict, **encoding_kwargs)
+    x, y = get_dataset(df, ics_dict, **encoding_kwargs)
     x[:, 4]=0
     # Take the first model in the list and get its class
     model_class = models[0].__class__
@@ -149,8 +149,8 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     train = train_dataframe.query('fold != @fold_out and fold != @fold_in').reset_index(drop=True)
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
     # Get datasets
-    x_train, y_train = get_mutation_dataset(train, ics_dict, **encoding_kwargs)
-    x_valid, y_valid = get_mutation_dataset(valid, ics_dict, **encoding_kwargs)
+    x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+    x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
     # SETTING CYSTEINE TO 0
     x_train[:, 4]=0
     x_valid[:, 4]=0
@@ -192,7 +192,7 @@ def nested_kcv_train_mut(dataframe, base_model, ics_dict, encoding_kwargs: dict 
     for fold_out in tqdm(folds, leave=False, desc='Outer fold', position=2):
         # Get test set & init models list to house all models trained in inner fold
         test = dataframe.query('fold == @fold_out').reset_index(drop=True)
-        x_test, y_test = get_mutation_dataset(test, ics_dict, **encoding_kwargs)
+        x_test, y_test = get_dataset(test, ics_dict, **encoding_kwargs)
         # For a given fold, all the models that are trained should be appended to this list
         inner_folds = sorted([f for f in folds if f != fold_out])
         n_jobs = len(inner_folds) if n_jobs is None else n_jobs

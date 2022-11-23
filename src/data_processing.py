@@ -360,7 +360,7 @@ def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encod
         x, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix, seq_col,
                                 hla_col, target_col, rank_col, mask, invert, add_rank,
                                 add_aaprop, remove_pep)
-    if dataset == 'mutation':
+    elif dataset == 'mutation':
         # Flatten and concat all the X to return a single tensor
         # Whatever reads it (model, wrapper, etc) should extract & reshape/view the
         # underlying tensors back into its shape
@@ -386,7 +386,7 @@ def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='oneh
 def get_freq_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                      seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
                      mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
-    x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
+    x, y = get_dataset(df, ics_dict, max_len, encoding, blosum_matrix,
                              seq_col, hla_col, target_col, rank_col,
                              mask, invert, add_rank, add_aaprop, remove_pep)
 
@@ -450,10 +450,9 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     return x, y
 
 
-def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                         seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                         mut_col=['blsm_mut_score', 'mutation_score', 'ratio_rank'], adaptive=False,
-                         mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
+def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+                seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
+                mut_col=None, adaptive=False, mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
     """
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
@@ -476,19 +475,21 @@ def get_mutation_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_mat
                                          target_col,
                                          invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
         # Same
-        if len(mut_col)>0:
-            mut_non = non_ancs[mut_col].values
-            x_non = np.concatenate([x_non, mut_non], axis=1)
+        if mut_col is not None and type(mut_col) == list:
+            if len(mut_col) > 0:
+                mut_non = non_ancs[mut_col].values
+                x_non = np.concatenate([x_non, mut_non], axis=1)
         # Joining the two Xs and Ys into single x,y vectors
         x = np.concatenate([x_anchors, x_non], axis=0)
         y = np.concatenate([y_anchors, y_non], axis=0)
 
     else:
         x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
-                                 mask, invert, add_rank=True, add_aaprop=False, remove_pep=False)
-        if len(mut_col)>0:
-            mut_scores = df[mut_col].values
-            x = np.concatenate([x, mut_scores], axis=1)
+                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep)
+        if mut_col is not None and type(mut_col)==list:
+            if len(mut_col)>0:
+                mut_scores = df[mut_col].values
+                x = np.concatenate([x, mut_scores], axis=1)
     return x, y
 
 

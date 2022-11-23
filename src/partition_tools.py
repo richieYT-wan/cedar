@@ -150,6 +150,7 @@ def pipeline_stratified_kfold(hobohm_filename, original_df, k=5, shuffle=True, s
         dataset (pd.DataFrame): dataset with assigned folds
     """
     # original_df = original_df.sort_values(pep_col).reset_index(drop=True)
+    print('start', len(original_df))
     unique_df, not_unique_df = read_hobohm(hobohm_filename, original_df, pep_col, hla_col, elrank_col, target_col)
     print('read hobohm', len(unique_df), len(not_unique_df))
     unique_df, not_unique_df = stratified_kfold_unique(unique_df, not_unique_df, original_df, k, shuffle, seed,

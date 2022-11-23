@@ -15,7 +15,7 @@ import warnings
 from datetime import datetime as dt
 import os, sys
 
-module_path = os.path.abspath(os.path.join('..'))
+module_path = os.path.abspath(os.path.join('../..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 
@@ -24,7 +24,7 @@ from src.utils import pkl_load, pkl_dump, flatten_product
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES
 from src.utils import str2bool, mkdirs, convert_path
 from src.models import FFN
-from src.train_eval import kcv_tune_nn_freq
+from src.sklearn_train_eval import kcv_tune_nn_freq
 
 warnings.filterwarnings('ignore')
 N_CORES = 1 + (multiprocessing.cpu_count() // 3)

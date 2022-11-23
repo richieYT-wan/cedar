@@ -28,8 +28,8 @@ from src.models import FFN
 from src.utils import pkl_load, pkl_dump, flatten_product
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES
 from src.utils import str2bool, mkdirs, convert_path
-from src.train_eval import nested_kcv_train_nn_freq, evaluate_trained_models_nn_freq
-from src.train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
+from src.nn_train_eval import nested_kcv_train_nn_freq, evaluate_trained_models_nn_freq
+from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
 
 warnings.filterwarnings('ignore')
 N_CORES = 1 + (multiprocessing.cpu_count() // 3)

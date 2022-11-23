@@ -22,7 +22,7 @@ if module_path not in sys.path:
 from src.utils import pkl_load, pkl_dump, flatten_product
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES
 from src.utils import str2bool, mkdirs, convert_path
-from src.train_eval import kcv_tune_sklearn
+from src.sklearn_train_eval import kcv_tune_sklearn
 
 warnings.filterwarnings('ignore')
 

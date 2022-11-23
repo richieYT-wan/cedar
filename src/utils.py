@@ -174,7 +174,7 @@ def convert_path(path):
 
 ### Reading NetMHCpan output fcts
 
-def parse_netmhcpan_header(df_columns: pd.core.indexes.multi.MultiIndex):
+def parse_netmhcpan_header(df_columns:pd.DataFrame.columns):
     """
     Reads and properly parses the headers for outputs of NetMHCpan
     """
@@ -231,6 +231,9 @@ def pipeline_netmhcpan_xls(df, xls_or_filename, xls_suffix):
         xls = read_xls_parse_shift(xls_or_filename)
     elif type(xls_or_filename) == pd.DataFrame:
         xls = xls_or_filename
+    else:
+        raise TypeError('The second argument `xls_or_filename` should either be a string or the parsed excel xls file.')
+
     merged_results = df.merge(df.apply(parse_netmhcpan_shift, netmhc_xls=xls,
                                        axis=1, result_type='expand').add_suffix(xls_suffix),
                               left_index=True, right_index=True)

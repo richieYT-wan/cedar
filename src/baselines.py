@@ -30,7 +30,7 @@ def plot_baseline_roc(axis, dataset, neoepi_only=True):
 
 def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, auc01=False):
     if binder is not None and anchor_mutation is not None:
-      df = dataset.query('binder==@binder and anchor_mutation==@anchor_mutation').copy()
+      df = dataset.query('binder==@binder and anchor_mutation==@anchor_mutation').copÏy()
     else:
       df = dataset.copy()
 

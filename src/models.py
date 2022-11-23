@@ -123,9 +123,54 @@ class DICNN(NetParent):
         return out
 
 
-class NetWrapper(NetParent):
+class FFN(NetParent):
+    def __init__(self, n_in=21, n_hidden=32, n_layers=1, act=nn.ReLU(), dropout=0.0):
+        super(FFN, self).__init__()
+        self.in_layer = nn.Linear(n_in, n_hidden)
+        self.dropout = nn.Dropout(dropout)
+        self.activation = act
+        hidden_layers = [nn.Linear(n_hidden, n_hidden), self.dropout, self.activation] * n_layers
+        self.hidden = nn.Sequential(*hidden_layers)
+        # Either use Softmax with 2D output or Sigmoid with 1D output
+        self.out_layer = nn.Linear(n_hidden, 1)
+
+    def forward(self, x):
+        if len(x.shape) == 3:
+            x = x.flatten(start_dim=1, end_dim=2)
+        x = self.activation(self.in_layer(x))
+        x = self.hidden(x)
+        out = F.sigmoid(self.out_layer(x))
+        return out
+
+
+class FFNetWrapper(NetParent):
+    def __init__(self, n_in=21, n_hidden=32, n_layers=1, act=nn.ReLU(), dropout=0.3):
+        super(FFNetWrapper, self).__init__()
+        self.standardizer = Standardizer()
+        self.input_length = n_in
+        self.ffn = FFN(n_in, n_hidden, n_layers, act, dropout)
+
+    def forward(self, x):
+        # Need to do self.standardizer.fit() somewhere in the nested_kcv function
+        x = self.standardizer(x)
+        x = self.ffn(x)
+        return x
+
+    def fit_standardizer(self, x):
+        assert self.training, 'Must be in training mode to fit!'
+        self.standardizer.fit(x)
+    def reset_parameters(self, **kwargs):
+        for child in self.children():
+            if hasattr(child, 'reset_parameters'):
+                try:
+                    child.reset_parameters(**kwargs)
+                except:
+                    print('here xd', child)
+
+
+class CNNetWrapper(NetParent):
     def __init__(self, input_length=12, n_filters=10, n_hidden=32, n_props=14, act=nn.ReLU()):
-        super(NetWrapper, self).__init__()
+        super(CNNetWrapper, self).__init__()
         self.standardizer = Standardizer()
         self.input_length = input_length
         self.n_props = n_props
@@ -221,26 +266,6 @@ class LinearBlock(NetParent):
         x = self.drop(self.bn1(self.act(self.linear(x))))
         x = F.sigmoid(self.out(x))
         return x
-
-
-class FFN(NetParent):
-    def __init__(self, n_in, n_hidden=32, n_layers=1, act=nn.SELU(), dropout=0.3):
-        super(FFN, self).__init__()
-        self.in_layer = nn.Linear(n_in, n_hidden)
-        self.dropout = nn.Dropout(dropout)
-        self.activation = act
-        hidden_layers = [nn.Linear(n_hidden, n_hidden), self.dropout, self.activation] * n_layers
-        self.hidden = nn.Sequential(*hidden_layers)
-        # Either use Softmax with 2D output or Sigmoid with 1D output
-        self.out_layer = nn.Linear(n_hidden, 1)
-
-    def forward(self, x):
-        if len(x.shape) == 3:
-            x = x.flatten(start_dim=1, end_dim=2)
-        x = self.activation(self.in_layer(x))
-        x = self.hidden(x)
-        out = F.sigmoid(self.out_layer(x))
-        return out
 
 
 """

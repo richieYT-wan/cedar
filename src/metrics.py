@@ -1,9 +1,13 @@
 import numpy as np
 import pandas as pd
+import sklearn
 import torch
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
+from torch import nn as nn
+
+from src.data_processing import verify_df, get_dataset
 
 mpl.rcParams['figure.dpi'] = 180
 sns.set_style('darkgrid')
@@ -11,41 +15,45 @@ from sklearn.metrics import roc_curve, roc_auc_score, f1_score, accuracy_score, 
     recall_score, precision_score, precision_recall_curve, auc, average_precision_score
 
 
-#
-# def get_pred_df(y_pred, y_scores, y_true):
-#     """
-#     Evaluates each model on their targets, then returns a df containing
-#     all the stats regarding the predictions.
-#     example of usage :
-#     Use test sets as data_dict, target_labels_dict, load trained model into model_dict,
-#     then call this method
-#     Args:
-#         y_scores:
-#         y_true:
-#         y_pred:
-#     Returns:
-#
-#     """
-#
-#     df = pd.DataFrame(columns=['y_true', 'predicted', 'score',
-#                                'tp', 'fp', 'tn', 'fn'])
-#
-#     tmp_data = torch.cat((y_true.view(-1, 1).cpu(),  # y_true
-#                           y_pred.detach().cpu().view(-1, 1),  # predicted
-#                           y_scores.detach().cpu()[:, 1].view(-1, 1)),
-#                          1)  # cat dimension
-#
-#     tmp = pd.DataFrame(data=tmp_data.numpy(),
-#                        columns=['y_true', 'predicted', 'score'])
-#     tmp['tp'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 1) else 0, axis=1)
-#     tmp['fp'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 1) else 0, axis=1)
-#     tmp['tn'] = tmp.apply(lambda x: 1 if (x['y_true'] == x['predicted'] and x['predicted'] == 0) else 0, axis=1)
-#     tmp['fn'] = tmp.apply(lambda x: 1 if (x['y_true'] != x['predicted'] and x['predicted'] == 0) else 0, axis=1)
-#     df = pd.concat([df, tmp], ignore_index=True)
-#     df = df.astype({'seqlen': 'int64', 'y_true': 'int64', 'predicted': 'int64',
-#                     'tp': 'int64', 'fp': 'int64', 'tn': 'int64', 'fn': 'int64'}, copy=True)
-#     return df
 
+def get_predictions(df, models, ics_dict, encoding_kwargs):
+    """
+
+    Args:
+        df (pd.DataFrame) : The dataframe containing the data (i.e. peptides and eventually additional columns)
+        models (list) : list of all the models for a given fold. Should be a LIST
+        ics_dict (dict): weights or None
+        encoding_kwargs: the kwargs needed to process the df
+    Returns:
+        predictions_df (pd
+        df (pd.DataFrame): DataFrame containing the Peptide-HLA pairs to evaluate
+        models (list): A.DataFrame): Original DataFrame + a column predictions which are the scores + y_true
+    """
+
+    df = verify_df(df, encoding_kwargs['seq_col'], encoding_kwargs['hla_col'],
+                   encoding_kwargs['target_col'])
+
+    # HERE NEED TO DO SWITCH CASES
+    x, y = get_dataset(df, ics_dict, **encoding_kwargs)
+
+    # Take the first model in the list and get its class
+    model_class = models[0].__class__
+
+    # If model is a scikit-learn model, get pred prob
+    if issubclass(model_class, sklearn.base.BaseEstimator):
+        average_predictions = [model.predict_proba(x)[:, 1] \
+                               for model in models]
+    # If models list is a torch model, use forward
+    elif issubclass(model_class, nn.Module):
+        x = torch.from_numpy(x)
+        with torch.no_grad():
+            average_predictions = [model(x).detach().cpu().numpy() for model in models]
+
+    average_predictions = np.mean(np.stack(average_predictions), axis=0)
+    # assert len(average_predictions)==len(df), f'Wrong shapes passed preds:{len(average_predictions)},df:{len(df)}'
+    output_df = df.copy(deep=True)
+    output_df['pred'] = average_predictions
+    return output_df
 
 def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
     """
@@ -113,7 +121,7 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
         style = '--' if type(k) == np.int32 else '-'
         alpha = 0.75 if type(k) == np.int32 else .9
         lw = .8 if type(k) == np.int32 else 1.5
-        sns.lineplot(fpr, tpr, ax=ax, label=f'{k}, AUC={auc.round(4)}, AUC_01={auc_01.round(4)}',
+        sns.lineplot(x=fpr, y=tpr, ax=ax, label=f'{k}, AUC={auc.round(4)}, AUC_01={auc_01.round(4)}',
                      n_boot=50, ls=style, lw=lw, alpha=alpha)
 
     sns.lineplot([0, 1], [0, 1], ax=ax, ls='--', color='k', label='random', lw=0.5)
@@ -347,3 +355,5 @@ def get_roc(df, score='pred_score', target='agg_label', binder=None, anchor_muta
               "auc01": auc01,
               "npep": len(df)}
     return output
+
+
