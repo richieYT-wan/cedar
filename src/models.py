@@ -159,6 +159,7 @@ class FFNetWrapper(NetParent):
     def fit_standardizer(self, x):
         assert self.training, 'Must be in training mode to fit!'
         self.standardizer.fit(x)
+
     def reset_parameters(self, **kwargs):
         for child in self.children():
             if hasattr(child, 'reset_parameters'):

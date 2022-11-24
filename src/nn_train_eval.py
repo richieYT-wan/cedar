@@ -1,4 +1,5 @@
 import copy
+import multiprocessing
 import os
 
 import pandas as pd
@@ -9,13 +10,9 @@ import torch.optim as optim
 import math
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
-from src.data_processing import get_tensor_dataset, get_dataset, \
-    BL62_VALUES, standardize, get_freq_tensors, verify_df, assert_encoding_kwargs
+from src.data_processing import get_dataset, assert_encoding_kwargs, to_tensors
 from src.metrics import get_metrics, get_mean_roc_curve
-import sklearn
 from sklearn.model_selection import ParameterGrid
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from joblib import Parallel, delayed
 from functools import partial
 from tqdm.auto import tqdm
@@ -119,12 +116,20 @@ def eval_model_step(model, criterion, valid_loader):
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     valid_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
-    valid_loss /= math.floor(len(valid_loader.dataset) / valid_loader.batch_size)
+    try:
+        valid_loss /= math.floor(len(valid_loader.dataset) / valid_loader.batch_size)
+    except ZeroDivisionError:
+        print(valid_loss)
+        print(len(valid_loader.dataset))
+        print(valid_loader.batch_size)
+        print(len(valid_loader.dataset)/valid_loader.batch_size)
+        print(math.floor(len(valid_loader.dataset)/valid_loader.batch_size))
+        raise ValueError('go fuck yourself')
     return valid_loss, valid_metrics
 
 
 def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, n_epochs, early_stopping=False,
-               patience=20, delta=1e-7, filename='checkpoint', verbosity:int=0):
+               patience=20, delta=1e-7, filename='checkpoint', verbosity: int = 0):
     # Very bad implementation in case loader is actually a dataset
     if type(train_loader) == torch.utils.data.dataset.TensorDataset:
         train_loader = DataLoader(train_loader)
@@ -180,7 +185,7 @@ def reset_model_optimizer(model, optimizer, seed):
     # Deepcopy of model and reset the params so it's untied from the previous model
     model = copy.deepcopy(model)
     model.reset_parameters(seed=seed)
-
+    model.train()
     # Re-initialize the optimizer object with the same kwargs without keeping the parameters
     # This only handles a single param groups so far
     optimizer_kwargs = {k: v for k, v in optimizer.param_groups[0].items() if k != 'params'}
@@ -188,95 +193,123 @@ def reset_model_optimizer(model, optimizer, seed):
     return model, optimizer
 
 
-###################
-##KCV AAFREQ FCTS##
-###################
-def get_predictions(df, models, ics_dict, encoding_kwargs):
-    """
-
-    Args:
-        models (list) : list of all the models for a given fold. Should be a LIST
-        ics_dict (dict): weights or None
-        encoding_kwargs: the kwargs needed to process the df
-        metrics (dict):
-
-    Returns:
-        predictions_df (pd
-        df (pd.DataFrame): DataFrame containing the Peptide-HLA pairs to evaluate
-        models (list): A.DataFrame): Original DataFrame + a column predictions which are the scores + y_true
-    """
-
-    df = verify_df(df, encoding_kwargs['seq_col'], encoding_kwargs['hla_col'],
-                   encoding_kwargs['target_col'])
-
-    # HERE NEED TO DO SWITCH CASES
-    x, y = get_dataset(df, ics_dict, **encoding_kwargs)
-
-    # Take the first model in the list and get its class
-    model_class = models[0].__class__
-
-    # If model is a scikit-learn model, get pred prob
-    if issubclass(model_class, sklearn.base.BaseEstimator):
-        average_predictions = [model.predict_proba(x)[:, 1] \
-                               for model in models]
-    # If models list is a torch model, use forward
-    elif issubclass(model_class, nn.Module):
-        x = torch.from_numpy(x)
-        with torch.no_grad():
-            average_predictions = [model(x).detach().cpu().numpy() for model in models]
-
-    average_predictions = np.meaqn(np.stack(average_predictions), axis=0)
-    # assert len(average_predictions)==len(df), f'Wrong shapes passed preds:{len(average_predictions)},df:{len(df)}'
-    output_df = df.copy(deep=True)
-    output_df['pred'] = average_predictions
-    return output_df
-
-
 ##################################
 ############ NN stuff ############
 ##################################
 
 def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
-                              encoding_kwargs, dataset, standardize, fold_out, fold_in,
+                              encoding_kwargs, standardize, fold_out, fold_in,
                               model, optimizer, criterion, training_kwargs: dict):
     """
-
+    Wrapper to parallelize training for all inner folds,
+    returns the trained model, train_metrics and evaluated on x_test (which is just x for df.query('fold==@fold_out')
     Args:
         train_dataframe:
         x_test:
-        base_model:
         ics_dict:
+        device:
         encoding_kwargs:
-        dataset:
         standardize:
         fold_out:
         fold_in:
+        model:
+        optimizer:
+        criterion:
+        training_kwargs:
 
     Returns:
 
     """
     seed = fold_out * 10 + fold_in
     model, optimizer = reset_model_optimizer(model, optimizer, seed)
-    train = train_dataframe.query('fold != @fold_oput and fold != @ fold_in').reset_index(drop=True)
+    train = train_dataframe.query('fold != @fold_out and fold != @ fold_in').reset_index(drop=True)
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
-    x_train, y_train = get_tensor_dataset(train, ics_dict, device, dataset, **encoding_kwargs)
-    x_valid, y_valid = get_tensor_dataset(valid, ics_dict, device, dataset, **encoding_kwargs)
-
+    # Converting to tensors
+    x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+    x_train, y_train = to_tensors(x_train, y_train, device)
+    x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
+    x_valid, y_valid = to_tensors(x_valid, y_valid, device)
+    # Fitting a standardizer ; model must be in training mode to fit so just in case
+    model.train()
     if standardize and hasattr(model, 'standardizer'):
-        if dataset == 'aafreq':
-            model.standardizer.fit(x_train)
-        elif dataset == 'mutation':
-            model.standardizer.fit(x_train[:, -len(encoding_kwargs['feat_cols']):])
+        model.fit_standardizer(x_train)
+    # Don't get dataloader for X_
+    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=128)
+    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=128)
+    # Making a deep copy to update the checkpoint filename to include outer-inner fold
+    training_kwargs = copy.deepcopy(training_kwargs)
+    training_kwargs['filename'] = f'{training_kwargs["filename"]}_o{fold_out}_i{fold_in}'
 
-    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=256)
-    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=256)
-
-    model, train_metrics = train_loop(model, train_loader, valid_loader, device, optimizer, criterion,
+    model, train_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
                                       **training_kwargs)
     with torch.no_grad():
         y_pred_test = model(x_test.to(device))
 
     return model, train_metrics, y_pred_test
+
+
+def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict, encoding_kwargs, training_kwargs,
+                        n_jobs=None):
+    """
+    Here should set optimizer kwargs and model params before calling this fct
+    Training_kwargs should only be for stuff like early stopping, n_epochs, etc.
+    ex:
+        model = NetworkClass(n_input=20, n_hidden=50)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        criterion = torch.nn.CrossEntropyLoss()
+        models, train_metrics, test_metrics = nested_kcv_train_nn(data, model, optimizer, criterion, device, ics_dict,
+                                                                  encoding_kwargs, training_kwargs, n_jobs)
+    Args:
+        dataframe:
+        model:
+        optimizer:
+        criterion:
+        device:
+        ics_dict:
+        encoding_kwargs:
+        training_kwargs:
+        n_jobs:
+
+    Returns:
+        models_dict
+        train_metrics
+        test_metrics
+    """
+    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+    models_dict = {}
+    test_metrics = {}
+    train_metrics = {}
+    folds = sorted(dataframe.fold.unique())
+    std = encoding_kwargs.pop('standardize')
+
+    # For now, when using GPU, use a single core
+    if 'cuda' in device.lower():
+        n_jobs = 1
+    else:
+        n_jobs = min(multiprocessing.cpu_count() - 1, len(folds) - 1) if n_jobs is None \
+            else n_jobs if (n_jobs is not None and n_jobs <= multiprocessing.cpu_count()) \
+            else multiprocessing.cpu_count() - 1
+
+    for fold_out in tqdm(folds, leave=False, desc='Outer fold', position=2):
+        test = dataframe.query('fold==@fold_out').reset_index(drop=True)
+        x_test, y_test = get_dataset(test, ics_dict, **encoding_kwargs)
+        x_test, y_test = to_tensors(x_test, y_test, device)
+        inner_folds = sorted([f for f in folds if f != fold_out])
+        train_wrapper_ = partial(parallel_nn_train_wrapper, train_dataframe=dataframe, x_test=x_test,
+                                 ics_dict = ics_dict, device = device, encoding_kwargs=encoding_kwargs, standardize=std,
+                                 fold_out=fold_out, model=model, optimizer=optimizer, criterion=criterion,
+                                 training_kwargs=training_kwargs)
+        output = Parallel(n_jobs=n_jobs)(
+            delayed(train_wrapper_)(fold_in=fold_in) for fold_in in tqdm(inner_folds, desc='Inner Folds',
+                                                                         leave=False, position=1))
+        models_dict[fold_out] = [x[0] for x in output]
+        train_metrics[fold_out] = {k: v for k, v in
+                                   zip(inner_folds, [x[1] for x in output])}
+        avg_prediction = [x[2] for x in output]
+        avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0).detach().cpu().numpy()
+        test_metrics[fold_out] = get_metrics(y_test, avg_prediction)
+
+    return models_dict, train_metrics, test_metrics
 
 
 def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hyperparams,
@@ -566,8 +599,6 @@ def evaluate_trained_models_nn_freq(test_dataframe, models_dict, ics_dict, devic
         test_results['concatenated'] = get_metrics(concat_true, concat_pred)
 
     return test_results
-
-
 
 ##############################################
 #############   DEPRECATED   #################
