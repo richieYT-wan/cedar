@@ -7,8 +7,41 @@ from itertools import chain, cycle
 import torch
 
 
+def set_mode(models_dict, mode='eval'):
+    """
+    QOL function to set all models to train or eval
+    Args:
+        models_dict (dict): dictionary of list of models
+        mode (str): mode.lower() should be either 'eval' or 'train'
+    Returns:
+        the same models_dict
+    """
+    assert mode.lower() in ['eval', 'train'], 'Please provide a proper mode' \
+                                              f'(either "train" or "eval"). You provided "{mode}"'
+    mode_bool = mode.lower() == 'train'
+    for key, model_list in models_dict.items():
+        for model in model_list:
+            model.train(mode_bool)
+
+
+def set_device(models_list, device):
+    """
+    QOL fct to set all models in a LIST to the same device.
+    Only for list and not Dict because copying takes time and space
+    Args:
+        models_list:
+        device:
+
+    Returns:
+
+    """
+    for model in models_list:
+        model.to(device)
+
+
 def recover_kwargs(string):
     pass
+
 
 def flatten_product(container):
     """
@@ -25,7 +58,6 @@ def flatten_product(container):
                 yield j
         else:
             yield i
-
 
 
 def save_checkpoint_multiple(models, dir_path: str = './', name: str = 'checkpoint.pt'):
@@ -174,7 +206,7 @@ def convert_path(path):
 
 ### Reading NetMHCpan output fcts
 
-def parse_netmhcpan_header(df_columns:pd.DataFrame.columns):
+def parse_netmhcpan_header(df_columns: pd.DataFrame.columns):
     """
     Reads and properly parses the headers for outputs of NetMHCpan
     """
@@ -211,7 +243,7 @@ def parse_netmhcpan_shift(row, netmhc_xls):
     tmp = tmp[[x for x in tmp.columns if x[0] == hla or x[0] == 'base']]
     try:
         argmin = tmp.iloc[tmp[(hla, 'EL_Rank')].argmin()].droplevel(0).rename({'Peptide': 'Peptide',
-                                                                           'EL_Rank': 'EL_rank'})
+                                                                               'EL_Rank': 'EL_rank'})
     except:
         print(tmp, hla)
         raise Exception
@@ -311,6 +343,7 @@ def find_rank_HLA(row, df_xls, dummy=None):
     tmp = df_xls.iloc[row.name]
     assert tmp[colpp] == pep, f'{tmp[colpp]},{pep}'
     return tmp[colhl]
+
 
 def find_core(row, df_xls, dummy=None):
     hla = row['HLA']

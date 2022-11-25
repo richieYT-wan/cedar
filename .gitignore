@@ -203,6 +203,7 @@ output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/df_results_xgb_
 output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/cedar_results_xgb_normal.pkl
 output/221028_new_core_mutscores/
 output/221112_new_core_mutscores_mergedtrainset/
+output/nn_test/
 output/bootstrapping/trainset_models.pkl
 .DS_Store
 notebook/cedar_results_related.csv

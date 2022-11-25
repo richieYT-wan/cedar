@@ -10,8 +10,9 @@ import torch.optim as optim
 import math
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
+from src.utils import set_mode, set_device
 from src.data_processing import get_dataset, assert_encoding_kwargs, to_tensors
-from src.metrics import get_metrics, get_mean_roc_curve
+from src.metrics import get_metrics, get_predictions, get_mean_roc_curve
 from sklearn.model_selection import ParameterGrid
 from joblib import Parallel, delayed
 from functools import partial
@@ -96,7 +97,8 @@ def train_model_step(model, criterion, optimizer, train_loader):
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     train_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
-    train_loss /= math.floor(len(train_loader.dataset) / train_loader.batch_size)
+    # train_loss /= math.floor(len(train_loader.dataset) / train_loader.batch_size)
+    train_loss *= (train_loader.batch_size / len(train_loader.dataset))
     return train_loss, train_metrics
 
 
@@ -116,15 +118,7 @@ def eval_model_step(model, criterion, valid_loader):
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     valid_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
-    try:
-        valid_loss /= math.floor(len(valid_loader.dataset) / valid_loader.batch_size)
-    except ZeroDivisionError:
-        print(valid_loss)
-        print(len(valid_loader.dataset))
-        print(valid_loader.batch_size)
-        print(len(valid_loader.dataset)/valid_loader.batch_size)
-        print(math.floor(len(valid_loader.dataset)/valid_loader.batch_size))
-        raise ValueError('go fuck yourself')
+    valid_loss *= (valid_loader.batch_size / len(valid_loader.dataset))
     return valid_loss, valid_metrics
 
 
@@ -133,7 +127,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
     # Very bad implementation in case loader is actually a dataset
     if type(train_loader) == torch.utils.data.dataset.TensorDataset:
         train_loader = DataLoader(train_loader)
-    model = model.to(device)
+    model.to(device)
     train_losses, valid_losses, train_metrics, valid_metrics = [], [], [], []
     early_stop = EarlyStopping(delta=delta, patience=patience, name=filename)
     valid_auc = []  # Used to check early stopping.
@@ -296,7 +290,7 @@ def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict
         x_test, y_test = to_tensors(x_test, y_test, device)
         inner_folds = sorted([f for f in folds if f != fold_out])
         train_wrapper_ = partial(parallel_nn_train_wrapper, train_dataframe=dataframe, x_test=x_test,
-                                 ics_dict = ics_dict, device = device, encoding_kwargs=encoding_kwargs, standardize=std,
+                                 ics_dict=ics_dict, device=device, encoding_kwargs=encoding_kwargs, standardize=std,
                                  fold_out=fold_out, model=model, optimizer=optimizer, criterion=criterion,
                                  training_kwargs=training_kwargs)
         output = Parallel(n_jobs=n_jobs)(
@@ -312,293 +306,384 @@ def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict
     return models_dict, train_metrics, test_metrics
 
 
-def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hyperparams,
-                     criterion, optimizer, device, outdir):
+def parallel_nn_eval_wrapper(test_dataframe, models_list, ics_dict, device,
+                             train_dataframe, encoding_kwargs, fold_out):
     """
-    In the end, should return a dataframe that houses all the results
+    This fct is for a given outer fold, and needs a list of models trained for this outer fold
+    i.e. models_list = models_dict[fold_out]
     Args:
-        model_constructor:
-        dataframe:
-        base_model:
+        test_dataframe:
+        models_list:
         ics_dict:
+        train_dataframe:
         encoding_kwargs:
-        hyperparams:
+        fold_out:
 
     Returns:
 
     """
-    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+    if 'fold' in test_dataframe.columns and test_dataframe.equals(train_dataframe):
+        test_df = test_dataframe.query('fold==@fold_out')
+    else:
+        test_df = test_dataframe.copy().reset_index(drop=True)
 
-    folds = sorted(dataframe.fold.unique())
-    # Here in "tune" mode, keep 20% of the dataset as test set
-    # Do a standard (not nested) crossvalidation on the remaining 8 folds
-    # This is quicker and used to tune hyperparameters when running MANY MANY conditions
-    seed = 0
-    # Randomly pick 20% & split
-    n_choice = int(0.2 * len(folds))
-    test_folds = sorted(np.random.choice(folds, n_choice))
-    train_folds = sorted([x for x in folds if x not in test_folds])
-    # Get test arrays
-    test = dataframe.query('fold in @test_folds')
-    x_test_base, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
-    # Get train df
-    dataset = dataframe.query('fold in @train_folds')
-    # Set up the grid and a list to house the dicts, which will be converted into dict of lists and then dataframe
-    params_grid = list(ParameterGrid(hyperparams))
-    list_dict_results = []
-    list_roc_curves = []
-    n_in = x_test_base.shape[1]
-    for hyperparameter_selection in tqdm(params_grid, desc='Hyperparameters', leave=False):
-        models_dict = {}
-        test_metrics = {}
-        train_metrics = {}
-        avg_prediction = []
-        # This is ONE crossvalidation loop, will do all of the 80% remaining folds available
-        # Here, the model is set with the hyperparameters from the grid
-        model = model_constructor(n_in, **hyperparameter_selection).to(device)
+    if train_dataframe is not None and not train_dataframe.equals(test_dataframe):
+        tmp = train_dataframe.query('fold != @fold_out')
+        train_peps = tmp[encoding_kwargs['seq_col']].unique()
+        test_df = test_df.query(f'{encoding_kwargs["seq_col"]} not in @train_peps')
 
-        for fold in train_folds:
-            model, optimizer = reset_model_optimizer(model, optimizer, seed)
-            # Create the sub-dict and put the model into the models dict
-            train_metrics[fold] = {}
-            # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
-            # Query subset dataframe and get encoded data and targets
-            train = dataset.query('fold != @fold').reset_index(drop=True)
-            valid = dataset.query('fold == @fold').reset_index(drop=True)
-            # Get tensors, do standardize operation (if applicable)
-            x_train, y_train = get_freq_tensors(train, ics_dict, device, **encoding_kwargs)
-            x_valid, y_valid = get_freq_tensors(valid, ics_dict, device, **encoding_kwargs)
-            # A bit annoying but x_test, y_test has to be re-initialized every time here because of how
-            # standardize overwrites it
-            x_test, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
-            if encoding_kwargs['standardize']:
-                # Saving the mean and std to be re-used when evaluating on another test-set
-                train_metrics[fold]['mu'] = x_train.mean(axis=0)
-                train_metrics[fold]['sigma'] = x_train.std(axis=0)
-                x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
-
-            else:
-                # Here copy it every time, this is a workaround because of how standardize overwrites it
-                # i.e. I save the output of standardize into the same variable x_test lol.
-                x_test = copy.deepcopy(x_test_base)
-            # Make dataloaders
-            train_loader = DataLoader(torch.utils.data.TensorDataset(x_train, y_train), batch_size=256)
-            valid_loader = DataLoader(torch.utils.data.TensorDataset(x_valid, y_valid), batch_size=256)
-
-            # Fit the model and append it to the list
-            # random filename to re-read in case of early stopping
-            filename = outdir + f'tmp_{str(np.random.randint(0, 9999999)).zfill(8)}'
-            model, result_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
-                                               n_epochs=250, early_stopping=True, patience=10, delta=1e-4,
-                                               filename=filename, verbosity=0)
-            models_dict[fold] = model
-            # Delete the saved tmp.pt afterwards
-            os.remove(filename + '.pt')
-            # Get the prediction values on both the train and validation set
-            y_train_score = model(x_train)
-            y_val_score = model(x_valid)
-            # Get the metrics and save them
-            train_metrics[fold]['train'] = get_metrics(y_train, y_train_score)
-            train_metrics[fold]['valid'] = get_metrics(y_valid, y_val_score)
-            avg_prediction.append(model(x_test))
-            # seed increment
-            seed += 1
-
-        avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0)
-        test_metrics['tune'] = get_metrics(y_test, avg_prediction)
-        # Making a separate dict to save roc curves because it will not be converted into a DF
-        roc_curves = copy.deepcopy(hyperparameter_selection)
-        roc_curves['test_roc'] = test_metrics['tune']['roc_curve']
-        roc_curves['valid_roc'] = get_mean_roc_curve(train_metrics, extra_key='valid')
-
-        roc_curves['test_auc'] = test_metrics['tune']['roc_curve']
-        roc_curves['avg_valid_auc'] = np.mean([v['valid']['auc'] for k, v in train_metrics.items()])
-
-        # Saving metrics into the dict containing the hyperparams
-        hyperparameter_selection['score_avg_valid_auc'] = np.mean([v['valid']['auc'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_train_auc'] = np.mean([v['train']['auc'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_valid_auc_01'] = np.mean(
-            [v['valid']['auc_01'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_train_auc_01'] = np.mean(
-            [v['train']['auc_01'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_valid_f1score'] = np.mean(
-            [v['valid']['f1'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_avg_train_f1score'] = np.mean(
-            [v['train']['f1'] for k, v in train_metrics.items()])
-        hyperparameter_selection['score_test_auc'] = test_metrics['tune']['auc']
-        hyperparameter_selection['score_test_auc_01'] = test_metrics['tune']['auc_01']
-        hyperparameter_selection['score_test_f1'] = test_metrics['tune']['f1']
-
-        # Save updated results into the list, without actually saving any of the models
-        list_dict_results.append(hyperparameter_selection)
-        list_roc_curves.append(roc_curves)
-    results_df = pd.DataFrame(list_dict_results)
-    return results_df, list_roc_curves
+    set_device(models_list, device)
+    predictions_df = get_predictions(test_df, models_list, ics_dict, encoding_kwargs)
+    test_metrics = get_metrics(predictions_df[encoding_kwargs['target_col']].values,
+                               predictions_df['pred'].values)
+    if device != 'cpu':
+        # If device was initially cuda, resets it to CPU after eval for space
+        set_device(models_list, 'cpu')
+    return predictions_df, test_metrics
 
 
-def nested_kcv_train_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs,
-                             hyperparams, criterion, optimizer, device, filename='model'):
+def evaluate_trained_models_nn(test_dataframe, models_dict, ics_dict, device,
+                               train_dataframe=None, encoding_kwargs=None,
+                               concatenated=False, only_concat=False, n_jobs=None):
     """
-
+    No need to training kwargs here as models should be in eval mode
     Args:
-        dataframe:
-        ics_dict:
-        model:
-        criterion:
-        optimizer:
-        device:
-        batch_size:
-        n_epochs:
-        early_stopping:
-        patience:
-        delta:
-        filename:
-
-    Returns:
-
-    """
-    # Models_folds will be a dictionary of each of the K folds, of which each contains a list of k-1 models
-    models_folds = {}
-    test_results = {}
-    train_results = {}
-    folds = sorted(dataframe.fold.unique())
-    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
-
-    print(f'Using {device}')
-    seed = 0
-
-    for fold_out in folds:
-        # Get test set & init models list to house all models trained in inner fold
-        test = dataframe.query('fold == @fold_out').reset_index(drop=True)
-        x_test_base, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
-
-        model = model_constructor(n_in=x_test_base.shape[1], **hyperparams)
-
-        models_list = []
-        train_results[fold_out] = {}
-        for fold_in in sorted([f for f in folds if f != fold_out]):
-            train_results[fold_out][fold_in] = {}
-            # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
-            # Also resets the optimizer so that it houses the new weights
-            model, optimizer = reset_model_optimizer(model, optimizer, seed)
-
-            # Query subset dataframe and get data loaders + send to device
-            train = dataframe.query('fold != @fold_out and fold != @fold_in').reset_index(drop=True)
-            valid = dataframe.query('fold == @fold_in').reset_index(drop=True)
-
-            # Get tensors, do standardize operation (if applicable)
-            x_train, y_train = get_freq_tensors(train, ics_dict, device, **encoding_kwargs)
-            x_valid, y_valid = get_freq_tensors(valid, ics_dict, device, **encoding_kwargs)
-            # A bit annoying but x_test, y_test has to be re-initialized every time here because of how
-            # standardize overwrites it
-            x_test, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
-            if encoding_kwargs['standardize']:
-                # Saving the mean and std to be re-used when evaluating on another test-set
-                train_results[fold_out][fold_in]['mu'] = x_train.mean(axis=0)
-                train_results[fold_out][fold_in]['sigma'] = x_train.std(axis=0)
-                x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
-
-            else:
-                # Here copy it every time, this is a workaround because of how standardize overwrites it
-                # i.e. I save the output of standardize into the same variable x_test lol.
-                x_test = copy.deepcopy(x_test_base)
-            # Make dataloaders
-            train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=256)
-            valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=256)
-            # Some checks
-
-            # Training loop
-            model, result_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
-                                               n_epochs=200, early_stopping=True, patience=12, delta=5e-6,
-                                               filename=f'{filename}_t{fold_out}_v{fold_in}', verbosity=0)
-
-            models_list.append(model)
-            # double level dict to house all training results
-            # (ex: train_results[0][3] will give results for fold_out 0, fold_in 3)
-            train_results[fold_out][fold_in]['train'] = result_metrics['train']
-            train_results[fold_out][fold_in]['valid'] = result_metrics['valid']
-            seed += 1
-        # Use the models trained in inner fold to make average prediction
-        models_folds[fold_out] = [mod.eval() for mod in models_list]
-        # Evaluate each models in the fold list, stack, and take the average to get average prediction (sigmoid score)
-        with torch.no_grad():
-            avg_prediction = torch.mean(torch.stack([mod(x_test) for mod in models_list]), dim=0)
-            test_results[fold_out] = get_metrics(y_test, avg_prediction)
-    return models_folds, train_results, test_results
-
-
-def evaluate_trained_models_nn_freq(test_dataframe, models_dict, ics_dict, device,
-                                    train_dataframe=None, encoding_kwargs: dict = None,
-                                    concatenated=False, only_concat=False):
-    """
-    Re-evaluates trained model on the dataset ...
-    The DF may contains folds, if not, will just evaluate the entire ensemble of models
-    of each fold on the provided dataframe;
-    There should be another function that makes sure the dataframe is in the right format
-    so that the function can read it properly and access HLA columns and peptide columns etc.
-    Args:
+        test_dataframe:
         models_dict:
-        dataframe:
         ics_dict:
-        device:
-        seq_col:
-        hla_col:
-        target_col:
+        train_dataframe:
+        encoding_kwargs:
         concatenated:
+        only_concat:
+        n_jobs:
 
     Returns:
 
     """
-    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=True)
-    standardize = encoding_kwargs.pop('standardize')
-    test_results = {}
+    if 'standardize' in encoding_kwargs.keys():
+        del encoding_kwargs['standardize']
+    set_mode(models_dict, 'eval')
+    eval_wrapper_ = partial(parallel_nn_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
+                            device=device, train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
+    n_jobs = 1 if device != 'cpu' else len(models_dict.keys()) if (
+                n_jobs is None and len(models_dict.keys()) <= multiprocessing.cpu_count()) else n_jobs
+    output = Parallel(n_jobs=n_jobs)(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
+                                     for (fold_out, models_list) in tqdm(models_dict.items(),
+                                                                         desc='Eval Folds',
+                                                                         leave=False,
+                                                                         position=2))
+    predictions_df = [x[0] for x in output]
+    test_metrics = [x[1] for x in output]
+    test_results = {k: v for k, v in zip(models_dict.keys(), test_metrics)}
+    predictions_df = pd.concat(predictions_df)
+
+    # Here get the concat results
     if concatenated:
-        concat_pred = []
-        concat_true = []
+        test_results['concatenated'] = get_metrics(predictions_df[encoding_kwargs['target_col']].values,
+                                                   predictions_df['pred'].values)
+    # Either concatenated, or mean predictions
+    else:
+        # obj_cols = [x for x,y in zip(predictions_df.dtypes.index, predictions_df.dtypes.values) if y=='object']
+        cols = [encoding_kwargs['seq_col'], encoding_kwargs['hla_col'], encoding_kwargs['target_col']]
+        mean_preds = predictions_df.groupby(cols).agg(mean_pred=('pred', 'mean'))
+        predictions_df = test_dataframe.merge(mean_preds, left_on=cols, right_on=cols, suffixes=[None, None])
+    # print('there', len(predictions_df))
 
-    for fold_out, models_list_out in models_dict.items():
-        # if fold is in df's columns, then do the evaluation on each of the inner and outer folds
+    if only_concat and concatenated:
+        keys_del = [k for k in test_results if k != 'concatenated']
+        for k in keys_del:
+            del test_results[k]
 
-        # Querying the right train set and get tensors & sent to device
-        if 'fold' in test_dataframe.columns and train_dataframe is None:
-            test_df = test_dataframe.query('fold == @fold_out')
-        else:
-            test_df = test_dataframe.copy().reset_index(drop=True)
-        x_test, y_test = get_freq_tensors(test_df, ics_dict, device=device, **encoding_kwargs)
+    return test_results, predictions_df
 
-        inner_folds = [x for x in range(len(models_dict.keys())) if x != fold_out]
-        if train_dataframe is not None:
-            tmp = train_dataframe.query('fold != @fold_out')  # Not sure why but I need to add this or it breaks
-            train_peps = [tmp.query('fold!=@fold_in')[encoding_kwargs['seq_col']].values for fold_in in inner_folds]
-            tmp_index = [test_df.query('Peptide not in @peps').index for peps in train_peps]
-            index_keep = tmp_index[0]
-            for index in tmp_index[1:]:
-                index_keep = index_keep.join(index, how='inner')
-        else:
-            index_keep = range(len(x_test))
-
-        if standardize:
-            # Very convoluted list comprehension, but basically predict_proba and the standardize operation
-            # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
-            # One of the worst garbage code (top 5) I've written this week
-            avg_prediction = [model(((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) /
-                                     train_metrics[fold_out][fold_in]['sigma'])) \
-                              for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
-        else:
-            avg_prediction = [model(x_test[index_keep]) for i, model in enumerate(models_list_out)]
-
-        avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0)
-        test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction)
-
-        if concatenated:
-            concat_pred.append(avg_prediction)
-            concat_true.append(y_test[index_keep])
-    if concatenated:
-        concat_pred = torch.cat(concat_pred)
-        concat_true = torch.cat(concat_true)
-        test_results['concatenated'] = get_metrics(concat_true, concat_pred)
-
-    return test_results
+#
+# def kcv_tune_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs, hyperparams,
+#                      criterion, optimizer, device, outdir):
+#     """
+#     In the end, should return a dataframe that houses all the results
+#     Args:
+#         model_constructor:
+#         dataframe:
+#         base_model:
+#         ics_dict:
+#         encoding_kwargs:
+#         hyperparams:
+#
+#     Returns:
+#
+#     """
+#     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+#
+#     folds = sorted(dataframe.fold.unique())
+#     # Here in "tune" mode, keep 20% of the dataset as test set
+#     # Do a standard (not nested) crossvalidation on the remaining 8 folds
+#     # This is quicker and used to tune hyperparameters when running MANY MANY conditions
+#     seed = 0
+#     # Randomly pick 20% & split
+#     n_choice = int(0.2 * len(folds))
+#     test_folds = sorted(np.random.choice(folds, n_choice))
+#     train_folds = sorted([x for x in folds if x not in test_folds])
+#     # Get test arrays
+#     test = dataframe.query('fold in @test_folds')
+#     x_test_base, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
+#     # Get train df
+#     dataset = dataframe.query('fold in @train_folds')
+#     # Set up the grid and a list to house the dicts, which will be converted into dict of lists and then dataframe
+#     params_grid = list(ParameterGrid(hyperparams))
+#     list_dict_results = []
+#     list_roc_curves = []
+#     n_in = x_test_base.shape[1]
+#     for hyperparameter_selection in tqdm(params_grid, desc='Hyperparameters', leave=False):
+#         models_dict = {}
+#         test_metrics = {}
+#         train_metrics = {}
+#         avg_prediction = []
+#         # This is ONE crossvalidation loop, will do all of the 80% remaining folds available
+#         # Here, the model is set with the hyperparameters from the grid
+#         model = model_constructor(n_in, **hyperparameter_selection).to(device)
+#
+#         for fold in train_folds:
+#             model, optimizer = reset_model_optimizer(model, optimizer, seed)
+#             # Create the sub-dict and put the model into the models dict
+#             train_metrics[fold] = {}
+#             # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
+#             # Query subset dataframe and get encoded data and targets
+#             train = dataset.query('fold != @fold').reset_index(drop=True)
+#             valid = dataset.query('fold == @fold').reset_index(drop=True)
+#             # Get tensors, do standardize operation (if applicable)
+#             x_train, y_train = get_freq_tensors(train, ics_dict, device, **encoding_kwargs)
+#             x_valid, y_valid = get_freq_tensors(valid, ics_dict, device, **encoding_kwargs)
+#             # A bit annoying but x_test, y_test has to be re-initialized every time here because of how
+#             # standardize overwrites it
+#             x_test, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
+#             if encoding_kwargs['standardize']:
+#                 # Saving the mean and std to be re-used when evaluating on another test-set
+#                 train_metrics[fold]['mu'] = x_train.mean(axis=0)
+#                 train_metrics[fold]['sigma'] = x_train.std(axis=0)
+#                 x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
+#
+#             else:
+#                 # Here copy it every time, this is a workaround because of how standardize overwrites it
+#                 # i.e. I save the output of standardize into the same variable x_test lol.
+#                 x_test = copy.deepcopy(x_test_base)
+#             # Make dataloaders
+#             train_loader = DataLoader(torch.utils.data.TensorDataset(x_train, y_train), batch_size=256)
+#             valid_loader = DataLoader(torch.utils.data.TensorDataset(x_valid, y_valid), batch_size=256)
+#
+#             # Fit the model and append it to the list
+#             # random filename to re-read in case of early stopping
+#             filename = outdir + f'tmp_{str(np.random.randint(0, 9999999)).zfill(8)}'
+#             model, result_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
+#                                                n_epochs=250, early_stopping=True, patience=10, delta=1e-4,
+#                                                filename=filename, verbosity=0)
+#             models_dict[fold] = model
+#             # Delete the saved tmp.pt afterwards
+#             os.remove(filename + '.pt')
+#             # Get the prediction values on both the train and validation set
+#             y_train_score = model(x_train)
+#             y_val_score = model(x_valid)
+#             # Get the metrics and save them
+#             train_metrics[fold]['train'] = get_metrics(y_train, y_train_score)
+#             train_metrics[fold]['valid'] = get_metrics(y_valid, y_val_score)
+#             avg_prediction.append(model(x_test))
+#             # seed increment
+#             seed += 1
+#
+#         avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0)
+#         test_metrics['tune'] = get_metrics(y_test, avg_prediction)
+#         # Making a separate dict to save roc curves because it will not be converted into a DF
+#         roc_curves = copy.deepcopy(hyperparameter_selection)
+#         roc_curves['test_roc'] = test_metrics['tune']['roc_curve']
+#         roc_curves['valid_roc'] = get_mean_roc_curve(train_metrics, extra_key='valid')
+#
+#         roc_curves['test_auc'] = test_metrics['tune']['roc_curve']
+#         roc_curves['avg_valid_auc'] = np.mean([v['valid']['auc'] for k, v in train_metrics.items()])
+#
+#         # Saving metrics into the dict containing the hyperparams
+#         hyperparameter_selection['score_avg_valid_auc'] = np.mean([v['valid']['auc'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_avg_train_auc'] = np.mean([v['train']['auc'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_avg_valid_auc_01'] = np.mean(
+#             [v['valid']['auc_01'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_avg_train_auc_01'] = np.mean(
+#             [v['train']['auc_01'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_avg_valid_f1score'] = np.mean(
+#             [v['valid']['f1'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_avg_train_f1score'] = np.mean(
+#             [v['train']['f1'] for k, v in train_metrics.items()])
+#         hyperparameter_selection['score_test_auc'] = test_metrics['tune']['auc']
+#         hyperparameter_selection['score_test_auc_01'] = test_metrics['tune']['auc_01']
+#         hyperparameter_selection['score_test_f1'] = test_metrics['tune']['f1']
+#
+#         # Save updated results into the list, without actually saving any of the models
+#         list_dict_results.append(hyperparameter_selection)
+#         list_roc_curves.append(roc_curves)
+#     results_df = pd.DataFrame(list_dict_results)
+#     return results_df, list_roc_curves
+#
+#
+# def nested_kcv_train_nn_freq(dataframe, model_constructor, ics_dict, encoding_kwargs,
+#                              hyperparams, criterion, optimizer, device, filename='model'):
+#     """
+#
+#     Args:
+#         dataframe:
+#         ics_dict:
+#         model:
+#         criterion:
+#         optimizer:
+#         device:
+#         batch_size:
+#         n_epochs:
+#         early_stopping:
+#         patience:
+#         delta:
+#         filename:
+#
+#     Returns:
+#
+#     """
+#     # Models_folds will be a dictionary of each of the K folds, of which each contains a list of k-1 models
+#     models_folds = {}
+#     test_results = {}
+#     train_results = {}
+#     folds = sorted(dataframe.fold.unique())
+#     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+#
+#     print(f'Using {device}')
+#     seed = 0
+#
+#     for fold_out in folds:
+#         # Get test set & init models list to house all models trained in inner fold
+#         test = dataframe.query('fold == @fold_out').reset_index(drop=True)
+#         x_test_base, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
+#
+#         model = model_constructor(n_in=x_test_base.shape[1], **hyperparams)
+#
+#         models_list = []
+#         train_results[fold_out] = {}
+#         for fold_in in sorted([f for f in folds if f != fold_out]):
+#             train_results[fold_out][fold_in] = {}
+#             # Here resets model weight at every fold, using the fold number (range(0, n_folds*(n_folds-1)) ) as seed
+#             # Also resets the optimizer so that it houses the new weights
+#             model, optimizer = reset_model_optimizer(model, optimizer, seed)
+#
+#             # Query subset dataframe and get data loaders + send to device
+#             train = dataframe.query('fold != @fold_out and fold != @fold_in').reset_index(drop=True)
+#             valid = dataframe.query('fold == @fold_in').reset_index(drop=True)
+#
+#             # Get tensors, do standardize operation (if applicable)
+#             x_train, y_train = get_freq_tensors(train, ics_dict, device, **encoding_kwargs)
+#             x_valid, y_valid = get_freq_tensors(valid, ics_dict, device, **encoding_kwargs)
+#             # A bit annoying but x_test, y_test has to be re-initialized every time here because of how
+#             # standardize overwrites it
+#             x_test, y_test = get_freq_tensors(test, ics_dict, device, **encoding_kwargs)
+#             if encoding_kwargs['standardize']:
+#                 # Saving the mean and std to be re-used when evaluating on another test-set
+#                 train_results[fold_out][fold_in]['mu'] = x_train.mean(axis=0)
+#                 train_results[fold_out][fold_in]['sigma'] = x_train.std(axis=0)
+#                 x_train, x_valid, x_test = standardize(x_train, x_valid, x_test_base)
+#
+#             else:
+#                 # Here copy it every time, this is a workaround because of how standardize overwrites it
+#                 # i.e. I save the output of standardize into the same variable x_test lol.
+#                 x_test = copy.deepcopy(x_test_base)
+#             # Make dataloaders
+#             train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=256)
+#             valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=256)
+#             # Some checks
+#
+#             # Training loop
+#             model, result_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
+#                                                n_epochs=200, early_stopping=True, patience=12, delta=5e-6,
+#                                                filename=f'{filename}_t{fold_out}_v{fold_in}', verbosity=0)
+#
+#             models_list.append(model)
+#             # double level dict to house all training results
+#             # (ex: train_results[0][3] will give results for fold_out 0, fold_in 3)
+#             train_results[fold_out][fold_in]['train'] = result_metrics['train']
+#             train_results[fold_out][fold_in]['valid'] = result_metrics['valid']
+#             seed += 1
+#         # Use the models trained in inner fold to make average prediction
+#         models_folds[fold_out] = [mod.eval() for mod in models_list]
+#         # Evaluate each models in the fold list, stack, and take the average to get average prediction (sigmoid score)
+#         with torch.no_grad():
+#             avg_prediction = torch.mean(torch.stack([mod(x_test) for mod in models_list]), dim=0)
+#             test_results[fold_out] = get_metrics(y_test, avg_prediction)
+#     return models_folds, train_results, test_results
+#
+#
+# def evaluate_trained_models_nn_freq(test_dataframe, models_dict, ics_dict, device,
+#                                     train_dataframe=None, encoding_kwargs: dict = None,
+#                                     concatenated=False, only_concat=False):
+#     """
+#     Re-evaluates trained model on the dataset ...
+#     The DF may contains folds, if not, will just evaluate the entire ensemble of models
+#     of each fold on the provided dataframe;
+#     There should be another function that makes sure the dataframe is in the right format
+#     so that the function can read it properly and access HLA columns and peptide columns etc.
+#     Args:
+#         models_dict:
+#         dataframe:
+#         ics_dict:
+#         device:
+#         seq_col:
+#         hla_col:
+#         target_col:
+#         concatenated:
+#
+#     Returns:
+#
+#     """
+#     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=True)
+#     standardize = encoding_kwargs.pop('standardize')
+#     test_results = {}
+#     if concatenated:
+#         concat_pred = []
+#         concat_true = []
+#
+#     for fold_out, models_list_out in models_dict.items():
+#         # if fold is in df's columns, then do the evaluation on each of the inner and outer folds
+#
+#         # Querying the right train set and get tensors & sent to device
+#         if 'fold' in test_dataframe.columns and train_dataframe is None:
+#             test_df = test_dataframe.query('fold == @fold_out')
+#         else:
+#             test_df = test_dataframe.copy().reset_index(drop=True)
+#         x_test, y_test = get_freq_tensors(test_df, ics_dict, device=device, **encoding_kwargs)
+#
+#         inner_folds = [x for x in range(len(models_dict.keys())) if x != fold_out]
+#         if train_dataframe is not None:
+#             tmp = train_dataframe.query('fold != @fold_out')  # Not sure why but I need to add this or it breaks
+#             train_peps = [tmp.query('fold!=@fold_in')[encoding_kwargs['seq_col']].values for fold_in in inner_folds]
+#             tmp_index = [test_df.query('Peptide not in @peps').index for peps in train_peps]
+#             index_keep = tmp_index[0]
+#             for index in tmp_index[1:]:
+#                 index_keep = index_keep.join(index, how='inner')
+#         else:
+#             index_keep = range(len(x_test))
+#
+#         if standardize:
+#             # Very convoluted list comprehension, but basically predict_proba and the standardize operation
+#             # is done within the same list comprehension, using enumerate to read the fold_in and getting the mu/std :-)
+#             # One of the worst garbage code (top 5) I've written this week
+#             avg_prediction = [model(((x_test[index_keep] - train_metrics[fold_out][fold_in]['mu']) /
+#                                      train_metrics[fold_out][fold_in]['sigma'])) \
+#                               for i, (fold_in, model) in enumerate(zip(inner_folds, models_list_out))]
+#         else:
+#             avg_prediction = [model(x_test[index_keep]) for i, model in enumerate(models_list_out)]
+#
+#         avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0)
+#         test_results[fold_out] = get_metrics(y_test[index_keep], avg_prediction)
+#
+#         if concatenated:
+#             concat_pred.append(avg_prediction)
+#             concat_true.append(y_test[index_keep])
+#     if concatenated:
+#         concat_pred = torch.cat(concat_pred)
+#         concat_true = torch.cat(concat_true)
+#         test_results['concatenated'] = get_metrics(concat_true, concat_pred)
+#
+#     return test_results
 
 ##############################################
 #############   DEPRECATED   #################

@@ -8,19 +8,23 @@ from xgboost import XGBClassifier
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import copy
 
 
 class NetParent(nn.Module):
     """
-    Creates a parent class that has reset_parameters implemented
+    Mostly a QOL superclass
+    Creates a parent class that has reset_parameters implemented and .device
     so I don't have to re-write it to each child class and can just inherit it
     """
 
     def __init__(self):
         super(NetParent, self).__init__()
+        # device is cpu by default
+        self.device = 'cpu'
 
-    # def forward(self):
-    #     raise NotImplementedError
+    def forward(self):
+        raise NotImplementedError
 
     @staticmethod
     def init_weights(m):
@@ -41,6 +45,12 @@ class NetParent(nn.Module):
                     self.reset_weight(sublayer)
             if hasattr(child, 'reset_parameters'):
                 self.reset_weight(child)
+
+    def to(self, device):
+        # Work around, so we can get model.device for all NetParent
+        #
+        super(NetParent, self).to(device)
+        self.device = device
 
 
 class Standardizer(nn.Module):
@@ -143,9 +153,9 @@ class FFN(NetParent):
         return out
 
 
-class FFNetWrapper(NetParent):
+class FFNetPipeline(NetParent):
     def __init__(self, n_in=21, n_hidden=32, n_layers=1, act=nn.ReLU(), dropout=0.3):
-        super(FFNetWrapper, self).__init__()
+        super(FFNetPipeline, self).__init__()
         self.standardizer = Standardizer()
         self.input_length = n_in
         self.ffn = FFN(n_in, n_hidden, n_layers, act, dropout)
@@ -169,9 +179,9 @@ class FFNetWrapper(NetParent):
                     print('here xd', child)
 
 
-class CNNetWrapper(NetParent):
+class CNNetPipeline(NetParent):
     def __init__(self, input_length=12, n_filters=10, n_hidden=32, n_props=14, act=nn.ReLU()):
-        super(CNNetWrapper, self).__init__()
+        super(CNNetPipeline, self).__init__()
         self.standardizer = Standardizer()
         self.input_length = input_length
         self.n_props = n_props

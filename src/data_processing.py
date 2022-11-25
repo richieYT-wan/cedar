@@ -118,7 +118,7 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
             if 'rank_col' not in encoding_kwargs.keys():
                 encoding_kwargs.update({'seq_col': 'trueHLA_EL_rank'})
 
-        # This KWARGS not needed in eval mode since I'm using Pipeline and Wrapper
+        # This KWARGS not needed in eval mode since I'm using Pipeline and Pipeline
         del encoding_kwargs['standardize']
     return encoding_kwargs
 
