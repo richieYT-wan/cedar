@@ -204,6 +204,8 @@ output/traineval/run_220905_10h44m20s_xgb_normal_redo/xgb_normal/cedar_results_x
 output/221028_new_core_mutscores/
 output/221112_new_core_mutscores_mergedtrainset/
 output/nn_test/
+output/*221122*/
+output/reshaped/
 output/bootstrapping/trainset_models.pkl
 .DS_Store
 notebook/cedar_results_related.csv
@@ -214,3 +216,7 @@ notebook/prime_results_related.csv
 notebook/results_a0201.pkl
 notebook/results_related_mutation_scorecols.pkl
 notebook/results_related_mutation_switch.pkl
+output/lr1e-4/train_metrics.pkl
+output/test/params/train_metrics.pkl
+pyscripts/stupid_save_reshape.py
+tune_train/stupid_save_reshape.sh

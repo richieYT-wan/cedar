@@ -39,32 +39,32 @@ class EarlyStopping:
         self.counter = 0
         self.best_score = None
         self.early_stop = False
-        self.val_loss_min = np.Inf
+        self.prev_best_score = np.Inf
         self.delta = delta
         self.path = f'{name}.pt'
 
-    def __call__(self, val_loss, model):
-
-        score = val_loss
-
+    def __call__(self, score, model):
         if self.best_score is None:
             self.best_score = score
-            self.save_checkpoint(val_loss, model)
-        elif score > self.best_score - self.delta:
-            self.counter += 1
-            if self.counter >= self.patience:
-                self.early_stop = True
-        else:
-            self.best_score = score
-            self.save_checkpoint(val_loss, model)
+            self.save_checkpoint(score, model)
             self.counter = 0
+        else:
+            # This condition works for AUC ; checks that the AUC is below the best AUC +/- some delta
+            if score < self.best_score + self.delta:
+                self.counter += 1
+                if self.counter >= self.patience:
+                    self.early_stop = True
+            else:
+                self.best_score = score
+                self.save_checkpoint(score, model)
+                self.counter = 0
 
-    def save_checkpoint(self, val_loss, model):
+    def save_checkpoint(self, score, model):
         '''Saves model when validation loss decrease.'''
         if self.verbose:
-            print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
+            print(f'Prev best score: ({self.prev_best_score:.6f} --> {score:.6f}).  Saving model ...')
         torch.save(model.state_dict(), self.path)
-        self.val_loss_min = val_loss
+        self.prev_best_score = score
 
 
 def invoke(early_stopping, loss, model, implement=False):
@@ -77,6 +77,17 @@ def invoke(early_stopping, loss, model, implement=False):
 
 
 def train_model_step(model, criterion, optimizer, train_loader):
+    """
+    TODO: Include a scheduler for the optimizer
+    Args:
+        model:
+        criterion:
+        optimizer:
+        train_loader:
+
+    Returns:
+
+    """
     model.train()
     train_loss = 0
     y_scores, y_true = [], []
@@ -86,19 +97,20 @@ def train_model_step(model, criterion, optimizer, train_loader):
         # Output should be sigmoid scores (range [0,1])
         y_scores.append(output)
         y_true.append(y_train)
-        if torch.isnan(torch.tensor(loss)): print('NaN losses!');return torch.nan
+        if torch.isnan(torch.tensor(loss)): print('NaN losses!'); return torch.nan
 
         model.zero_grad()
         loss.backward()
         optimizer.step()
-        train_loss += loss.item()
+        # Multiply to have a normalized running loss at the end
+        train_loss += loss.item() * y_train.shape[0]
 
     # Concatenate the y_pred & y_true tensors and compute metrics
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     train_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
     # train_loss /= math.floor(len(train_loader.dataset) / train_loader.batch_size)
-    train_loss *= (train_loader.batch_size / len(train_loader.dataset))
+    train_loss /= len(train_loader.dataset)
     return train_loss, train_metrics
 
 
@@ -110,7 +122,7 @@ def eval_model_step(model, criterion, valid_loader):
     with torch.no_grad():
         for x_valid, y_valid in valid_loader:
             output = model(x_valid)
-            valid_loss += criterion(output, y_valid).item()
+            valid_loss += (criterion(output, y_valid).item() * y_valid.shape[0])
             # Output should be sigmoid scores (range [0,1])
             y_scores.append(output)
             y_true.append(y_valid)
@@ -118,7 +130,7 @@ def eval_model_step(model, criterion, valid_loader):
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     valid_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
-    valid_loss *= (valid_loader.batch_size / len(valid_loader.dataset))
+    valid_loss /= len(valid_loader.dataset)
     return valid_loss, valid_metrics
 
 
@@ -132,6 +144,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
     early_stop = EarlyStopping(delta=delta, patience=patience, name=filename)
     valid_auc = []  # Used to check early stopping.
     range_ = tqdm(range(1, n_epochs + 1), leave=False) if verbosity > 0 else range(1, n_epochs + 1)
+    e = 0
     for epoch in range_:
         train_loss, train_metrics_ = train_model_step(model, criterion, optimizer, train_loader)
         valid_loss, valid_metrics_ = eval_model_step(model, criterion, valid_loader)
@@ -154,7 +167,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
             print(f'\nTrain Epoch: {epoch}\tTrain Loss: {train_loss:.5f}\tEval Loss:{valid_loss:.5f}\n' \
                   f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
-        # Stop training if early stopping
+        # Stop training if early stopping, using AUC as metric
         if early_stopping:
             if invoke(early_stop, valid_auc[-1], model, implement=early_stopping):
                 model.load_state_dict(torch.load(f'{filename}.pt'))
@@ -163,12 +176,14 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
                            f'previous avg losses: {np.mean(valid_losses[-patience:-1]),}, previous losses std: {np.std(valid_losses[-patience:-1])}\n'
                            f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                            f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
+                e = epoch
                 break
     # flatten metrics into lists for easier printing, i.e. make dict of list from list of dicts
     results_metrics = {'train': {k: [dic[k] for dic in train_metrics] for k in train_metrics[0]},
                        'valid': {k: [dic[k] for dic in valid_metrics] for k in valid_metrics[0]}}
     results_metrics['train']['losses'] = train_losses
     results_metrics['valid']['losses'] = valid_losses
+    results_metrics['break_epoch'] = e
 
     # Return the model in eval mode to be sure
     model.eval()
@@ -176,6 +191,16 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
 
 
 def reset_model_optimizer(model, optimizer, seed):
+    """
+    TODO: Include a scheduler for the optimizer
+    Args:
+        model:
+        optimizer:
+        seed:
+
+    Returns:
+
+    """
     # Deepcopy of model and reset the params so it's untied from the previous model
     model = copy.deepcopy(model)
     model.reset_parameters(seed=seed)
@@ -214,7 +239,7 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
     Returns:
 
     """
-    seed = fold_out * 10 + fold_in
+    seed = int(f'{fold_out}{fold_in}')
     model, optimizer = reset_model_optimizer(model, optimizer, seed)
     train = train_dataframe.query('fold != @fold_out and fold != @ fold_in').reset_index(drop=True)
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
@@ -236,6 +261,12 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
 
     model, train_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
                                       **training_kwargs)
+    if train_metrics['break_epoch'] < 75:
+        print(f'\n\n{"#"*10}\n\n')
+        print(f'THIS FUCKED UP:\t{train_metrics["break_epoch"]}\tF_in={fold_in},\tF_out={fold_out},\tseed={seed}')
+        print(train_metrics['valid']['losses'])
+        print(train_metrics['valid']['auc'])
+
     with torch.no_grad():
         y_pred_test = model(x_test.to(device))
 
@@ -245,6 +276,8 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
 def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict, encoding_kwargs, training_kwargs,
                         n_jobs=None):
     """
+    TODO: Have the fct (here or after return in another fct/scope) save the models checkpoints from the models dict
+
     Here should set optimizer kwargs and model params before calling this fct
     Training_kwargs should only be for stuff like early stopping, n_epochs, etc.
     ex:
@@ -275,7 +308,6 @@ def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict
     train_metrics = {}
     folds = sorted(dataframe.fold.unique())
     std = encoding_kwargs.pop('standardize')
-
     # For now, when using GPU, use a single core
     if 'cuda' in device.lower():
         n_jobs = 1
@@ -302,7 +334,6 @@ def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict
         avg_prediction = [x[2] for x in output]
         avg_prediction = torch.mean(torch.stack(avg_prediction), dim=0).detach().cpu().numpy()
         test_metrics[fold_out] = get_metrics(y_test, avg_prediction)
-
     return models_dict, train_metrics, test_metrics
 
 
