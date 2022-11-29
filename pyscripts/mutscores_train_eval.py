@@ -172,7 +172,7 @@ def main():
                             # Saving Feature importances as dataframe
                             df_fi = pd.DataFrame(fi, index=fn).T
                             df_fi.to_csv(
-                                f'{args["outdir"]}raw/featimps_{encoding}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                f'{args["outdir"]}raw/featimps_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                 index=False)
 
                             # EVAL AND BOOTSTRAPPING ON CEDAR
