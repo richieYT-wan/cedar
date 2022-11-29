@@ -46,9 +46,9 @@ def main():
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
         args['datadir']), convert_path(args['icsdir'])
     print('Making dirs')
-    mkdirs(args['outdir'])
-    mkdirs(f'{args["outdir"]}raw/')
-    mkdirs(f'{args["outdir"]}bootstrapping/')
+    #mkdirs(args['outdir'])
+    #mkdirs(f'{args["outdir"]}raw/')
+    #mkdirs(f'{args["outdir"]}bootstrapping/')
     N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
             args['ncores'] is None) else args['ncores']
 
