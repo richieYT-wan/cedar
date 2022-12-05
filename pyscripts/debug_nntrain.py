@@ -16,12 +16,7 @@ from src.utils import mkdirs, convert_path, pkl_dump, pkl_load, display_side
 from src.data_processing import get_dataset, BL62_VALUES, BL62FREQ_VALUES, HLAS, AA_KEYS
 from src.utils import pkl_load, pkl_dump
 
-from joblib import Parallel, delayed
-from functools import partial
-import multiprocessing
-import itertools
-from copy import deepcopy
-from src.models import FFNetPipeline, FFN, LinearBlock
+from src.models import FFNetPipeline
 from src.nn_train_eval import nested_kcv_train_nn, evaluate_trained_models_nn
 
 
@@ -31,14 +26,14 @@ eval_dataset = pd.read_csv('../data/mutant/221119_prime_related_10fold.csv')
 ics_dict = ics_kl
 
 
-training_kwargs = dict(n_epochs=500, early_stopping=True, patience=50, delta=1e-6,
+training_kwargs = dict(n_epochs=500, early_stopping=True, patience=500, delta=1e-6,
                        filename='../output/nn_test/checkpoint_test',
                        verbosity=1)
 encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, standardize=True, seq_col='Peptide',
                        hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mut_col=['mutation_score'],
                        adaptive=False, mask=True, add_rank=True, add_aaprop=False, remove_pep=False)
 
-model = FFNetPipeline(n_in=22, n_hidden=25, n_layers=2, dropout=0.25)
+model = FFNetPipeline(n_in=22, n_hidden=25, n_layers=3, dropout=0.25)
 
 lr=5e-5
 wd=5e-3

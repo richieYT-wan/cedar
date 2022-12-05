@@ -109,7 +109,6 @@ def train_model_step(model, criterion, optimizer, train_loader):
     y_scores, y_true = torch.cat(y_scores), torch.cat(y_true)
     train_metrics = get_metrics(y_true, y_scores)
     # Normalizes to loss per batch
-    # train_loss /= math.floor(len(train_loader.dataset) / train_loader.batch_size)
     train_loss /= len(train_loader.dataset)
     return train_loss, train_metrics
 
@@ -145,6 +144,8 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
     valid_auc = []  # Used to check early stopping.
     range_ = tqdm(range(1, n_epochs + 1), leave=False) if verbosity > 0 else range(1, n_epochs + 1)
     e = 0
+    best_auc = 0
+    best_loss = 100
     for epoch in range_:
         train_loss, train_metrics_ = train_model_step(model, criterion, optimizer, train_loader)
         valid_loss, valid_metrics_ = eval_model_step(model, criterion, valid_loader)
@@ -167,17 +168,21 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
             print(f'\nTrain Epoch: {epoch}\tTrain Loss: {train_loss:.5f}\tEval Loss:{valid_loss:.5f}\n' \
                   f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
-        # Stop training if early stopping, using AUC as metric
-        if early_stopping:
-            if invoke(early_stop, valid_auc[-1], model, implement=early_stopping):
-                model.load_state_dict(torch.load(f'{filename}.pt'))
-                tqdm.write(f'\nEarly Stopping at epoch={epoch};'
-                           f'current best valid loss:{valid_loss}; '
-                           f'previous avg losses: {np.mean(valid_losses[-patience:-1]),}, previous losses std: {np.std(valid_losses[-patience:-1])}\n'
-                           f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
-                           f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
-                e = epoch
-                break
+        # TODO : For now, early stopping is disabled and just train to the end and re-load the best model
+
+
+        # TODO : Re-implement early stopping
+        # # Stop training if early stopping, using AUC as metric
+        # if early_stopping:
+        #     if invoke(early_stop, valid_auc[-1], model, implement=early_stopping):
+        #         model.load_state_dict(torch.load(f'{filename}.pt'))
+        #         tqdm.write(f'\nEarly Stopping at epoch={epoch};'
+        #                    f'current best valid loss:{valid_loss}; '
+        #                    f'previous avg losses: {np.mean(valid_losses[-patience:-1]),}, previous losses std: {np.std(valid_losses[-patience:-1])}\n'
+        #                    f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
+        #                    f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
+        #         e = epoch
+        #         break
     # flatten metrics into lists for easier printing, i.e. make dict of list from list of dicts
     results_metrics = {'train': {k: [dic[k] for dic in train_metrics] for k in train_metrics[0]},
                        'valid': {k: [dic[k] for dic in valid_metrics] for k in valid_metrics[0]}}
@@ -253,8 +258,8 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
     if standardize and hasattr(model, 'standardizer'):
         model.fit_standardizer(x_train)
     # Don't get dataloader for X_
-    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=128)
-    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=128)
+    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=64)
+    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=64)
     # Making a deep copy to update the checkpoint filename to include outer-inner fold
     training_kwargs = copy.deepcopy(training_kwargs)
     training_kwargs['filename'] = f'{training_kwargs["filename"]}_o{fold_out}_i{fold_in}'
