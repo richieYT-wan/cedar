@@ -174,7 +174,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
             best_epoch = e
             best_loss = valid_loss
             best_auc = valid_metrics_['auc']
-            torch.save(model.state_dict(), filename)
+            torch.save(model.state_dict(), f'{filename}.pt')
 
         # TODO : Re-implement early stopping
         # # Stop training if early stopping, using AUC as metric
