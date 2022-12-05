@@ -11,7 +11,7 @@ N_CORES = multiprocessing.cpu_count() - 2
 
 def bootstrap_wrapper(y_score, y_true, seed):
     np.random.seed(seed)
-    sample_idx = np.random.randint(0, len(y_score)+1, len(y_score))
+    sample_idx = np.random.randint(0, len(y_score), len(y_score))
     sample_score = y_score[sample_idx]
     sample_true = y_true[sample_idx]
 
@@ -48,7 +48,7 @@ def bootstrap_downsample_wrapper(df, downsample_label, downsample_number, score_
     y_score = sample_df[score_col].values
     y_score = -1*y_score if 'rank' in score_col.lower() else y_score
     y_true = sample_df[target_col].values
-    sample_idx = np.random.randint(0, len(y_score)+1, len(y_score))
+    sample_idx = np.random.randint(0, len(y_score), len(y_score))
     sample_score = y_score[sample_idx]
     sample_true = y_true[sample_idx]
 
