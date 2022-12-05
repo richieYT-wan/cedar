@@ -20,7 +20,9 @@ from src.utils import mkdirs, convert_path
 from src.metrics import get_nested_feature_importance
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
-
+from src.nn_train_eval import nested_kcv_train_nn, evaluate_trained_models_nn
+from src.models import FFNetPipeline
+from torch import nn, optim
 
 N_CORES = 36
 
@@ -62,6 +64,8 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+    parser.add_argument('-mask_aa', type=str, default= None,
+                        help = 'Which amino acid to mask (ex: "C", "A", etc) None by default')
     return parser.parse_args()
 
 
@@ -74,6 +78,7 @@ def main():
     mkdirs(args['outdir'])
     mkdirs(f'{args["outdir"]}raw/')
     mkdirs(f'{args["outdir"]}bootstrapping/')
+    mkdirs(f'{args["outdir"]}checkpoints/')
     N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
             args['ncores'] is None) else args['ncores']
 
@@ -116,7 +121,8 @@ def main():
                        'add_rank': True,
                        'add_aaprop': False,
                        'remove_pep': False,
-                       'standardize': True}
+                       'standardize': True,
+                       'mask_aa': args['mask_aa']}
     results_related = {}
     mega_df = pd.DataFrame()
     print('Starting loops')
@@ -156,35 +162,42 @@ def main():
                                     continue
                                 else:
                                     ic_name = 'Inverted ' + ic_name
+                            # creasting filename
+                            filename = f'{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}'
                             # Make result dict
                             results_related[rank_col][pep_col][key][blsm_name][ic_name] = {}
-                            # Using the same model and hyperparameters
-                            model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
-                                                           max_depth=8, ccp_alpha=9.945e-6)
+
+                            # Using the same model and hyperparameters : NN stuff
+                            nh = 1
+                            nl = 1
+                            lr = 5e-5
+                            wd = 5e-3
+                            training_kwargs = dict(n_epochs=1000, early_stopping=True, patience=500, delta=1e-6,
+                                                   filename=f'{args["outdir"]}checkpoints/{filename}',
+                                                   verbosity=1)
+                            model = FFNetPipeline(n_in=21 + len(mut_cols), n_hidden=nh, n_layers=nl, dropout=0.25)
+                            optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
+                            criterion = nn.BCELoss()
+                            device = 'cpu'
                             # Training model and getting feature importances
                             print('Training')
-                            trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
-                                                                                    ics_dict=ics_dict,
-                                                                                    encoding_kwargs=encoding_kwargs,
-                                                                                    n_jobs=10)
-                            fi = get_nested_feature_importance(trained_models)
-                            fn = AA_KEYS + ['rank'] + mut_cols
-                            # Saving Feature importances as dataframe
-                            df_fi = pd.DataFrame(fi, index=fn).T
-                            df_fi.to_csv(
-                                f'{args["outdir"]}raw/featimps_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                                index=False)
+
+                            trained_models, train_metrics, test_metrics = nested_kcv_train_nn(train_dataset, model,
+                                                                                              optimizer, criterion,
+                                                                                              device,
+                                                                                              ics_dict, encoding_kwargs,
+                                                                                              training_kwargs, 10)
 
                             # EVAL AND BOOTSTRAPPING ON CEDAR
-                            _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_dataset,
-                                                                            trained_models,
-                                                                            ics_dict, train_dataset,
-                                                                            encoding_kwargs,
-                                                                            concatenated=True,
-                                                                            only_concat=True)
+                            _, cedar_preds_df = evaluate_trained_models_nn(cedar_dataset,
+                                                                           trained_models,
+                                                                           ics_dict, device, train_dataset,
+                                                                           encoding_kwargs,
+                                                                           concatenated=True,
+                                                                           only_concat=True, n_jobs=10)
                             #
                             cedar_preds_df.drop(columns=aa_cols).to_csv(
-                                f'{args["outdir"]}raw/cedar_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                f'{args["outdir"]}raw/cedar_preds_{filename}.csv',
                                 index=False)
                             # Bootstrapping (CEDAR)
                             cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, blsm_name, ic_name,
@@ -194,16 +207,16 @@ def main():
                             mega_df = mega_df.append(cedar_bootstrapped_df)
 
                             # EVAL AND BOOTSTRAPPING ON PRIME
-                            _, prime_preds_df = evaluate_trained_models_sklearn(prime_dataset,
-                                                                            trained_models,
-                                                                            ics_dict, train_dataset,
-                                                                            encoding_kwargs,
-                                                                            concatenated=False,
-                                                                            only_concat=False)
+                            _, prime_preds_df = evaluate_trained_models_nn(prime_dataset,
+                                                                           trained_models,
+                                                                           ics_dict, device, train_dataset,
+                                                                           encoding_kwargs,
+                                                                           concatenated=True,
+                                                                           only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             prime_preds_df.drop(columns=aa_cols).to_csv(
-                                f'{args["outdir"]}raw/prime_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                f'{args["outdir"]}raw/prime_preds_{filename}.csv',
                                 index=False)
                             # Bootstrapping (PRIME)
                             prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, blsm_name, ic_name,
@@ -213,16 +226,16 @@ def main():
                             mega_df = mega_df.append(prime_bootstrapped_df)
 
                             # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
-                            _, prime_switch_preds_df = evaluate_trained_models_sklearn(prime_switch_dataset,
-                                                                                   trained_models,
-                                                                                   ics_dict, train_dataset,
-                                                                                   encoding_kwargs,
-                                                                                   concatenated=False,
-                                                                                   only_concat=False)
+                            _, prime_switch_preds_df = evaluate_trained_models_nn(prime_switch_dataset,
+                                                                                  trained_models,
+                                                                                  ics_dict, device, train_dataset,
+                                                                                  encoding_kwargs,
+                                                                                  concatenated=True,
+                                                                                  only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             prime_switch_preds_df.drop(columns=aa_cols).to_csv(
-                                f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                f'{args["outdir"]}raw/prime_switch_preds_{filename}.csv',
                                 index=False)
                             # Bootstrapping (PRIME)
                             prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args,
@@ -234,16 +247,16 @@ def main():
 
                             # ///////////////////////////
                             # EVAL AND BOOTSTRAPPING ON IBEL
-                            _, ibel_preds_df = evaluate_trained_models_sklearn(ibel_dataset,
-                                                                           trained_models,
-                                                                           ics_dict, train_dataset,
-                                                                           encoding_kwargs,
-                                                                           concatenated=False,
-                                                                           only_concat=False)
+                            _, ibel_preds_df = evaluate_trained_models_nn(ibel_dataset,
+                                                                          trained_models,
+                                                                          ics_dict, device, train_dataset,
+                                                                          encoding_kwargs,
+                                                                          concatenated=True,
+                                                                          only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             ibel_preds_df.drop(columns=aa_cols).to_csv(
-                                f'{args["outdir"]}raw/ibel_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                f'{args["outdir"]}raw/ibel_preds_{filename}.csv',
                                 index=False)
                             # Bootstrapping (PRIME)
                             ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, blsm_name, ic_name,
@@ -255,16 +268,16 @@ def main():
                             # /////////////////////////// only if trainset == MERGED should I evaluate on it
                             if args['trainset'].lower() == 'merged':
                                 # EVAL AND BOOTSTRAPPING ON IBEL
-                                _, merged_preds_df = evaluate_trained_models_sklearn(merged_dataset,
-                                                                                 trained_models,
-                                                                                 ics_dict, train_dataset,
-                                                                                 encoding_kwargs,
-                                                                                 concatenated=False,
-                                                                                 only_concat=False)
+                                _, merged_preds_df = evaluate_trained_models_nn(merged_dataset,
+                                                                                trained_models,
+                                                                                ics_dict, device, train_dataset,
+                                                                                encoding_kwargs,
+                                                                                concatenated=True,
+                                                                                only_concat=True, n_jobs=10)
 
                                 # Pre-saving results before bootstrapping
                                 merged_preds_df.drop(columns=aa_cols).to_csv(
-                                    f'{args["outdir"]}raw/merged_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                    f'{args["outdir"]}raw/merged_preds_{filename}.csv',
                                     index=False)
                                 # Bootstrapping (PRIME)
                                 merged_bootstrapped_df = final_bootstrap_wrapper(merged_preds_df, args, blsm_name,

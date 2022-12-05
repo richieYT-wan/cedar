@@ -91,8 +91,7 @@ def parallel_wrapper(lr, nh, nl):
     low_valid_auc = mean_valid_auc - std_valid_auc
     high_valid_auc = mean_valid_auc + std_valid_auc
 
-
-    f,a = plt.subplots(1,1, figsize=(12,4))
+    f, a = plt.subplots(1, 2, figsize=(12, 4))
     f.suptitle(f'lr: {lr},   nh: {nh},   nl: {nl}')
     x = np.arange(1, len(mean_train_auc) + 1, 1)
     a[0].plot(x, mean_train_losses, label='mean_train_loss')

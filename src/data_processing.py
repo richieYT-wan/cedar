@@ -461,7 +461,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
 def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
                 seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
                 mut_col=None, adaptive=False, mask=False, invert=False, add_rank=False, add_aaprop=False,
-                remove_pep=False):
+                remove_pep=False, mask_aa=None):
     """
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
@@ -499,6 +499,10 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
             if len(mut_col) > 0:
                 mut_scores = df[mut_col].values
                 x = np.concatenate([x, mut_scores], axis=1)
+    if mask_aa:
+        assert mask_aa.upper() in AA_KEYS, f'Amino acid to mask is not in the AA alphabet!'\
+                                   '\nYou provided {mask_aa}, and the alphabet is {AA_KEYS}'
+        x[:, AA_KEYS.index(mask_aa.upper())] = 0
     return x, y
 
 
