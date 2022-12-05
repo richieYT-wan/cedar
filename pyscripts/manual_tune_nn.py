@@ -24,7 +24,7 @@ train_dataset = pd.read_csv('../data/mutant/221028_cedar_related_newcore_fold.cs
 eval_dataset = pd.read_csv('../data/mutant/221119_prime_related_10fold.csv')
 ics_dict = ics_kl
 
-DIR_ = f'../output/nn_manual_tune/'
+DIR_ = f'../output/nn_manual_tune_qsub/'
 mkdirs(DIR_)
 mkdirs(f'{DIR_}checkpoints/')
 training_kwargs = dict(n_epochs=1000, early_stopping=True, patience=500, delta=1e-6,
@@ -45,12 +45,12 @@ def parallel_wrapper(lr, nh, nl):
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=5e-3)
     training_kwargs['filename'] = f'{DIR_}checkpoints/lr{lr}_nh{nh}_nl{nl}_chkpt'
     models_dict, train_metrics, test_metrics = nested_kcv_train_nn(train_dataset, model, optimizer, criterion, device,
-                                                                   ics_dict, encoding_kwargs, training_kwargs, n_jobs)
+                                                                   ics_dict, encoding_kwargs, training_kwargs, 10)
 
     test_results, predictions_df = evaluate_trained_models_nn(eval_dataset, models_dict, ics_dict, device,
                                                               train_dataset,
                                                               encoding_kwargs, concatenated=True, only_concat=True,
-                                                              n_jobs=n_jobs)
+                                                              n_jobs=10)
     print(f'Eta:\t{lr},\tHidden:\t{nh},\tLayers:\t{nl}')
     print('\ntrain',
           np.mean([x[-1] for x in [v2['train']['auc'] for k1, v1 in train_metrics.items() for _, v2 in v1.items()]]))
@@ -66,10 +66,10 @@ def parallel_wrapper(lr, nh, nl):
                np.mean([x['auc'] for _, x in test_metrics.items()]),
                test_results['concatenated']['auc']]
 
-    train_auc = np.stack([train_metrics[k1][k2]['train']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]]),
-    valid_auc = np.stack([train_metrics[k1][k2]['valid']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]]),
+    train_auc = np.stack([train_metrics[k1][k2]['train']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]])
+    valid_auc = np.stack([train_metrics[k1][k2]['valid']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]])
     train_losses = np.stack(
-        [train_metrics[k1][k2]['train']['losses'] for k1 in train_metrics for k2 in train_metrics[k1]]),
+        [train_metrics[k1][k2]['train']['losses'] for k1 in train_metrics for k2 in train_metrics[k1]])
     valid_losses = np.stack(
         [train_metrics[k1][k2]['valid']['losses'] for k1 in train_metrics for k2 in train_metrics[k1]])
 
@@ -114,7 +114,7 @@ def parallel_wrapper(lr, nh, nl):
     a[1].legend(loc='lower right')
     a[1].set_title('AUCs')
     a[1].set_xlabel('Epoch')
-    f.savefig(f'{DIR_}lr{lr}_nh{nh}_nl{nl}_fig.pn', bbox_inches='tight')
+    f.savefig(f'{DIR_}lr{lr}_nh{nh}_nl{nl}_fig.png', bbox_inches='tight')
     return results
 
 

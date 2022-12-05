@@ -273,11 +273,13 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
 
     model, train_metrics = train_loop(model, train_loader, valid_loader, device, criterion, optimizer,
                                       **training_kwargs)
-    if train_metrics['break_epoch'] < 75:
-        print(f'\n\n{"#"*10}\n\n')
-        print(f'THIS FUCKED UP:\t{train_metrics["break_epoch"]}\tF_in={fold_in},\tF_out={fold_out},\tseed={seed}')
-        print(train_metrics['valid']['losses'])
-        print(train_metrics['valid']['auc'])
+
+    # TODO : Deprecate this
+    # if train_metrics['break_epoch'] < 75:
+    #     print(f'\n\n{"#"*10}\n\n')
+    #     print(f'THIS FUCKED UP:\t{train_metrics["break_epoch"]}\tF_in={fold_in},\tF_out={fold_out},\tseed={seed}')
+    #     print(train_metrics['valid']['losses'])
+    #     print(train_metrics['valid']['auc'])
 
     with torch.no_grad():
         y_pred_test = model(x_test.to(device))
