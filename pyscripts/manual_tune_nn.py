@@ -26,7 +26,7 @@ ics_dict = ics_kl
 
 DIR_ = f'../output/nn_manual_tune/'
 mkdirs(DIR_)
-
+mkdirs(f'{DIR_}checkpoints/')
 training_kwargs = dict(n_epochs=1000, early_stopping=True, patience=500, delta=1e-6,
                        filename=f'{DIR_}checkpoint_test',
                        verbosity=1)
@@ -43,7 +43,7 @@ n_jobs = 1
 def parallel_wrapper(lr, nh, nl):
     model = FFNetPipeline(n_in=23, n_hidden=nh, n_layers=nl, dropout=0.25)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=5e-3)
-    training_kwargs['filename'] = f'{DIR_}lr{lr}_nh{nh}_nl{nl}_chkpt'
+    training_kwargs['filename'] = f'{DIR_}checkpoints/lr{lr}_nh{nh}_nl{nl}_chkpt'
     models_dict, train_metrics, test_metrics = nested_kcv_train_nn(train_dataset, model, optimizer, criterion, device,
                                                                    ics_dict, encoding_kwargs, training_kwargs, n_jobs)
 
@@ -65,6 +65,57 @@ def parallel_wrapper(lr, nh, nl):
                    [x[-1] for x in [v2['valid']['auc'] for k1, v1 in train_metrics.items() for _, v2 in v1.items()]]),
                np.mean([x['auc'] for _, x in test_metrics.items()]),
                test_results['concatenated']['auc']]
+
+    train_auc = np.stack([train_metrics[k1][k2]['train']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]]),
+    valid_auc = np.stack([train_metrics[k1][k2]['valid']['auc'] for k1 in train_metrics for k2 in train_metrics[k1]]),
+    train_losses = np.stack(
+        [train_metrics[k1][k2]['train']['losses'] for k1 in train_metrics for k2 in train_metrics[k1]]),
+    valid_losses = np.stack(
+        [train_metrics[k1][k2]['valid']['losses'] for k1 in train_metrics for k2 in train_metrics[k1]])
+
+    mean_train_losses = np.mean(train_losses, axis=0)
+    mean_valid_losses = np.mean(valid_losses, axis=0)
+    std_train_losses = np.std(train_losses, axis=0)
+    std_valid_losses = np.std(valid_losses, axis=0)
+    low_train_losses = mean_train_losses - std_train_losses
+    high_train_losses = mean_train_losses + std_train_losses
+    low_valid_losses = mean_valid_losses - std_valid_losses
+    high_valid_losses = mean_valid_losses + std_valid_losses
+
+    mean_train_auc = np.mean(train_auc, axis=0)
+    mean_valid_auc = np.mean(valid_auc, axis=0)
+    std_train_auc = np.std(train_auc, axis=0)
+    std_valid_auc = np.std(valid_auc, axis=0)
+    low_train_auc = mean_train_auc - std_train_auc
+    high_train_auc = mean_train_auc + std_train_auc
+    low_valid_auc = mean_valid_auc - std_valid_auc
+    high_valid_auc = mean_valid_auc + std_valid_auc
+
+
+    f,a = plt.subplots(1,1, figsize=(12,4))
+    f.suptitle(f'lr: {lr},   nh: {nh},   nl: {nl}')
+    x = np.arange(1, len(mean_train_auc) + 1, 1)
+    a[0].plot(x, mean_train_losses, label='mean_train_loss')
+    a[0].fill_between(x, y1=low_train_losses,
+                      y2=high_train_losses, alpha=0.175)
+
+    a[0].plot(x, mean_valid_losses, label='mean_valid_loss')
+    a[0].fill_between(x, y1=low_valid_losses,
+                      y2=high_valid_losses, alpha=0.175)
+    a[0].legend()
+    a[0].set_title('Losses')
+    a[0].set_xlabel('Epoch')
+    a[1].plot(x, mean_train_auc, label='mean_train_auc')
+    a[1].fill_between(x, y1=low_train_auc,
+                      y2=high_train_auc, alpha=0.175)
+
+    a[1].plot(x, mean_valid_auc, label='mean_valid_auc')
+    a[1].fill_between(x, y1=low_valid_auc,
+                      y2=high_valid_auc, alpha=0.175)
+    a[1].legend(loc='lower right')
+    a[1].set_title('AUCs')
+    a[1].set_xlabel('Epoch')
+    f.savefig(f'{DIR_}lr{lr}_nh{nh}_nl{nl}_fig.pn', bbox_inches='tight')
     return results
 
 
