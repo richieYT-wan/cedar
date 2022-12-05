@@ -145,6 +145,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
     range_ = tqdm(range(1, n_epochs + 1), leave=False) if verbosity > 0 else range(1, n_epochs + 1)
     e = 0
     best_auc = 0
+    best_epoch = 0
     best_loss = 100
     for epoch in range_:
         train_loss, train_metrics_ = train_model_step(model, criterion, optimizer, train_loader)
@@ -169,7 +170,11 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
                   f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
         # TODO : For now, early stopping is disabled and just train to the end and re-load the best model
-
+        if valid_metrics_['auc']>best_auc:
+            best_epoch = e
+            best_loss = valid_loss
+            best_auc = valid_metrics_['auc']
+            torch.save(model.state_dict(), filename)
 
         # TODO : Re-implement early stopping
         # # Stop training if early stopping, using AUC as metric
@@ -183,6 +188,8 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
         #                    f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
         #         e = epoch
         #         break
+    print(f'Reloading best model at {best_epoch} epochs, with best AUC: {best_auc}, ""best"" valid loss = {best_loss}')
+    model.load_state_dict(torch.load(f'{filename}.pt'))
     # flatten metrics into lists for easier printing, i.e. make dict of list from list of dicts
     results_metrics = {'train': {k: [dic[k] for dic in train_metrics] for k in train_metrics[0]},
                        'valid': {k: [dic[k] for dic in valid_metrics] for k in valid_metrics[0]}}

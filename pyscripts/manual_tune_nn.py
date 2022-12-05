@@ -1,5 +1,4 @@
 import os, sys
-
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
@@ -32,13 +31,10 @@ encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, standa
                        mut_col=['mutation_score', 'ratio_rank'],
                        adaptive=False, mask=True, add_rank=True, add_aaprop=False, remove_pep=False)
 
-model = FFNetPipeline(n_in=22, n_hidden=25, n_layers=3, dropout=0.25)
 
-lr = 5e-5
-wd = 5e-3
-DIR_ = f'../output/nn_test/{lr}_{wd}_Stop/'
+
+DIR_ = f'../output/nn_manual_tune/'
 mkdirs(DIR_)
-optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=wd, amsgrad=True)
 
 criterion = nn.BCELoss()
 device = 'cpu'
@@ -79,4 +75,4 @@ conditions = list(list(flatten_product(x)) for x in conditions)
 
 output = Parallel(n_jobs=4)(delayed(parallel_wrapper)(lr=lr, nh=nh, nl=nl) for lr, nh, nl in conditions)
 results = pd.DataFrame(output, columns = ['lr', 'n_hidden', 'n_layers', 'train_auc', 'valid_auc', 'test_auc', 'external_prime_auc'])
-results.to_csv('./manual_tune_results.csv', index=False)
+results.to_csv(f'{DIR_}manual_tune_results.csv', index=False)
