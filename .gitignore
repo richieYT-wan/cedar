@@ -187,6 +187,7 @@ output/221102_new_core_mutscores/
 output/221028_new_core_mutscores/
 output/221112_new_core_mutscores_mergedtrainset/
 
+
 notebook/tmp.pkl
 output/bootstrapping/
 output/traineval/run_220905_11h48m21s_log_redo/train_metrics_log.pkl
@@ -207,6 +208,7 @@ output/nn_test/
 output/*221122*/
 output/reshaped/
 output/bootstrapping/trainset_models.pkl
+output/nn_manual_tune_qsub/checkpoints/
 .DS_Store
 notebook/cedar_results_related.csv
 notebook/full_results_df.csv

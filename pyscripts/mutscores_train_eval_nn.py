@@ -11,20 +11,23 @@ import os, sys
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
+from itertools import product
 
 # Custom fct imports
 from src.utils import pkl_load, pkl_dump
 import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, AA_KEYS
-from src.utils import mkdirs, convert_path
-from src.metrics import get_nested_feature_importance
+from src.utils import mkdirs, convert_path, flatten_product
+from src.metrics import plot_nn_train_metrics
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
 from src.nn_train_eval import nested_kcv_train_nn, evaluate_trained_models_nn
 from src.models import FFNetPipeline
 from torch import nn, optim
+from datetime import datetime as dt
 
 N_CORES = 36
+today = dt.today().strftime('%Y%m%d')
 
 
 def final_bootstrap_wrapper(preds_df, args, blsm_name,
@@ -58,14 +61,14 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/mutant/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/221028_new_core_mutscores/')
+    parser.add_argument('-outdir', type=str, default=f'../output/{today}_mutscores_nn/')
     parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
-    parser.add_argument('-mask_aa', type=str, default= None,
-                        help = 'Which amino acid to mask (ex: "C", "A", etc) None by default')
+    parser.add_argument('-mask_aa', type=str, default=None,
+                        help='Which amino acid to mask (ex: "C", "A", etc) None by default')
     return parser.parse_args()
 
 
@@ -79,6 +82,7 @@ def main():
     mkdirs(f'{args["outdir"]}raw/')
     mkdirs(f'{args["outdir"]}bootstrapping/')
     mkdirs(f'{args["outdir"]}checkpoints/')
+    mkdirs(f'{args["outdir"]}figs/')
     N_CORES = int(multiprocessing.cpu_count() * 3 / 4) + int(multiprocessing.cpu_count() * 0.05) if (
             args['ncores'] is None) else args['ncores']
 
@@ -125,6 +129,7 @@ def main():
                        'mask_aa': args['mask_aa']}
     results_related = {}
     mega_df = pd.DataFrame()
+
     print('Starting loops')
     for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
         results_related[rank_col] = {}
@@ -162,17 +167,17 @@ def main():
                                     continue
                                 else:
                                     ic_name = 'Inverted ' + ic_name
-                            # creasting filename
+                            # creating filename
                             filename = f'{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}'
                             # Make result dict
                             results_related[rank_col][pep_col][key][blsm_name][ic_name] = {}
 
                             # Using the same model and hyperparameters : NN stuff
-                            nh = 1
-                            nl = 1
-                            lr = 5e-5
+                            nh = 10
+                            nl = 3
+                            lr = 1e-4
                             wd = 5e-3
-                            training_kwargs = dict(n_epochs=1000, early_stopping=True, patience=500, delta=1e-6,
+                            training_kwargs = dict(n_epochs=500, early_stopping=False, patience=500, delta=1e-6,
                                                    filename=f'{args["outdir"]}checkpoints/{filename}',
                                                    verbosity=1)
                             model = FFNetPipeline(n_in=21 + len(mut_cols), n_hidden=nh, n_layers=nl, dropout=0.25)
@@ -186,15 +191,15 @@ def main():
                                                                                               optimizer, criterion,
                                                                                               device,
                                                                                               ics_dict, encoding_kwargs,
-                                                                                              training_kwargs, 10)
-
+                                                                                              training_kwargs, 20)
+                            plot_nn_train_metrics(train_metrics, title=filename, filename=f'{args["outdir"]}/figs/{filename}.png')
                             # EVAL AND BOOTSTRAPPING ON CEDAR
                             _, cedar_preds_df = evaluate_trained_models_nn(cedar_dataset,
                                                                            trained_models,
                                                                            ics_dict, device, train_dataset,
                                                                            encoding_kwargs,
                                                                            concatenated=True,
-                                                                           only_concat=True, n_jobs=10)
+                                                                           only_concat=True, n_jobs=20)
                             #
                             cedar_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/cedar_preds_{filename}.csv',
@@ -212,7 +217,7 @@ def main():
                                                                            ics_dict, device, train_dataset,
                                                                            encoding_kwargs,
                                                                            concatenated=True,
-                                                                           only_concat=True, n_jobs=10)
+                                                                           only_concat=True, n_jobs=20)
 
                             # Pre-saving results before bootstrapping
                             prime_preds_df.drop(columns=aa_cols).to_csv(
@@ -231,7 +236,7 @@ def main():
                                                                                   ics_dict, device, train_dataset,
                                                                                   encoding_kwargs,
                                                                                   concatenated=True,
-                                                                                  only_concat=True, n_jobs=10)
+                                                                                  only_concat=True, n_jobs=20)
 
                             # Pre-saving results before bootstrapping
                             prime_switch_preds_df.drop(columns=aa_cols).to_csv(
@@ -252,7 +257,7 @@ def main():
                                                                           ics_dict, device, train_dataset,
                                                                           encoding_kwargs,
                                                                           concatenated=True,
-                                                                          only_concat=True, n_jobs=10)
+                                                                          only_concat=True, n_jobs=20)
 
                             # Pre-saving results before bootstrapping
                             ibel_preds_df.drop(columns=aa_cols).to_csv(
@@ -273,7 +278,7 @@ def main():
                                                                                 ics_dict, device, train_dataset,
                                                                                 encoding_kwargs,
                                                                                 concatenated=True,
-                                                                                only_concat=True, n_jobs=10)
+                                                                                only_concat=True, n_jobs=20)
 
                                 # Pre-saving results before bootstrapping
                                 merged_preds_df.drop(columns=aa_cols).to_csv(

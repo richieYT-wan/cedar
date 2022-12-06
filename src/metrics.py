@@ -356,3 +356,62 @@ def get_roc(df, score='pred_score', target='agg_label', binder=None, anchor_muta
               "auc01": auc01,
               "npep": len(df)}
     return output
+
+
+def plot_nn_train_metrics(train_metrics, title, filename):
+    train_auc = np.stack(
+        [train_metrics[k1][k2]['train']['auc'] for k1 in train_metrics for k2 in
+         train_metrics[k1]])
+    valid_auc = np.stack(
+        [train_metrics[k1][k2]['valid']['auc'] for k1 in train_metrics for k2 in
+         train_metrics[k1]])
+    train_losses = np.stack(
+        [train_metrics[k1][k2]['train']['losses'] for k1 in train_metrics for k2 in
+         train_metrics[k1]])
+    valid_losses = np.stack(
+        [train_metrics[k1][k2]['valid']['losses'] for k1 in train_metrics for k2 in
+         train_metrics[k1]])
+
+    mean_train_losses = np.mean(train_losses, axis=0)
+    mean_valid_losses = np.mean(valid_losses, axis=0)
+    std_train_losses = np.std(train_losses, axis=0)
+    std_valid_losses = np.std(valid_losses, axis=0)
+    low_train_losses = mean_train_losses - std_train_losses
+    high_train_losses = mean_train_losses + std_train_losses
+    low_valid_losses = mean_valid_losses - std_valid_losses
+    high_valid_losses = mean_valid_losses + std_valid_losses
+
+    mean_train_auc = np.mean(train_auc, axis=0)
+    mean_valid_auc = np.mean(valid_auc, axis=0)
+    std_train_auc = np.std(train_auc, axis=0)
+    std_valid_auc = np.std(valid_auc, axis=0)
+    low_train_auc = mean_train_auc - std_train_auc
+    high_train_auc = mean_train_auc + std_train_auc
+    low_valid_auc = mean_valid_auc - std_valid_auc
+    high_valid_auc = mean_valid_auc + std_valid_auc
+
+    f, a = plt.subplots(1, 2, figsize=(12, 4))
+    f.suptitle(f'{title}')
+    x = np.arange(1, len(mean_train_auc) + 1, 1)
+    a[0].plot(x, mean_train_losses, label='mean_train_loss')
+    a[0].fill_between(x, y1=low_train_losses,
+                      y2=high_train_losses, alpha=0.175)
+
+    a[0].plot(x, mean_valid_losses, label='mean_valid_loss')
+    a[0].fill_between(x, y1=low_valid_losses,
+                      y2=high_valid_losses, alpha=0.175)
+    a[0].legend()
+    a[0].set_title('Losses')
+    a[0].set_xlabel('Epoch')
+    a[1].plot(x, mean_train_auc, label='mean_train_auc')
+    a[1].fill_between(x, y1=low_train_auc,
+                      y2=high_train_auc, alpha=0.175)
+
+    a[1].plot(x, mean_valid_auc, label='mean_valid_auc')
+    a[1].fill_between(x, y1=low_valid_auc,
+                      y2=high_valid_auc, alpha=0.175)
+    a[1].legend(loc='lower right')
+    a[1].set_title('AUCs')
+    a[1].set_xlabel('Epoch')
+    if filename is not None:
+        f.savefig(filename, bbox_inches='tight')
