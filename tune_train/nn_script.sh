@@ -4,7 +4,7 @@ for mask in 'false' 'C'
 do
 	for trainset in 'cedar' 'prime' 'merged'
 	do
-		filename="/home/projects/vaccine/people/yatwan/cedar/tune_train/mutscores_nn_train${trainset}mask${mask}"
+		filename="/home/projects/vaccine/people/yatwan/cedar/tune_train/mutscores_nn_train_${trainset}_mask_${mask}"
 		touch ${filename}
 		echo "#! /usr/bin/bash" > ${filename}
 		echo "source /home/projects/vaccine/people/yatwan/anaconda3/etc/profile.d/conda.sh" >> ${filename}                                            
