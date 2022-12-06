@@ -171,7 +171,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
         # TODO : For now, early stopping is disabled and just train to the end and re-load the best model
         if valid_metrics_['auc']>best_auc:
-            best_epoch = e
+            best_epoch = epoch
             best_loss = valid_loss
             best_auc = valid_metrics_['auc']
             torch.save(model.state_dict(), f'{filename}.pt')

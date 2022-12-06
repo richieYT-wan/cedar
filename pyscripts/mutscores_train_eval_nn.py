@@ -126,6 +126,7 @@ def main():
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True,
+                       'target_col':'agg_label',
                        'hla_col' : 'HLA',
                        'mask_aa': args['mask_aa']}
     results_related = {}
