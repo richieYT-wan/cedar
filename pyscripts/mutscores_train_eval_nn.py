@@ -126,6 +126,7 @@ def main():
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True,
+                       'hla_col' : 'HLA',
                        'mask_aa': args['mask_aa']}
     results_related = {}
     mega_df = pd.DataFrame()
