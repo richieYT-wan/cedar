@@ -64,6 +64,8 @@ class Standardizer(nn.Module):
         assert self.training, 'Can not fit while in eval mode. Please set model to training mode'
         self.mu = x_train.mean(axis=0)
         self.sigma = x_train.std(axis=0)
+        # Fix issues with sigma=0 that would cause a division by 0 and return NaNs
+        self.sigma[torch.where(self.sigma==0)] = 1e-12
         self.fitted = True
 
     def forward(self, x):
