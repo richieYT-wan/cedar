@@ -18,5 +18,6 @@ do
 		echo "cd \${PYDIR}" >> ${filename}
 		echo "pwd" >> ${filename}
 		echo "python3 ./mutscores_train_eval_nn.py -datadir \${DATADIR} -outdir \${OUTDIR} -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 38 -mask_aa ${mask}"  >> ${filename}
+		qsub -W group_list=vaccine -A vaccine -l nodes=1:ppn=40:thinnode,mem=180gb,walltime=12:00:00:00 ${filename}
 	done
 done
