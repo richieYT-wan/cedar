@@ -500,8 +500,10 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
                 mut_scores = df[mut_col].values
                 x = np.concatenate([x, mut_scores], axis=1)
     if mask_aa:
-        assert mask_aa.upper() in AA_KEYS, f'Amino acid to mask is not in the AA alphabet!'\
-                                   '\nYou provided {mask_aa}, and the alphabet is {AA_KEYS}'
+        if mask_aa.lower() == 'false':
+            return x, y
+        assert mask_aa.upper() in AA_KEYS, f'Amino acid to mask is not in the AA alphabet!' \
+                                           '\nYou provided {mask_aa}, and the alphabet is {AA_KEYS}'
         x[:, AA_KEYS.index(mask_aa.upper())] = 0
     return x, y
 
