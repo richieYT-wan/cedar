@@ -45,12 +45,12 @@ def parallel_wrapper(lr, nh, nl):
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=5e-3)
     training_kwargs['filename'] = f'{DIR_}checkpoints/lr{lr}_nh{nh}_nl{nl}_chkpt'
     models_dict, train_metrics, test_metrics = nested_kcv_train_nn(train_dataset, model, optimizer, criterion, device,
-                                                                   ics_dict, encoding_kwargs, training_kwargs, 10)
+                                                                   ics_dict, encoding_kwargs, training_kwargs, 6)
 
     test_results, predictions_df = evaluate_trained_models_nn(eval_dataset, models_dict, ics_dict, device,
                                                               train_dataset,
                                                               encoding_kwargs, concatenated=True, only_concat=True,
-                                                              n_jobs=10)
+                                                              n_jobs=6)
     print(f'Eta:\t{lr},\tHidden:\t{nh},\tLayers:\t{nl}')
     print('\ntrain',
           np.mean([x[-1] for x in [v2['train']['auc'] for k1, v1 in train_metrics.items() for _, v2 in v1.items()]]))
@@ -118,13 +118,13 @@ def parallel_wrapper(lr, nh, nl):
     return results
 
 
-lrs = [1e-5, 5e-5, 1e-4]
-nhs = [10, 20, 30, 40]
-nls = [1, 2, 3, 4]
+lrs = [5e-5, 1e-4]
+nhs = [10, 25, 40]
+nls = [1, 2, 3]
 conditions = product(lrs, product(nhs, product(nls)))
 conditions = list(list(flatten_product(x)) for x in conditions)
 
-output = Parallel(n_jobs=4)(delayed(parallel_wrapper)(lr=lr, nh=nh, nl=nl) for lr, nh, nl in conditions)
+output = Parallel(n_jobs=6)(delayed(parallel_wrapper)(lr=lr, nh=nh, nl=nl) for lr, nh, nl in conditions)
 results = pd.DataFrame(output, columns=['lr', 'n_hidden', 'n_layers', 'train_auc', 'valid_auc', 'test_auc',
                                         'external_prime_auc'])
 results.to_csv(f'{DIR_}manual_tune_results.csv', index=False)
