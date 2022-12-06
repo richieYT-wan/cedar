@@ -17,6 +17,6 @@ do
 		echo "TRAINSET="${trainset}"" >> ${filename}
 		echo "cd \${PYDIR}" >> ${filename}
 		echo "pwd" >> ${filename}
-		echo "python3 ./mutscores_train_eval.py -datadir \${DATADIR} -outdir \${OUTDIR} -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 39  > 'tmp.txt'" >> ${filename}
+		echo "python3 ./mutscores_train_eval_nn.py -datadir \${DATADIR} -outdir \${OUTDIR} -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 38 -mask_aa ${mask} >> ${filename}
 	done
 done
