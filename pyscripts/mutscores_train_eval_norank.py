@@ -251,7 +251,7 @@ def main():
                     mega_df = mega_df.append(ibel_bootstrapped_df)
 
                     # /////////////////////////// only if trainset == MERGED should I evaluate on it
-                    if args['trainset'].lower() == 'merged':
+                    if train_nm.lower() == 'merged':
                         # EVAL AND BOOTSTRAPPING ON IBEL
                         _, merged_preds_df = evaluate_trained_models_sklearn(merged_dataset,
                                                                              trained_models,
