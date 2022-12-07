@@ -24,7 +24,7 @@ train_dataset = pd.read_csv('../data/mutant/221028_cedar_related_newcore_fold.cs
 eval_dataset = pd.read_csv('../data/mutant/221119_prime_related_10fold.csv')
 ics_dict = ics_kl
 
-DIR_ = f'../output/nn_manual_tune_qsub/'
+DIR_ = f'../output/nn_manual_tune_qsub_batchsize32/'
 mkdirs(DIR_)
 mkdirs(f'{DIR_}checkpoints/')
 training_kwargs = dict(n_epochs=500, early_stopping=True, patience=500, delta=1e-6,
