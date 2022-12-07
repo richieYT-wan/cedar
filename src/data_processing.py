@@ -104,7 +104,7 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
                            'standardize': False}
     essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
     keys_check = [x in encoding_kwargs.keys() for x in essential_keys]
-    keys_check_dict = {k:v for (k,v) in zip(keys_check) if v ==False}
+    keys_check_dict = {k:v for (k,v) in zip(essential_keys,keys_check) if v ==False}
     assert all(keys_check), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
                                   f"{list(keys_check_dict.keys())} are missing!"
 
