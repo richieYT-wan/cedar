@@ -69,7 +69,7 @@ def args_parser():
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-mask_aa', type=str, default=None,
                         help='Which amino acid to mask (ex: "C", "A", etc) None by default')
-    parser.add_argument('add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
+    parser.add_argument('-add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
     return parser.parse_args()
 
 
