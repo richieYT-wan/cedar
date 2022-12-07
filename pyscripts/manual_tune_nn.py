@@ -27,7 +27,7 @@ ics_dict = ics_kl
 DIR_ = f'../output/nn_manual_tune_qsub/'
 mkdirs(DIR_)
 mkdirs(f'{DIR_}checkpoints/')
-training_kwargs = dict(n_epochs=1000, early_stopping=True, patience=500, delta=1e-6,
+training_kwargs = dict(n_epochs=500, early_stopping=True, patience=500, delta=1e-6,
                        filename=f'{DIR_}checkpoint_test',
                        verbosity=1)
 encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, standardize=True, seq_col='Peptide',
