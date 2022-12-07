@@ -27,7 +27,7 @@ today = dt.today().strftime("%Y%m%d")
 N_CORES = 36
 
 
-def final_bootstrap_wrapper(preds_df, args, filename, blsm_name,
+def final_bootstrap_wrapper(preds_df, args, filename, train_nm, blsm_name,
                             ic_name, pep_col, rank_col, key, evalset,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
@@ -37,6 +37,7 @@ def final_bootstrap_wrapper(preds_df, args, filename, blsm_name,
                                                 y_true=targets,
                                                 n_rounds=n_rounds, n_jobs=n_jobs)
     bootstrapped_df['encoding'] = blsm_name
+    bootstrapped_df['trainset'] = train_nm
     bootstrapped_df['weight'] = ic_name
     bootstrapped_df['pep_col'] = pep_col
     bootstrapped_df['rank_col'] = rank_col
@@ -133,7 +134,7 @@ def main():
         # For each
         for condition in cdts:
             key = condition[-1]
-            mut_cols = key if key != 'aa_props' else aa_cols
+            mut_cols = key.split('-') if key != 'aa_props' else aa_cols
             encoding_kwargs['mut_col'] = mut_cols
             results[train_nm][key] = {}
             for invert in [True, False]:
@@ -185,7 +186,7 @@ def main():
                         f'{args["outdir"]}raw/cedar_preds_{filename}.csv',
                         index=False)
                     # Bootstrapping (CEDAR)
-                    cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, blsm_name, ic_name,
+                    cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, train_nm, blsm_name, ic_name,
                                                                     pep_col, rank_col, key,
                                                                     evalset='CEDAR', n_rounds=10000,
                                                                     n_jobs=N_CORES)
@@ -204,7 +205,7 @@ def main():
                         f'{args["outdir"]}raw/prime_preds_{filename}.csv',
                         index=False)
                     # Bootstrapping (PRIME)
-                    prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, filename, blsm_name, ic_name,
+                    prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, filename, train_nm, blsm_name, ic_name,
                                                                     pep_col, rank_col, key,
                                                                     evalset='PRIME', n_rounds=10000,
                                                                     n_jobs=N_CORES)
@@ -223,7 +224,7 @@ def main():
                         f'{args["outdir"]}raw/prime_switch_preds_{filename}.csv',
                         index=False)
                     # Bootstrapping (PRIME)
-                    prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args, filename,
+                    prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args, filename,train_nm,
                                                                            blsm_name, ic_name,
                                                                            pep_col, rank_col, key,
                                                                            evalset='PRIME_AC', n_rounds=10000,
@@ -244,7 +245,7 @@ def main():
                         f'{args["outdir"]}raw/ibel_preds_{filename}.csv',
                         index=False)
                     # Bootstrapping (PRIME)
-                    ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, filename, blsm_name, ic_name,
+                    ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, filename, train_nm, blsm_name, ic_name,
                                                                    pep_col, rank_col, key,
                                                                    evalset='IBEL', n_rounds=10000,
                                                                    n_jobs=N_CORES)
@@ -265,7 +266,7 @@ def main():
                             f'{args["outdir"]}raw/merged_preds_{filename}.csv',
                             index=False)
                         # Bootstrapping (PRIME)
-                        merged_bootstrapped_df = final_bootstrap_wrapper(merged_preds_df, args, filename, blsm_name,
+                        merged_bootstrapped_df = final_bootstrap_wrapper(merged_preds_df, args, filename, train_nm, blsm_name,
                                                                          ic_name, pep_col, rank_col, key,
                                                                          evalset='MERGED', n_rounds=10000,
                                                                          n_jobs=N_CORES)
