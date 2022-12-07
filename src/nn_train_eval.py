@@ -170,7 +170,7 @@ def train_loop(model, train_loader, valid_loader, device, criterion, optimizer, 
                   f'\tTrain AUC, Accuracy:\t{train_metrics_["auc"], train_metrics_["accuracy"]}\n' \
                   f'\tEval AUC, Accuracy:\t{valid_metrics_["auc"], valid_metrics_["accuracy"]}')
         # TODO : For now, early stopping is disabled and just train to the end and re-load the best model
-        if valid_metrics_['auc']>best_auc:
+        if valid_metrics_['auc'] > best_auc:
             best_epoch = epoch
             best_loss = valid_loss
             best_auc = valid_metrics_['auc']
@@ -316,6 +316,7 @@ def nested_kcv_train_nn(dataframe, model, optimizer, criterion, device, ics_dict
         train_metrics
         test_metrics
     """
+    encoding_kwargs['standardize'] = True
     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
     models_dict = {}
     test_metrics = {}
@@ -411,7 +412,7 @@ def evaluate_trained_models_nn(test_dataframe, models_dict, ics_dict, device,
     eval_wrapper_ = partial(parallel_nn_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
                             device=device, train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
     n_jobs = 1 if device != 'cpu' else len(models_dict.keys()) if (
-                n_jobs is None and len(models_dict.keys()) <= multiprocessing.cpu_count()) else n_jobs
+            n_jobs is None and len(models_dict.keys()) <= multiprocessing.cpu_count()) else n_jobs
     output = Parallel(n_jobs=n_jobs)(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
                                      for (fold_out, models_list) in tqdm(models_dict.items(),
                                                                          desc='Eval Folds',

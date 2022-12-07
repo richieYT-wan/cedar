@@ -17,7 +17,7 @@ from itertools import product
 from src.utils import pkl_load, pkl_dump
 import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, AA_KEYS
-from src.utils import mkdirs, convert_path, flatten_product
+from src.utils import mkdirs, convert_path, flatten_product, str2bool
 from src.metrics import plot_nn_train_metrics
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
@@ -69,6 +69,7 @@ def args_parser():
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-mask_aa', type=str, default=None,
                         help='Which amino acid to mask (ex: "C", "A", etc) None by default')
+    parser.add_argument('add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
     return parser.parse_args()
 
 
@@ -122,7 +123,7 @@ def main():
                        'encoding': 'onehot',
                        'blosum_matrix': None,
                        'mask': False,  # Using Shannon ICs, true if both mask and name is "shannon"
-                       'add_rank': True,
+                       'add_rank': args['add_rank'],
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True,
@@ -182,7 +183,8 @@ def main():
                             training_kwargs = dict(n_epochs=500, early_stopping=False, patience=500, delta=1e-6,
                                                    filename=f'{args["outdir"]}checkpoints/{filename}',
                                                    verbosity=1)
-                            model = FFNetPipeline(n_in=21 + len(mut_cols), n_hidden=nh, n_layers=nl, dropout=0.25)
+                            n_in = 21 if args['add_rank'] else 20
+                            model = FFNetPipeline(n_in=n_in + len(mut_cols), n_hidden=nh, n_layers=nl, dropout=0.25)
                             optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
                             criterion = nn.BCELoss()
                             device = 'cpu'

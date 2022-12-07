@@ -144,7 +144,9 @@ def get_mean_roc_curve(roc_curves, extra_key=None):
     Returns:
         base_fpr
         mean_curve
-        std_curve
+        low_std_curve
+        high_std_curve
+        auc
     """
 
     # Base fpr to interpolate

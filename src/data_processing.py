@@ -103,9 +103,10 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
                            'blosum_matrix': None,
                            'standardize': False}
     essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
-    assert all([x in encoding_kwargs.keys() for x in
-                essential_keys]), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
-                                  f"{'max_len', 'encoding', 'blosum_matrix', 'standardize'} are required."
+    keys_check = [x in encoding_kwargs.keys() for x in essential_keys]
+    keys_check_dict = {k:v for (k,v) in zip(keys_check) if v ==False}
+    assert all(keys_check), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                                  f"{list(keys_check_dict.keys())} are missing!"
 
     if mode_eval:
         if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):

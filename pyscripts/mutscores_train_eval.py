@@ -16,7 +16,7 @@ if module_path not in sys.path:
 from src.utils import pkl_load, pkl_dump
 import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, AA_KEYS
-from src.utils import mkdirs, convert_path
+from src.utils import mkdirs, convert_path, str2bool
 from src.metrics import get_nested_feature_importance
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
@@ -62,6 +62,10 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+    parser.add_argument('mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
+                                                                   'within the standard amino acid alphabet. To '
+                                                                   'disable, input "false". "false" by default.')
+    parser.add_argument('add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
     return parser.parse_args()
 
 
@@ -113,7 +117,7 @@ def main():
                        'encoding': 'onehot',
                        'blosum_matrix': None,
                        'mask': False,  # Using Shannon ICs, true if both mask and name is "shannon"
-                       'add_rank': True,
+                       'add_rank': args['add_rank'],
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True}

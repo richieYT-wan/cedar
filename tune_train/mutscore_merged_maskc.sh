@@ -11,5 +11,5 @@ ICSDIR=../data/ic_dicts/
 TRAINSET="merged"
 cd ${PYDIR}
 pwd
-python3 ./mutscores_train_eval_maskcysteine.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39  > 'tmp.txt'
+python3 ./mutscores_train_eval.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39  -mask_aa 'C'
 
