@@ -159,7 +159,7 @@ def main():
                     trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                                 ics_dict=ics_dict,
                                                                                 encoding_kwargs=encoding_kwargs,
-                                                                                n_jobs=30)
+                                                                                n_jobs=15)
                     fi = get_nested_feature_importance(trained_models)
                     fn = AA_KEYS + mut_cols
                     # Saving Feature importances as dataframe
@@ -218,7 +218,7 @@ def main():
                         f'{args["outdir"]}raw/prime_switch_preds_{filename}.csv',
                         index=False)
                     # Bootstrapping (PRIME)
-                    prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, filename, args,
+                    prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args, filename,
                                                                            blsm_name, ic_name,
                                                                            pep_col, rank_col, key,
                                                                            evalset='PRIME_AC', n_rounds=10000,
