@@ -265,8 +265,8 @@ def parallel_nn_train_wrapper(train_dataframe, x_test, ics_dict, device,
     if standardize and hasattr(model, 'standardizer'):
         model.fit_standardizer(x_train)
     # Don't get dataloader for X_
-    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=32ß)
-    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=32ß)
+    train_loader = DataLoader(TensorDataset(x_train, y_train), batch_size=32)
+    valid_loader = DataLoader(TensorDataset(x_valid, y_valid), batch_size=32)
     # Making a deep copy to update the checkpoint filename to include outer-inner fold
     training_kwargs = copy.deepcopy(training_kwargs)
     training_kwargs['filename'] = f'{training_kwargs["filename"]}_o{fold_out}_i{fold_in}'
