@@ -163,7 +163,10 @@ def main():
                     fi = get_nested_feature_importance(trained_models)
                     print(AA_KEYS)
                     print(mut_cols)
-                    fn = AA_KEYS + mut_cols
+                    try :
+                        fn = AA_KEYS + mut_cols
+                    except :
+                        raise ValueError(f'{mut_cols}, {type(mut_cols)}')
                     # Saving Feature importances as dataframe
                     df_fi = pd.DataFrame(fi, index=fn).T
                     df_fi.to_csv(
