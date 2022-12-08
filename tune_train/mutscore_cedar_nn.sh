@@ -11,5 +11,5 @@ ICSDIR=../data/ic_dicts/
 TRAINSET="cedar"
 cd ${PYDIR}
 pwd
-python3 ./mutscores_train_eval_nn.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39  > 'tmp.txt'
+python3 ./mutscores_train_eval_nn.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39  > ''
 

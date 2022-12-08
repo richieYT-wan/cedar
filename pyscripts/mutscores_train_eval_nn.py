@@ -123,7 +123,7 @@ def main():
                        'encoding': 'onehot',
                        'blosum_matrix': None,
                        'mask': False,  # Using Shannon ICs, true if both mask and name is "shannon"
-                       'add_rank': args['add_rank'],
+                       'add_rank': True,
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True,
@@ -134,9 +134,10 @@ def main():
     mega_df = pd.DataFrame()
 
     print('Starting loops')
-    for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
+    for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut', None]:
         results_related[rank_col] = {}
         encoding_kwargs['rank_col'] = rank_col
+        encoding_kwargs['add_rank'] = False if rank_col is None else True
         for pep_col in ['Peptide', 'icore_mut']:
             results_related[rank_col][pep_col] = {}
             encoding_kwargs['seq_col'] = pep_col
@@ -179,11 +180,11 @@ def main():
                             nh = 10
                             nl = 3
                             lr = 1e-4
-                            wd = 5e-3
-                            training_kwargs = dict(n_epochs=500, early_stopping=False, patience=500, delta=1e-6,
+                            wd = 6.5e-3
+                            training_kwargs = dict(n_epochs=400, early_stopping=False, patience=400, delta=1e-6,
                                                    filename=f'{args["outdir"]}checkpoints/{filename}',
                                                    verbosity=1)
-                            n_in = 21 if args['add_rank'] else 20
+                            n_in = 21 if encoding_kwargs['add_rank'] else 20
                             model = FFNetPipeline(n_in=n_in + len(mut_cols), n_hidden=nh, n_layers=nl, dropout=0.25)
                             optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
                             criterion = nn.BCELoss()
@@ -195,7 +196,7 @@ def main():
                                                                                               optimizer, criterion,
                                                                                               device,
                                                                                               ics_dict, encoding_kwargs,
-                                                                                              training_kwargs, 20)
+                                                                                              training_kwargs, 10)
                             plot_nn_train_metrics(train_metrics, title=filename, filename=f'{args["outdir"]}/figs/{filename}.png')
                             # EVAL AND BOOTSTRAPPING ON CEDAR
                             _, cedar_preds_df = evaluate_trained_models_nn(cedar_dataset,
@@ -203,7 +204,7 @@ def main():
                                                                            ics_dict, device, train_dataset,
                                                                            encoding_kwargs,
                                                                            concatenated=True,
-                                                                           only_concat=True, n_jobs=20)
+                                                                           only_concat=True, n_jobs=10)
                             #
                             cedar_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/cedar_preds_{filename}.csv',
@@ -221,7 +222,7 @@ def main():
                                                                            ics_dict, device, train_dataset,
                                                                            encoding_kwargs,
                                                                            concatenated=True,
-                                                                           only_concat=True, n_jobs=20)
+                                                                           only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             prime_preds_df.drop(columns=aa_cols).to_csv(
@@ -240,7 +241,7 @@ def main():
                                                                                   ics_dict, device, train_dataset,
                                                                                   encoding_kwargs,
                                                                                   concatenated=True,
-                                                                                  only_concat=True, n_jobs=20)
+                                                                                  only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             prime_switch_preds_df.drop(columns=aa_cols).to_csv(
@@ -261,7 +262,7 @@ def main():
                                                                           ics_dict, device, train_dataset,
                                                                           encoding_kwargs,
                                                                           concatenated=True,
-                                                                          only_concat=True, n_jobs=20)
+                                                                          only_concat=True, n_jobs=10)
 
                             # Pre-saving results before bootstrapping
                             ibel_preds_df.drop(columns=aa_cols).to_csv(
@@ -282,7 +283,7 @@ def main():
                                                                                 ics_dict, device, train_dataset,
                                                                                 encoding_kwargs,
                                                                                 concatenated=True,
-                                                                                only_concat=True, n_jobs=20)
+                                                                                only_concat=True, n_jobs=10)
 
                                 # Pre-saving results before bootstrapping
                                 merged_preds_df.drop(columns=aa_cols).to_csv(
