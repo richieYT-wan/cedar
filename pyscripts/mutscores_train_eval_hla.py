@@ -55,7 +55,6 @@ def args_parser():
     parser.add_argument('-datadir', type=str, default='../data/mutant/',
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str, default='../output/221212_HLA_specific_model/')
-    parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
