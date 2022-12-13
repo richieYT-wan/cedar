@@ -85,8 +85,6 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
     # Setting trainset
-    assert (args['trainset'].lower() in ['cedar', 'prime',
-                                         'merged']), 'please input -trainset as either "cedar", "prime" or "merged"'
     mega_df = pd.DataFrame()
     print('Starting loops')
     encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
