@@ -62,10 +62,10 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
-    parser.add_argument('mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
+    parser.add_argument('-mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
                                                                    'within the standard amino acid alphabet. To '
                                                                    'disable, input "false". "false" by default.')
-    parser.add_argument('add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
+    parser.add_argument('-add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
     return parser.parse_args()
 
 
