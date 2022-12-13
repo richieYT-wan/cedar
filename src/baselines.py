@@ -49,6 +49,15 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
     auc_nnalign = roc_auc_score(df['agg_label'].values, df['nnalign_score'].values)
     if auc01:
         auc01_nnalign = roc_auc_score(df['agg_label'].values, df['nnalign_score'].values, max_fpr=0.1)
+
+    # MIXMHCRANK
+    fpr_mixmhc, tpr_mixmhc, _ = roc_curve(df['agg_label'].values, -1*df['MixMHCrank'].values)
+    auc_mixmhc = roc_auc_score(df['agg_label'].values, -1*df['MixMHCrank'].values)
+    if auc01:
+        auc01_mixmhc = roc_auc_score(df['agg_label'].values, -1*df['MixMHCrank'].values, max_fpr=0.1)
+
+    label_mixmhcrank = f'NetMHCrank: AUC={round(auc_mixmhc, 3)}, AUC01={round(auc01_mixmhc, 3)}' if auc01 else f'MixMHCrank: AUC={round(auc_mixmhc, 3)}'
+
     label_NetMHCrank= f'NetMHCrank: AUC={round(auc_netmhc, 3)}, AUC01={round(auc01_netmhc,3)}' if auc01 else f'NetMHCrank: AUC={round(auc_netmhc, 3)}'
 
     label_PRIME= f'PRIME: AUC={round(auc_prime, 3)}, AUC01={round(auc01_prime,3)}' if auc01 else f'PRIME: AUC={round(auc_prime, 3)}'
@@ -61,5 +70,7 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
               linestyle='--', lw=0.75, color='g')
     axis.plot(fpr_nnalign, tpr_nnalign, label=label_NN_Align, #f'NN_Align: AUC = {round(auc_nnalign, 3)}',
               linestyle='--', lw=0.75, color='c')
+    axis.plot(fpr_mixmhc, tpr_mixmhc, label=label_mixmhcrank,
+              linestyle='--', lw=0.75, color='y')
     axis.plot([0,1],[0,1], label='Random', ls=':', lw=0.5, c='k')
 

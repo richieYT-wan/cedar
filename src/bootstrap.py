@@ -46,7 +46,7 @@ def bootstrap_downsample_wrapper(df, downsample_label, downsample_number, score_
     downsample = df.query(f'{target_col} == @downsample_label').sample(int(downsample_number), random_state=seed)
     sample_df = pd.concat([df.query(f'{target_col} != @downsample_label'), downsample])
     y_score = sample_df[score_col].values
-    y_score = -1*y_score if 'rank' in score_col.lower() else y_score
+    y_score = -1 * y_score if 'rank' in score_col.lower() else y_score
     y_true = sample_df[target_col].values
     sample_idx = np.random.randint(0, len(y_score), len(y_score))
     sample_score = y_score[sample_idx]
@@ -84,6 +84,33 @@ def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES):
     wrapper = partial(bootstrap_wrapper,
                       y_score=y_score, y_true=y_true)
     print('Sampling')
+    output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in
+                                     tqdm(range(n_rounds), desc='Bootstrapping rounds', position=1, leave=False))
+
+    print('Making results DF and curves')
+    result_df = pd.concat([x[0] for x in output])
+    mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None])
+    # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
+    return result_df, mean_roc_curve
+
+
+def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_jobs=N_CORES):
+    """
+    Does the same as bootstrap_eval but with a custom score_columns instead of taking as input the arrays
+    of scores and labels
+    Args:
+        df: df containing the true labels and predictions/scores/whichever
+        score_col: the name of the score columns (ex: 'pred', 'MixMHCrank', etc)
+        target_col: the name of the target columns
+        n_rounds: # of bootstrapping rounds
+        n_jobs: # of parallel jobs
+
+    Returns:
+
+    """
+    scores = -1 * df[score_col].values if 'rank' in score_col.lower() else df[score_col].values
+    labels = df[target_col].values
+    wrapper = partial(bootstrap_wrapper, y_score=scores, y_true=labels)
     output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in
                                      tqdm(range(n_rounds), desc='Bootstrapping rounds', position=1, leave=False))
 

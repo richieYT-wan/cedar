@@ -209,6 +209,8 @@ output/*221122*/
 output/reshaped/
 output/bootstrapping/trainset_models.pkl
 output/nn_manual_tune_qsub/checkpoints/
+output/*221207*/
+
 .DS_Store
 notebook/cedar_results_related.csv
 notebook/full_results_df.csv

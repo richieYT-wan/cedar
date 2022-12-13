@@ -1,0 +1,75 @@
+#Call: /tools/src/gibbscluster-2.0/GibbsCluster-2.0e_WEB.pl -H /tools/opt/R-3.2.0/bin/R -G /tools/src/seq2logo-2.0/Seq2Logo.py -k 5 -Z 50000 -f /var/www/webface/tmp/server/GibbsCluster/63971F7600003ED46040AABC/file.1 -C -g 1-4 -l 9 -t 1.5 -i 10 -n 20 -D 4 -I 1 -s 100 -r 20 -u 10 -T -j 2 -b 0.8 -q 5 -S 5 -P mhcI -c 0 -z 2
+#Mon Dec 12 13:32:55 2022
+#Session ID: 3591970
+#Run name: mhcI_3591970
+#Read 5605 unique sequences
+##### Settings: #####
+#No shift moves, cluster move at every iteration
+#Number of clusters: 1 - 4
+#Motif length: 9
+#Initial MC temperture: 1.5
+#Number of temperature steps: 20
+#Number of iterations x Sequence x Tstep: 10
+#Max insertion length: 1
+#Max deletion length: 4
+#Interval between Indel moves: 10
+#Number of initial seeds: 5
+#Penalty lambda: 0.8
+#Weight on small clusters: 5
+#Sequence weighting type: 0
+#Use trash cluster to remove outliers: 1
+#Threshold for trash cluster: 2
+#### Running Gibbs clustering...
+#Clustering with 1 groups, seed number 1
+#Clustering with 1 groups, seed number 2
+#Clustering with 1 groups, seed number 3
+#Clustering with 1 groups, seed number 4
+#Clustering with 1 groups, seed number 5
+#Clustering with 2 groups, seed number 1
+#Clustering with 2 groups, seed number 2
+#Clustering with 2 groups, seed number 3
+#Clustering with 2 groups, seed number 4
+#Clustering with 2 groups, seed number 5
+#Clustering with 3 groups, seed number 1
+#Clustering with 3 groups, seed number 2
+#Clustering with 3 groups, seed number 3
+#Clustering with 3 groups, seed number 4
+#Clustering with 3 groups, seed number 5
+#Clustering with 4 groups, seed number 1
+#Clustering with 4 groups, seed number 2
+#Clustering with 4 groups, seed number 3
+#Clustering with 4 groups, seed number 4
+#Clustering with 4 groups, seed number 5
+#Clustering complete!
+### Determining seeds with highest KLD...
+#Best 1 groups, seed 5
+#Best 2 groups, seed 2
+#Best 3 groups, seed 2
+#Best 4 groups, seed 3
+###Parsing result files...
+#RESULTS for 1 CLUSTERS
+#1 Final Average KLD: 5.491398
+#1	1	3365	5.491
+#Outliers: 2240
+#
+#RESULTS for 2 CLUSTERS
+#2 Final Average KLD: 6.247768
+#2	1	2458	6.140
+#2	2	1771	6.398
+#Outliers: 1376
+#
+#RESULTS for 3 CLUSTERS
+#3 Final Average KLD: 6.779173
+#3	1	1497	6.713
+#3	2	1257	6.912
+#3	3	1871	6.744
+#Outliers: 980
+#
+#RESULTS for 4 CLUSTERS
+#4 Final Average KLD: 7.071722
+#4	1	1646	6.732
+#4	2	1066	8.012
+#4	3	952	6.663
+#4	4	1214	7.027
+#Outliers: 727
+#

@@ -1,0 +1,795 @@
+# /tools/src/gibbscluster-2.0/bin/gibbs_cluster_1.2.2_DB.Linux_x86_64 -mhc1 -trash -l 9 -g 2 -ts 1.5 -blf /tools/src/gibbscluster-2.0/data/blosum%i.freq_rownorm -blm 62 -base 2 -bg 1 -i 10 -s 2 -nt 20 -fr 20 -fs 100 -wlc 200 -swt 0 -lambda 0.8 -dlen 4 -ilen 1 -findels 10 -sigma 5 /var/www/html/services/GibbsCluster-2.0/tmp/mhcI_4027417/data/pepdata.txt
+# Mon Dec 12 15:14:01 2022
+# User: services
+# PWD : /var/www/webface/tmp/server/GibbsCluster/6397372200006863AA6CEAD5
+# Host: Linux engine 5.4.0-122-generic x86_64
+# -mhc1    1                    Use peptides of fixed length, no window shift
+# -trash   1                    Use trash cluster to remove outliers
+# -l       9                    Motif length
+# -g       2                    Number of initial clusters
+# -ts      1.500000             Start temperature
+# -blf     /tools/src/gibbscluster-2.0/data/blosum%i.freq_rownorm Real value blosum matrix filename
+# -blm     62                   Blosum matrix number
+# -base    2.000000             Baseline value to discard to trash
+# -bg      1                    [0] Flat (0.05) [1] Precalculated [2] From data
+# -i       10                   Number of iterations per train example
+# -s       2                    Seed [-1] Default, [0] Time [>0] Specific seed
+# -nt      20                   Number of temperature steps
+# -fr      20                   Interval between Single sequence moves (if -mhc1 == 1)
+# -fs      100                  Interval between Phase shift moves
+# -wlc     200.000000           Weigth on low count
+# -swt     0                    [0] 1/ns [1] Clustering [2] No sequence weighting
+# -lambda  0.800000             Penalty factor for overlapping clusters
+# -dlen    4                    Max length of deletions
+# -ilen    1                    Max length of insertions
+# -findels 10                   Interval between Indel moves
+# -sigma   5.000000             Weight on blosum for small cluster confidence
+# Command line parameters set to:
+#	[-l int]             9                    Motif length
+#	[-g int]             2                    Number of initial clusters
+#	[-trash]             1                    Use trash cluster to remove outliers
+#	[-i int]             10                   Number of iterations per train example
+#	[-s int]             2                    Seed [-1] Default, [0] Time [>0] Specific seed
+#	[-f filename]        0                    File for frequency matrices
+#	[-m filename]        0                    File for log-odds matrices
+#	[-a filename]        aln.txt              File for multiple alignments
+#	[-pc]                0                    Print core of alignment
+#	[-c filename]        core.txt             File for core
+#	[-alp string]        ARNDCQEGHILKMFPSTWYV Amino acid alphabet
+#	[-bg int]            1                    [0] Flat (0.05) [1] Precalculated [2] From data
+#	[-base float]        2.000000             Baseline value to discard to trash
+#	[-mhc1]              1                    Use peptides of fixed length, no window shift
+#	[-ts float]          1.500000             Start temperature
+#	[-te float]          0.000010             Final temperature
+#	[-nt int]            20                   Number of temperature steps
+#	[-ms int]            3                    Max phase shift distance
+#	[-fs int]            100                  Interval between Phase shift moves
+#	[-findels int]       10                   Interval between Indel moves
+#	[-fr int]            20                   Interval between Single sequence moves (if -mhc1 == 1)
+#	[-lambda float]      0.800000             Penalty factor for overlapping clusters
+#	[-sigma float]       5.000000             Weight on blosum for small cluster confidence
+#	[-noph]              0                    Exclude phase shift move
+#	[-r float]           5.000000             Scale factor for phase shift moves
+#	[-wlc float]         200.000000           Weigth on low count
+#	[-blf filename]      /tools/src/gibbscluster-2.0/data/blosum%i.freq_rownorm Real value blosum matrix filename
+#	[-blm int]           62                   Blosum matrix number
+#	[-cX int]            1                    [0] Count X as A, [1] Exclude X from count
+#	[-v]                 0                    Verbose mode
+#	[-debug]             0                    Debug model
+#	[-cthr float]        0.620000             Clustering threshold for sequence weighting
+#	[-swt int]           0                    [0] 1/ns [1] Clustering [2] No sequence weighting
+#	[-w string]          1,3,1,1,1,1,1,1,3    Weigths on positions
+#	[-iw]                0                    Include weights on positions
+#	[-noc float]         0.000000             Log-odds score assignment to no count elements
+#	[-p1a]               0                    Allow only Hydrophobic AA at P1
+#	[-p1l filename]      ILVMFYW              Allowed letters at P1 [Only with -p1a option]
+#	[-factor float]      2.885400             Scale factor for matrix 2/log2
+#	[-cntthr int]        0                    Low bound for amino acids counts to include in matrix
+#	[-p1s]               0                    Penalize disallowed P1 amino acids in shift
+#	[-pkld]              0                    Print KLD list (file to -kldf)
+#	[-kldf string]       kldfq.txt            Print complete list of KLD values to specified file
+#	[-kldq int]          1000                 Total datapoints when printing KLDs
+#	[-ilen int]          1                    Max length of insertions
+#	[-dlen int]          4                    Max length of deletions
+#	[-xc]                0                    Exclude final check of all peptides to clusters
+# Random seed is 2
+# Read 661 elements on seqlist /var/www/html/services/GibbsCluster-2.0/tmp/mhcI_4027417/data/pepdata.txt
+# Number of temperature steps 20 dt 0.078947
+# Back ground frequences
+# 0 A  0.07400
+# 1 R  0.05200
+# 2 N  0.04500
+# 3 D  0.05400
+# 4 C  0.02500
+# 5 Q  0.03400
+# 6 E  0.05400
+# 7 G  0.07400
+# 8 H  0.02600
+# 9 I  0.06800
+# 10 L  0.09900
+# 11 K  0.05800
+# 12 M  0.02500
+# 13 F  0.04700
+# 14 P  0.03900
+# 15 S  0.05700
+# 16 T  0.05100
+# 17 W  0.01300
+# 18 Y  0.03200
+# 19 V  0.07300
+# Read_realblosum done. Alphabet ARNDCQEGHILKMFPSTWYV
+# G 0 331
+# G 1 330
+# G 2 0
+### Initial alignments weighed KLD sum 0.000000
+
+# Doing temprature step 0 1.500000
+# Doing temprature step 1 1.421053
+# Doing temprature step 2 1.342106
+# Doing temprature step 3 1.263160
+# Doing temprature step 4 1.184213
+# Doing temprature step 5 1.105266
+# Doing temprature step 6 1.026319
+# Doing temprature step 7 0.947372
+# Doing temprature step 8 0.868425
+# Doing temprature step 9 0.789479
+# Doing temprature step 10 0.710532
+# Doing temprature step 11 0.631585
+# Doing temprature step 12 0.552638
+# Doing temprature step 13 0.473691
+# Doing temprature step 14 0.394744
+# Doing temprature step 15 0.315798
+# Doing temprature step 16 0.236851
+# Doing temprature step 17 0.157904
+# Doing temprature step 18 0.078957
+# Doing temprature step 19 0.000010
+## Sequence alignment for group 0
+G  0    0         KYVYDFGVSV  YVYDFGVSV o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.321 bgG   1 bgS  4.225 cS 11.941
+G  0    1         KPSDTPRPVM  KPSDTPRPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.341 bgG  -1 bgS  2.000 cS  2.741
+G  0    2          YLTDKDFEF  YLTDKDFEF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.208 bgG   1 bgS  3.076 cS  8.748
+G  0    3         RVYKCIFNHK  RVYKCIFHK o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  7.874 bgG  -1 bgS  2.000 cS  6.274
+G  0    4         MLLENKAVEK  MLLEKAVEK o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  7.172 bgG   1 bgS  3.686 cS  4.224
+G  0    5          KVCCCQILL  KVCCCQILL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  6.057 bgG  -1 bgS  2.000 cS  4.457
+G  0    6         SNCCWSIFYV  SNCCWSIFV o  0 ip -99 il -99 dp   8 dl   1  prime_pos sS  9.052 bgG  -1 bgS  2.000 cS  7.452
+G  0    7          MLGEQLFPL  MLGEQLFPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.026 bgG   1 bgS  7.866 cS  3.733
+G  0    8          FLGEAWAQV  FLGEAWAQV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.396 bgG   1 bgS  2.550 cS  8.355
+G  0    9          FQLNQSFEI  FQLNQSFEI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.157 bgG   1 bgS  2.377 cS  5.255
+G  0   10          LLYQELLPL  LLYQELLPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.891 bgG   1 bgS  5.322 cS  6.634
+G  0   11          EVLPFFLFF  EVLPFFLFF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.023 bgG   1 bgS  2.268 cS  4.208
+G  0   12        RYLYHRVDVIF  YLYHVDVIF o  1 ip -99 il -99 dp   4 dl   1  cedar_pos sS 15.264 bgG   1 bgS  2.830 cS 13.000
+G  0   13         TPTDVTARHL  TPTDVTAHL o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  6.306 bgG  -1 bgS  2.000 cS  4.706
+G  0   14          KLKFVTLVF  KLKFVTLVF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.775 bgG  -1 bgS  2.000 cS  7.175
+G  0   15         MQLMPFGCLL  MLMPFGCLL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  8.051 bgG   1 bgS  3.368 cS  5.356
+G  0   16         VYALIAGATL  YALIAGATL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.545 bgG  -1 bgS  2.000 cS  0.945
+G  0   17         IRLYQFRLIV  RLYQFRLIV o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.160 bgG   1 bgS  2.909 cS  9.832
+G  0   18          QQWLALFFV  QQWLALFFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.099 bgG  -1 bgS  2.000 cS 11.499
+G  0   19        TMSLYDLDIEA  SLYDLDIEA o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.285 bgG  -1 bgS  2.000 cS  9.685
+G  0   20        SPPHPGRLPDL  SPPHPGRLL o  0 ip -99 il -99 dp   8 dl   2  cedar_pos sS  6.550 bgG  -1 bgS  2.000 cS  4.950
+G  0   21         PSLLWMNLFV  SLLWMNLFV o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.380 bgG  -1 bgS  2.000 cS 11.780
+G  0   22          GLLNSIWPL  GLLNSIWPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.548 bgG   1 bgS  6.682 cS  6.203
+G  0   23         KLVVVGADGV  KLVVVGADV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  5.496 bgG  -1 bgS  2.000 cS  3.896
+G  0   24          FLYEKQHEL  FLYEKQHEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.685 bgG   1 bgS  6.647 cS  9.367
+G  0   25         GTKKDVDVLK  GTKDVDVLK o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  5.836 bgG  -1 bgS  2.000 cS  4.236
+G  0   26          AYLEAIHDF  AYLEAIHDF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.899 bgG  -1 bgS  2.000 cS  3.299
+G  0   27          WLWEPLRVV  WLWEPLRVV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.816 bgG  -1 bgS  2.000 cS  9.216
+G  0   28          YMPTTIIAA  YMPTTIIAA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.840 bgG   1 bgS  3.399 cS  2.121
+G  0   29          KLADYLNVL  KLADYLNVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.382 bgG   1 bgS  5.848 cS  2.703
+G  0   30          IILVAVPHV  IILVAVPHV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.216 bgG   1 bgS  2.015 cS  3.604
+G  0   31          YVLTWIVGA  YVLTWIVGA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.333 bgG  -1 bgS  2.000 cS  6.733
+G  0   32          RLFLGLAIK  RLFLGLAIK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.408 bgG  -1 bgS  2.000 cS  1.808
+G  0   33          ALLETPSLL  ALLETPSLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.800 bgG   1 bgS  4.191 cS  4.447
+G  0   34         HLIDSNTLQV  HLIDSTLQV o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS 10.495 bgG   1 bgS  5.653 cS  5.973
+G  0   35          ILPDAGQTV  ILPDAGQTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.230 bgG  -1 bgS  2.000 cS  7.630
+G  0   36          AYLEAIHHF  AYLEAIHHF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.472 bgG   1 bgS  2.094 cS  6.797
+G  0   37          AIDAALTFV  AIDAALTFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.832 bgG   1 bgS  2.344 cS  1.956
+G  0   38         FWYTHNLIFV  FWYTHNIFV o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS 18.635 bgG  -1 bgS  2.000 cS 17.035
+G  0   39         STGDATPLPV  STGDATLPV o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS  9.233 bgG  -1 bgS  2.000 cS  7.633
+G  0   40         MLEYQKILWK  MLYQKILWK o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 11.295 bgG  -1 bgS  2.000 cS  9.695
+G  0   41          TQFLYIWFK  TQFLYIWFK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.032 bgG  -1 bgS  2.000 cS  4.432
+G  0   42          KIYRRQIFK  KIYRRQIFK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.016 bgG  -1 bgS  2.000 cS  7.416
+G  0   43          KLSHQLVLL  KLSHQLVLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.828 bgG   1 bgS  6.362 cS  5.739
+G  0   44         VYQYTFPDFL  YQYTFPDFL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 16.075 bgG   1 bgS  5.755 cS 11.471
+G  0   45         STPLPGTRVR  STPLPGTRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.838 bgG  -1 bgS  2.000 cS  4.238
+G  0   46          VVMSWAPPV  VVMSWAPPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.987 bgG   1 bgS  4.440 cS  2.435
+G  0   47        RTQDVSVQVER  RTQDVSVQV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.094 bgG   1 bgS  6.085 cS  4.226
+G  0   48          FWYTHNLIF  FWYTHNLIF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.585 bgG  -1 bgS  2.000 cS  9.985
+G  0   49        KALDPHSGHFV  ALPHSGHFV o  1 ip -99 il -99 dp   2 dl   1  cedar_pos sS 15.756 bgG  -1 bgS  2.000 cS 14.156
+G  0   50          ATTLKAFFK  ATTLKAFFK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.231 bgG  -1 bgS  2.000 cS  1.631
+G  0   51          ILITQVLGL  ILITQVLGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.180 bgG  -1 bgS  2.000 cS  3.580
+G  0   52          SLFNGVFPR  SLFNGVFPR o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.314 bgG  -1 bgS  2.000 cS  7.714
+G  0   53          QSLFWSIFV  QSLFWSIFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.497 bgG  -1 bgS  2.000 cS 10.897
+G  0   54          ALWDRVVDL  ALWDRVVDL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.471 bgG  -1 bgS  2.000 cS  9.871
+G  0   55         SVLENFTIFL  SVLEFTIFL o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 16.484 bgG  -1 bgS  2.000 cS 14.884
+G  0   56         FRYYRVSILL  FRYYVSILL o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 11.226 bgG  -1 bgS  2.000 cS  9.626
+G  0   57          YLYDRLLRV  YLYDRLLRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.897 bgG   1 bgS  5.315 cS 10.645
+G  0   58          FWYYAKVDL  FWYYAKVDL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.594 bgG  -1 bgS  2.000 cS  3.994
+G  0   59          QLCDVMFYL  QLCDVMFYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.564 bgG   1 bgS  5.487 cS  8.175
+G  0   60         VFSFTATLPF  FSFTATLPF o  1 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.619 bgG  -1 bgS  2.000 cS  8.019
+G  0   61          ILPKVLILI  ILPKVLILI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.572 bgG  -1 bgS  2.000 cS  5.972
+G  0   62         YVYDFGVSVS  YVYDFGVSV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.321 bgG   1 bgS  4.225 cS 11.941
+G  0   63          NISEDVIFF  NISEDVIFF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.846 bgG  -1 bgS  2.000 cS  3.246
+G  0   64          LLLFLTIFI  LLLFLTIFI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.711 bgG  -1 bgS  2.000 cS  7.111
+G  0   65          SLLQGSPHV  SLLQGSPHV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.373 bgG   1 bgS  7.533 cS  4.347
+G  0   66         YMYLRQLFHI  YMYLQLFHI o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 10.903 bgG   1 bgS  5.179 cS  6.760
+G  0   67          SLDLTTSPV  SLDLTTSPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.032 bgG  -1 bgS  2.000 cS  5.432
+G  0   68          ALHGGWTTK  ALHGGWTTK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.338 bgG  -1 bgS  2.000 cS  0.738
+G  0   69          FILDAVQRV  FILDAVQRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.519 bgG  -1 bgS  2.000 cS  6.919
+G  0   70         YLYHRVDVIF  YLYHVDVIF o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 15.264 bgG   1 bgS  2.830 cS 13.000
+G  0   71         CQQWLALFFV  QQWLALFFV o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.099 bgG  -1 bgS  2.000 cS 11.499
+G  0   72        HVKITDFGRAK  KITDFGRAK o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.806 bgG  -1 bgS  2.000 cS  6.206
+G  0   73         SPWWNFGSLL  SWWNFGSLL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 14.971 bgG  -1 bgS  2.000 cS 13.371
+G  0   74          GVADVLLYR  GVADVLLYR o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.368 bgG  -1 bgS  2.000 cS  1.768
+G  0   75          LLLDIVAPK  LLLDIVAPK o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.319 bgG  -1 bgS  2.000 cS  7.719
+G  0   76         TQLMPFGSLL  QLMPFGSLL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.853 bgG   1 bgS  6.270 cS  5.838
+G  0   77          RTMAATTLK  RTMAATTLK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.529 bgG  -1 bgS  2.000 cS  1.929
+G  0   78          ILWIFSIYL  ILWIFSIYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.136 bgG   1 bgS  2.523 cS 13.118
+G  0   79         HQNPVTGLLL  HQNPVTLLL o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS  6.396 bgG  -1 bgS  2.000 cS  4.796
+G  0   80          GRQSWSLYV  GRQSWSLYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.319 bgG  -1 bgS  2.000 cS  6.719
+G  0   81          RFLHDLHLL  RFLHDLHLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.193 bgG   1 bgS  2.551 cS  4.153
+G  0   82         RILKVTEFKK  RILKVTEFK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.016 bgG  -1 bgS  2.000 cS  5.416
+G  0   83          LLKHPFTLM  LLKHPFTLM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.032 bgG  -1 bgS  2.000 cS  2.432
+G  0   84          FMPDFDLHL  FMPDFDLHL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.000 bgG   1 bgS  4.972 cS 10.023
+G  0   85          SVQDVSLFV  SVQDVSLFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.274 bgG  -1 bgS  2.000 cS 12.674
+G  0   86         KLYGLDWAEL  KLYLDWAEL o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 12.597 bgG  -1 bgS  2.000 cS 10.997
+G  0   87          KLPLDIDPV  KLPLDIDPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.086 bgG  -1 bgS  2.000 cS  8.486
+G  0   88          LIIPFIHLI  LIIPFIHLI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.764 bgG   1 bgS  4.309 cS  2.317
+G  0   89         ILLLFLTIFI  ILLLFTIFI o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS 14.294 bgG  -1 bgS  2.000 cS 12.694
+G  0   90         FLSNFIILML  FLSNFIILL o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 14.998 bgG   1 bgS  7.671 cS  8.861
+G  0   91         SSLDLTTSPV  SSLDLTTPV o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 10.258 bgG  -1 bgS  2.000 cS  8.658
+G  0   92          RILKVTEFK  RILKVTEFK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.016 bgG  -1 bgS  2.000 cS  5.416
+G  0   93          AVMRWGMPL  AVMRWGMPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.098 bgG  -1 bgS  2.000 cS  6.498
+G  0   94          YILKYSVFL  YILKYSVFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.890 bgG   1 bgS  8.338 cS  5.219
+G  0   95         ISLNNAVIEL  SLNNAVIEL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.277 bgG   1 bgS  2.960 cS  7.909
+G  0   96         SLADEAEVYL  SLADAEVYL o  0 ip -99 il -99 dp   4 dl   1  prime_pos sS  9.450 bgG   1 bgS  3.964 cS  6.279
+G  0   97          KLWASPLHV  KLWASPLHV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.818 bgG   1 bgS  4.534 cS  9.191
+G  0   98        KLYTSEILSPI  KLYTSEIPI o  0 ip -99 il -99 dp   7 dl   2  cedar_pos sS 13.148 bgG  -1 bgS  2.000 cS 11.548
+G  0   99        FWYTHNLIFVF  FWYTHNIFV o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS 18.635 bgG   1 bgS  3.107 cS 16.149
+G  0  100          FSSDVLNLV  FSSDVLNLV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.838 bgG   1 bgS  2.678 cS  4.696
+G  0  101         LLVDAMHNQL  LLVDAMHQL o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  9.644 bgG  -1 bgS  2.000 cS  8.044
+G  0  102         IFWYTHNLIF  FWYTHNLIF o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.585 bgG  -1 bgS  2.000 cS  9.985
+G  0  103          SLLTNWPFV  SLLTNWPFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.801 bgG  -1 bgS  2.000 cS 11.201
+G  0  104          SLLWMNLFV  SLLWMNLFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.380 bgG  -1 bgS  2.000 cS 11.780
+G  0  105          TLWCSPIKV  TLWCSPIKV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.922 bgG  -1 bgS  2.000 cS  9.322
+G  0  106          GLYVFRNER  GLYVFRNER o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.789 bgG  -1 bgS  2.000 cS  3.189
+G  0  107         KTYQVSYGFR  KTYQVSYFR o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  9.578 bgG  -1 bgS  2.000 cS  7.978
+G  0  108          YLNELVVFV  YLNELVVFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.839 bgG   1 bgS 12.660 cS  3.711
+G  0  109          ALYGFVPVL  ALYGFVPVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.385 bgG   1 bgS  4.181 cS  8.040
+G  0  110        WLIRETQPITK  WLITQPITK o  0 ip -99 il -99 dp   3 dl   2  cedar_pos sS  6.573 bgG  -1 bgS  2.000 cS  4.973
+G  0  111          YLDTDVILM  YLDTDVILM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.350 bgG   1 bgS  3.082 cS  5.884
+G  0  112          SMACVGFFL  SMACVGFFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.860 bgG   1 bgS  2.284 cS  9.032
+G  0  113          SLYDLDIEA  SLYDLDIEA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.285 bgG  -1 bgS  2.000 cS  9.685
+G  0  114         ALDPHSGHFV  ALPHSGHFV o  0 ip -99 il -99 dp   2 dl   1  prime_pos sS 15.756 bgG  -1 bgS  2.000 cS 14.156
+G  0  115         SGLYVFRNER  SLYVFRNER o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  6.401 bgG  -1 bgS  2.000 cS  4.801
+G  0  116          ALPQHLIRV  ALPQHLIRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.248 bgG   1 bgS  4.141 cS  5.936
+G  0  117          FFYLLDFTF  FFYLLDFTF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.705 bgG  -1 bgS  2.000 cS  4.105
+G  0  118         VKITDFGRAK  KITDFGRAK o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.806 bgG  -1 bgS  2.000 cS  6.206
+G  0  119          TLYSLTLLY  TLYSLTLLY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.948 bgG   1 bgS  2.626 cS  4.847
+G  0  120         KTGEQRVVTL  KTGEQVVTL o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  4.327 bgG   1 bgS  3.693 cS  1.373
+G  0  121          KIFSEVTLK  KIFSEVTLK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.355 bgG  -1 bgS  2.000 cS  3.755
+G  0  122          FVYVFITHL  FVYVFITHL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.917 bgG   1 bgS  5.426 cS  8.576
+G  0  123          QLQKANVLL  QLQKANVLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.989 bgG  -1 bgS  2.000 cS  6.389
+G  0  124          YLWPPVQLA  YLWPPVQLA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.757 bgG  -1 bgS  2.000 cS 10.157
+G  0  125          KVYEGVWKK  KVYEGVWKK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.927 bgG  -1 bgS  2.000 cS  6.327
+G  0  126         VLLGVKLFGV  VLLGVKLFV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  7.875 bgG   1 bgS  2.340 cS  6.003
+G  0  127        ALFLVFGRTRK  ALFLVFTRK o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS  6.496 bgG  -1 bgS  2.000 cS  4.896
+G  0  128          FLPDLNVNA  FLPDLNVNA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.816 bgG  -1 bgS  2.000 cS  5.216
+G  0  129         KILDAVVAQK  KILDAVVQK o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 11.780 bgG  -1 bgS  2.000 cS 10.180
+G  0  130          QLPDFVNQL  QLPDFVNQL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.428 bgG  -1 bgS  2.000 cS 11.828
+G  0  131          ILGIFNEFV  ILGIFNEFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.042 bgG  -1 bgS  2.000 cS  3.442
+G  0  132          KQWLVWLFL  KQWLVWLFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 16.766 bgG  -1 bgS  2.000 cS 15.166
+G  0  133         LRILKVTEFK  RILKVTEFK o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.016 bgG  -1 bgS  2.000 cS  5.416
+G  0  134          YVTAMDIFV  YVTAMDIFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.277 bgG  -1 bgS  2.000 cS  7.677
+G  0  135         KELLKHPFTL  KLLKHPFTL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 10.560 bgG   1 bgS  7.962 cS  4.191
+G  0  136         KLVVVGACGV  KLVVVGACV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  6.678 bgG  -1 bgS  2.000 cS  5.078
+G  0  137          SSAAAPFPL  SSAAAPFPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.555 bgG  -1 bgS  2.000 cS  1.955
+G  0  138          YSKNLNSFF  YSKNLNSFF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.833 bgG  -1 bgS  2.000 cS  2.233
+G  0  139        ALDPHSGHFVA  ALPHSGHFV o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 15.756 bgG  -1 bgS  2.000 cS 14.156
+G  0  140        KLSHQLVLLFL  KLSHVLLFL o  0 ip -99 il -99 dp   4 dl   2  cedar_pos sS 14.493 bgG   1 bgS  8.156 cS  7.968
+G  0  141          KLLAGVEIV  KLLAGVEIV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.284 bgG   1 bgS  2.176 cS  3.544
+G  0  142          GAQSWLWFV  GAQSWLWFV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.901 bgG  -1 bgS  2.000 cS  5.301
+G  0  143         VLENFTIFLV  VLENFTIFV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 13.438 bgG  -1 bgS  2.000 cS 11.838
+G  0  144         ALLETPSLLL  ALLTPSLLL o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 13.397 bgG  -1 bgS  2.000 cS 11.797
+G  0  145          ILLDWAANI  ILLDWAANI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.162 bgG  -1 bgS  2.000 cS  6.562
+G  0  146          VLWDYVYQL  VLWDYVYQL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.770 bgG   1 bgS  5.713 cS  8.200
+G  0  147          YLYHRVDVI  YLYHRVDVI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.637 bgG  -1 bgS  2.000 cS  8.037
+G  0  148          HLMDGDLGL  HLMDGDLGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.238 bgG   1 bgS  3.495 cS  3.442
+G  0  149          QQFAVGSYV  QQFAVGSYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.118 bgG   1 bgS  3.047 cS  1.680
+G  0  150          SILEQMHRK  SILEQMHRK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.152 bgG  -1 bgS  2.000 cS  6.552
+G  0  151          YLLTDCNPA  YLLTDCNPA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.767 bgG   1 bgS  3.084 cS  6.300
+G  0  152         MQLMPFGSLL  MLMPFGSLL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 12.123 bgG   1 bgS  7.818 cS  5.869
+G  0  153         SLLMWITQAL  SLLMWITQL o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 14.546 bgG  -1 bgS  2.000 cS 12.946
+G  0  154         HTLLLWEHNR  HLLLWEHNR o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  6.902 bgG  -1 bgS  2.000 cS  5.302
+G  0  155          GLSFFILSL  GLSFFILSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.805 bgG   1 bgS  6.009 cS  1.998
+G  0  156        MLLENKAVEKA  MLLEKAVEK o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  7.172 bgG   1 bgS  3.686 cS  4.224
+G  0  157          KLNTITAVV  KLNTITAVV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.810 bgG   1 bgS  2.579 cS  4.747
+G  0  158        IFQEMFDKHYK  FQEMFDHYK o  1 ip -99 il -99 dp   6 dl   1  cedar_pos sS  7.547 bgG   1 bgS  4.480 cS  3.963
+G  0  159         LYIWFKTACL  YIWFKTACL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.447 bgG  -1 bgS  2.000 cS  7.847
+G  0  160          SLLMWITQA  SLLMWITQA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.905 bgG  -1 bgS  2.000 cS  9.305
+G  0  161         AALLQVTLLL  ALLQVTLLL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.970 bgG  -1 bgS  2.000 cS 11.370
+G  0  162          RTQDAEFLK  RTQDAEFLK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.434 bgG  -1 bgS  2.000 cS  3.834
+G  0  163          VQYLGMFPV  VQYLGMFPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.456 bgG  -1 bgS  2.000 cS  6.856
+G  0  164          QVTDFLAPL  QVTDFLAPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.806 bgG  -1 bgS  2.000 cS  8.206
+G  0  165          TLFTMVGTV  TLFTMVGTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.986 bgG  -1 bgS  2.000 cS  4.386
+G  0  166         RYLYHRVDVI  YLYHRVDVI o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.637 bgG   1 bgS  4.470 cS  6.061
+G  0  167          AYLEAIHYF  AYLEAIHYF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.863 bgG   1 bgS  3.344 cS  6.187
+G  0  168        LMLEYQKILWK  MLYQKILWK o  1 ip -99 il -99 dp   2 dl   1  cedar_pos sS 11.295 bgG  -1 bgS  2.000 cS  9.695
+G  0  169          MLMLAVIVA  MLMLAVIVA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.121 bgG  -1 bgS  2.000 cS  5.521
+G  0  170          LLLNMLIVL  LLLNMLIVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.035 bgG   1 bgS  3.625 cS  5.135
+G  0  171         KLVVVGAVGV  KLVVVGAVV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  7.261 bgG  -1 bgS  2.000 cS  5.661
+G  0  172          GQWGFSHGA  GQWGFSHGA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.114 bgG  -1 bgS  2.000 cS  3.514
+G  0  173         TYLPSAWNFF  YLPSAWNFF o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.002 bgG   1 bgS  8.285 cS  7.374
+G  0  174          YQVSYGFRL  YQVSYGFRL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.232 bgG   1 bgS  4.237 cS  1.843
+G  0  175          TIQKFLSLK  TIQKFLSLK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.943 bgG  -1 bgS  2.000 cS  2.343
+G  0  176          KLQFHCMPV  KLQFHCMPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.109 bgG   1 bgS  7.324 cS  4.250
+G  0  177          SHETVIIEL  SHETVIIEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.435 bgG  -1 bgS  2.000 cS  2.835
+G  0  178         KLFEFLVYGV  KLFEFLVYV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 15.912 bgG   1 bgS 15.023 cS  3.894
+G  0  179         TLDWLLQTPK  TLWLLQTPK o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 10.184 bgG  -1 bgS  2.000 cS  8.584
+G  0  180          GRKLFGTHF  GRKLFGTHF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.514 bgG  -1 bgS  2.000 cS  1.914
+G  0  181         VLSNDVCAQV  VLSDVCAQV o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS  8.018 bgG   1 bgS  5.449 cS  3.658
+G  0  182         FLQEVNVCGV  FLQEVNVCV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 12.068 bgG   1 bgS  8.837 cS  4.999
+G  0  183          FLTVFSHFM  FLTVFSHFM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.745 bgG  -1 bgS  2.000 cS 12.145
+G  0  184          FLASPSVPL  FLASPSVPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.458 bgG   1 bgS  5.339 cS  7.187
+G  0  185          PWWNFGSLL  PWWNFGSLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.915 bgG  -1 bgS  2.000 cS  6.315
+G  0  186          YLDLKGPKV  YLDLKGPKV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.139 bgG   1 bgS  2.920 cS  2.804
+G  0  187          KLKLPIIMK  KLKLPIIMK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.987 bgG  -1 bgS  2.000 cS  5.387
+G  0  188        RTSSTQQDNPK  SSTQQDNPK o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.195 bgG  -1 bgS  2.000 cS  1.595
+G  0  189          KRPTPTFHF  KRPTPTFHF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.982 bgG  -1 bgS  2.000 cS  7.382
+G  0  190          FISNTVFRK  FISNTVFRK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.323 bgG  -1 bgS  2.000 cS  2.723
+G  0  191          YLLFMIGYT  YLLFMIGYT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.238 bgG  -1 bgS  2.000 cS  3.638
+G  0  192        YVRVTVQARVM  YVVTVQARV o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  5.360 bgG  -1 bgS  2.000 cS  3.760
+G  0  193          MMWDCWHAV  MMWDCWHAV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.085 bgG  -1 bgS  2.000 cS 11.485
+G  0  194        QKTYQVSYGFR  KTYQVSYFR o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS  9.578 bgG  -1 bgS  2.000 cS  7.978
+G  0  195          RYYRVSILL  RYYRVSILL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.791 bgG  -1 bgS  2.000 cS  7.191
+G  0  196          KLANPLPYT  KLANPLPYT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.319 bgG   1 bgS  2.132 cS  2.613
+G  0  197          FLYNLLTRV  FLYNLLTRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.807 bgG   1 bgS  8.723 cS  4.829
+G  0  198         ALSYLVSFQR  ALYLVSFQR o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 11.608 bgG  -1 bgS  2.000 cS 10.008
+G  0  199          ALIHHNTYL  ALIHHNTYL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.050 bgG   1 bgS  6.906 cS  3.525
+G  0  200          IHYTAQIIL  IHYTAQIIL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.650 bgG  -1 bgS  2.000 cS  4.050
+G  0  201         ALYGFVPVLL  ALYGFVVLL o  0 ip -99 il -99 dp   6 dl   1  prime_pos sS 14.434 bgG   1 bgS  2.743 cS 12.239
+G  0  202          SLPMKNFPV  SLPMKNFPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.866 bgG  -1 bgS  2.000 cS 10.266
+G  0  203         YLTDKDFEFA  YLTDKDFFA o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 12.600 bgG  -1 bgS  2.000 cS 11.000
+G  0  204          KQWLVWLAL  KQWLVWLAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.553 bgG  -1 bgS  2.000 cS  9.953
+G  0  205          FLFYPLDFT  FLFYPLDFT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.559 bgG  -1 bgS  2.000 cS  3.959
+G  0  206         GIKFVKHLGK  GIKFVKHLK o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  3.360 bgG  -1 bgS  2.000 cS  1.760
+G  0  207          HIHCVNPPL  HIHCVNPPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.052 bgG   1 bgS  3.735 cS  3.064
+G  0  208         YQYTFPDFLY  YQYTFPDFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 16.075 bgG  -1 bgS  2.000 cS 14.475
+G  0  209         VGFFFFFLPV  GFFFFFLPV o  1 ip -99 il -99 dp -99 dl -99  prime_pos sS  7.000 bgG  -1 bgS  2.000 cS  5.400
+G  0  210         LDYEWGTVTF  LDYEWTVTF o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  5.132 bgG  -1 bgS  2.000 cS  3.532
+G  0  211          RLSDFSEQL  RLSDFSEQL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.568 bgG   1 bgS  8.593 cS  3.694
+G  0  212          FLLDSCTKL  FLLDSCTKL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.299 bgG   1 bgS  8.420 cS  3.564
+G  0  213          GLLDEDFYA  GLLDEDFYA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.217 bgG  -1 bgS  2.000 cS  6.617
+G  0  214          VLQEATICV  VLQEATICV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.010 bgG   1 bgS  3.244 cS  7.415
+G  0  215          YPPPPPALL  YPPPPPALL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.186 bgG  -1 bgS  2.000 cS  5.586
+G  0  216          YLQTDVFLV  YLQTDVFLV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.956 bgG   1 bgS  6.198 cS  9.998
+G  0  217        SSEDDGFFLGK  SSEDDGFFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.883 bgG  -1 bgS  2.000 cS  6.283
+G  0  218        YLYHRVDVIFC  YLYHDVIFC o  0 ip -99 il -99 dp   4 dl   2  cedar_pos sS 16.983 bgG  -1 bgS  2.000 cS 15.383
+G  0  219          SLNNAVIEL  SLNNAVIEL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 10.277 bgG   1 bgS  2.960 cS  7.909
+G  0  220         KTLTSVFQKK  KTLTSVFQK o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  8.755 bgG  -1 bgS  2.000 cS  7.155
+G  0  221          RLHDLVFPL  RLHDLVFPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.972 bgG   1 bgS  8.197 cS  5.415
+G  0  222        IRLYQFRLIVI  RLYQFLIVI o  1 ip -99 il -99 dp   5 dl   1  cedar_pos sS 12.809 bgG   1 bgS  5.184 cS  8.662
+G  0  223          RMWDFDIFL  RMWDFDIFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 18.573 bgG  -1 bgS  2.000 cS 16.973
+G  0  224        GTYVRVTVQAR  GTYVVTVQA o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  4.781 bgG  -1 bgS  2.000 cS  3.181
+G  0  225          KLYEEPLLK  KLYEEPLLK o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 13.320 bgG  -1 bgS  2.000 cS 11.720
+G  0  226         VLWDYVYQLL  VLWDYVYLL o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 13.446 bgG   1 bgS  4.046 cS 10.209
+G  0  227        FILLLFLTIFI  ILLLFTIFI o  1 ip -99 il -99 dp   5 dl   1  cedar_pos sS 14.294 bgG  -1 bgS  2.000 cS 12.694
+G  0  228          SLLMWITQV  SLLMWITQV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.005 bgG  -1 bgS  2.000 cS 13.405
+G  0  229          KLPKYGVKV  KLPKYGVKV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.847 bgG   1 bgS  3.009 cS  6.440
+G  0  230          ILWRQDINL  ILWRQDINL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.185 bgG  -1 bgS  2.000 cS  6.585
+G  0  231          AYLEAIHKF  AYLEAIHKF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.779 bgG  -1 bgS  2.000 cS  4.179
+G  0  232          ALLQVTLLL  ALLQVTLLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.970 bgG  -1 bgS  2.000 cS 11.370
+G  0  233          KITDFGRAK  KITDFGRAK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.806 bgG  -1 bgS  2.000 cS  6.206
+G  0  234          KSPNPSTPC  KSPNPSTPC o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.518 bgG  -1 bgS  2.000 cS  3.918
+G  0  235          FLWSVFMLI  FLWSVFMLI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.293 bgG   1 bgS  3.064 cS  9.842
+G  0  236          KTLTSVFQK  KTLTSVFQK o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  8.755 bgG  -1 bgS  2.000 cS  7.155
+G  0  237          KLVFGSVFL  KLVFGSVFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.140 bgG   1 bgS  2.332 cS  8.274
+G  0  238         FLAPLFLVLL  FLPLFLVLL o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 14.381 bgG   1 bgS  4.087 cS 11.111
+G  0  239          FLLDEAIGL  FLLDEAIGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.445 bgG   1 bgS  2.196 cS  6.688
+G  0  240          KLILWRGLK  KLILWRGLK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.947 bgG  -1 bgS  2.000 cS  4.347
+G  0  241          TLPEEFHEF  TLPEEFHEF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.129 bgG   1 bgS  3.509 cS  4.322
+G  0  242          FLTAHSLPL  FLTAHSLPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.375 bgG   1 bgS  8.920 cS  4.239
+G  0  243          ILQDGFLYV  ILQDGFLYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.941 bgG   1 bgS  7.548 cS  3.903
+G  0  244          KLGDVITII  KLGDVITII o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.784 bgG  -1 bgS  2.000 cS  6.184
+G  0  245          NLNCCSVPV  NLNCCSVPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.495 bgG   1 bgS  5.300 cS  2.255
+G  0  246          GLTSFFIAI  GLTSFFIAI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.138 bgG  -1 bgS  2.000 cS  4.538
+G  0  247        AQFSSDVLNLV  AQFDVLNLV o  0 ip -99 il -99 dp   3 dl   2  cedar_pos sS  7.919 bgG  -1 bgS  2.000 cS  6.319
+G  0  248          FPLTASKVL  FPLTASKVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.670 bgG  -1 bgS  2.000 cS  1.070
+G  0  249        AVYHEIHIGYL  AVYHEIHYL o  0 ip -99 il -99 dp   7 dl   2  cedar_pos sS 11.559 bgG  -1 bgS  2.000 cS  9.959
+G  0  250          SISCHVFCL  SISCHVFCL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.193 bgG   1 bgS  4.017 cS  2.979
+G  0  251         GRKLFGTHFY  GRKLFTHFY o  0 ip -99 il -99 dp   5 dl   1  prime_pos sS  4.786 bgG  -1 bgS  2.000 cS  3.186
+G  0  252          SSYTGFANK  SSYTGFANK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.884 bgG  -1 bgS  2.000 cS  2.284
+G  0  253          YLQDSMATT  YLQDSMATT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.966 bgG   1 bgS  5.171 cS  2.829
+G  0  254          VLFHRAFLV  VLFHRAFLV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.720 bgG   1 bgS  4.912 cS  2.790
+G  0  255          YLVYQMLKV  YLVYQMLKV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.541 bgG   1 bgS  6.052 cS  1.700
+G  0  256        FGLLGNILLVI  FLLGNILLV o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  8.228 bgG   1 bgS  7.404 cS  2.306
+G  0  257          GLIPFFMVV  GLIPFFMVV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.503 bgG   1 bgS  5.936 cS  2.754
+G  0  258          FLLPSGMAL  FLLPSGMAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.429 bgG   1 bgS  8.336 cS  1.760
+G  0  259          HMTEVVRHC  HMTEVVRHC o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.067 bgG  -1 bgS  2.000 cS  0.467
+G  0  260          ILCETCLIV  ILCETCLIV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.496 bgG   1 bgS  4.649 cS  0.777
+## Sequence alignment for group 1
+G  1    0          VMLEGEQEA  VMLEGEQEA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.805 bgG  -1 bgS  2.000 cS  4.205
+G  1    1         VMIACNIREL  VMIACIREL o  0 ip -99 il -99 dp   5 dl   1  prime_pos sS 10.684 bgG  -1 bgS  2.000 cS  9.084
+G  1    2          KMAACPKKL  KMAACPKKL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.411 bgG  -1 bgS  2.000 cS  3.811
+G  1    3          QLDIIPASV  QLDIIPASV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.451 bgG  -1 bgS  2.000 cS  7.851
+G  1    4         FVVPYMIYLL  FVVPYIYLL o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS 13.141 bgG   0 bgS  5.271 cS  8.924
+G  1    5        SRTNTAILETL  RTNAILETL o  1 ip -99 il -99 dp   3 dl   1  cedar_pos sS 12.855 bgG  -1 bgS  2.000 cS 11.255
+G  1    6        IHYTAQIILAL  YTAQIILAL o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.075 bgG   0 bgS  7.166 cS  5.343
+G  1    7          TLFSALWAL  TLFSALWAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.613 bgG   0 bgS  6.163 cS  6.682
+G  1    8          QMIYSAARV  QMIYSAARV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.416 bgG  -1 bgS  2.000 cS  5.816
+G  1    9          FPQGLPNEY  FPQGLPNEY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.393 bgG  -1 bgS  2.000 cS  8.793
+G  1   10         YSNYYCGLRY  YSNYYCLRY o  0 ip -99 il -99 dp   6 dl   1  prime_pos sS  8.213 bgG  -1 bgS  2.000 cS  6.613
+G  1   11          ILAALFLGL  ILAALFLGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.279 bgG  -1 bgS  2.000 cS  6.679
+G  1   12          LLAMTVPNV  LLAMTVPNV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.950 bgG  -1 bgS  2.000 cS  4.350
+G  1   13          ILMHGLVSL  ILMHGLVSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.916 bgG   0 bgS  5.282 cS  9.691
+G  1   14          KMVAVFYNT  KMVAVFYNT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.595 bgG  -1 bgS  2.000 cS  4.995
+G  1   15         FVSTSDIKSM  FVSSDIKSM o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS  7.312 bgG  -1 bgS  2.000 cS  5.712
+G  1   16         RVYISYLDCI  RYISYLDCI o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  8.214 bgG  -1 bgS  2.000 cS  6.614
+G  1   17          FMLYLLTLM  FMLYLLTLM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.224 bgG   0 bgS  4.236 cS  5.835
+G  1   18         YTDFHCQYVK  YTDFHCQYV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 11.437 bgG   0 bgS  2.968 cS  9.063
+G  1   19          ALQSRLQAL  ALQSRLQAL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  5.559 bgG  -1 bgS  2.000 cS  3.959
+G  1   20        RLSCMLARLEV  RLSCMLLEV o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS 13.060 bgG   0 bgS  7.921 cS  6.723
+G  1   21          WVLALFDEV  WVLALFDEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.285 bgG  -1 bgS  2.000 cS  4.685
+G  1   22         HEIHIGYLEY  HEIHIGYEY o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  9.891 bgG  -1 bgS  2.000 cS  8.291
+G  1   23          KENSLIIQF  KENSLIIQF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.265 bgG  -1 bgS  2.000 cS  2.665
+G  1   24          HLHCYRSSF  HLHCYRSSF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.553 bgG  -1 bgS  2.000 cS  6.953
+G  1   25          LVRRTLLHV  LVRRTLLHV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.440 bgG  -1 bgS  2.000 cS  1.840
+G  1   26          FLFELIPEP  FLFELIPEP o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.888 bgG   0 bgS  2.557 cS  9.842
+G  1   27          YLSELLQTV  YLSELLQTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 16.345 bgG   0 bgS  7.517 cS 10.331
+G  1   28          LASYFFWGL  LASYFFWGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.366 bgG  -1 bgS  2.000 cS  5.766
+G  1   29          FMIGYTSAL  FMIGYTSAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.935 bgG  -1 bgS  2.000 cS 11.335
+G  1   30        HEIHIGYLEYV  HEIHYLEYV o  0 ip -99 il -99 dp   4 dl   2  cedar_pos sS 13.499 bgG  -1 bgS  2.000 cS 11.899
+G  1   31         LLFGMPPCLL  LLFGMPPCL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.549 bgG   0 bgS  2.562 cS  9.500
+G  1   32        RTNTVILETLK  RTNTILETL o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 10.571 bgG  -1 bgS  2.000 cS  8.971
+G  1   33          SLLRSLENV  SLLRSLENV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.396 bgG   0 bgS  4.212 cS  2.026
+G  1   34         FISIFFFLEI  FISIFFFEI o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  9.153 bgG   0 bgS  4.435 cS  5.605
+G  1   35         YMKSLEFENK  YMKSLEFEK o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  6.173 bgG   0 bgS  3.112 cS  3.683
+G  1   36        LLHASFVTLGK  LLHASFVTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.072 bgG   0 bgS  2.636 cS  9.963
+G  1   37         TMSFSHLFYL  TMFSHLFYL o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 14.930 bgG   0 bgS  6.816 cS  9.478
+G  1   38          FIFSYVVAV  FIFSYVVAV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.063 bgG   0 bgS  6.552 cS  6.822
+G  1   39          LVIGMPPPV  LVIGMPPPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.557 bgG  -1 bgS  2.000 cS  5.957
+G  1   40          RLMVAVEEA  RLMVAVEEA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.256 bgG   0 bgS  2.250 cS  3.456
+G  1   41          VLNYFKPYL  VLNYFKPYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.941 bgG   0 bgS  5.179 cS  5.798
+G  1   42          HLLSVEYQI  HLLSVEYQI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.815 bgG   0 bgS  5.147 cS  3.697
+G  1   43          KLMNIQQKL  KLMNIQQKL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.667 bgG   0 bgS  4.031 cS  3.442
+G  1   44         RPIPIKYKAM  RPIPIKYAM o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 11.272 bgG  -1 bgS  2.000 cS  9.672
+G  1   45          QTNPVTLQY  QTNPVTLQY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.279 bgG  -1 bgS  2.000 cS  1.679
+G  1   46          ALSPVIPHI  ALSPVIPHI o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 10.159 bgG   0 bgS  6.948 cS  4.600
+G  1   47         SIAPEIALEL  SIAPIALEL o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  7.023 bgG  -1 bgS  2.000 cS  5.423
+G  1   48         YFATLITELF  YFATLITEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.186 bgG   0 bgS  4.217 cS  4.812
+G  1   49          ALSYTPAEV  ALSYTPAEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.580 bgG   0 bgS  3.648 cS  4.662
+G  1   50          LFGVCIYSF  LFGVCIYSF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.384 bgG  -1 bgS  2.000 cS  3.784
+G  1   51          GMGPLLAMV  GMGPLLAMV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.713 bgG  -1 bgS  2.000 cS  6.113
+G  1   52          TEDEHFEFY  TEDEHFEFY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.652 bgG  -1 bgS  2.000 cS  5.052
+G  1   53          LLFGYSFAT  LLFGYSFAT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.166 bgG  -1 bgS  2.000 cS  6.566
+G  1   54          ILTGLNYEV  ILTGLNYEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.003 bgG   0 bgS  2.166 cS  5.270
+G  1   55         LMMPFSIVYI  LMMPSIVYI o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS 16.937 bgG   0 bgS  3.458 cS 14.170
+G  1   56          WRNILLLSL  WRNILLLSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.841 bgG  -1 bgS  2.000 cS  5.241
+G  1   57         YYSKNLNSFF  YYSKNLNSF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.423 bgG   0 bgS  4.878 cS  4.521
+G  1   58          TAMDIFVTV  TAMDIFVTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.401 bgG   0 bgS  2.134 cS  4.694
+G  1   59          VTEKLQPTY  VTEKLQPTY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.488 bgG  -1 bgS  2.000 cS  1.888
+G  1   60          LLAIKVPNV  LLAIKVPNV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.389 bgG  -1 bgS  2.000 cS  2.789
+G  1   61          FLFMYLVMV  FLFMYLVMV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.466 bgG   0 bgS  8.413 cS  8.736
+G  1   62          YSMECFQFM  YSMECFQFM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.250 bgG   0 bgS  5.378 cS  2.947
+G  1   63          VYQYTFPDF  VYQYTFPDF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.038 bgG  -1 bgS  2.000 cS  2.438
+G  1   64        KSDIGWIWELW  KSDIGIWEL o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  7.629 bgG  -1 bgS  2.000 cS  6.029
+G  1   65          FLEIYTVTV  FLEIYTVTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.402 bgG   0 bgS  7.228 cS  2.620
+G  1   66         MMMWDCWHAV  MMMWDCWHV o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 19.142 bgG   0 bgS  5.746 cS 14.546
+G  1   67          TMAAISNTV  TMAAISNTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.124 bgG  -1 bgS  2.000 cS  7.524
+G  1   68          AMAGSLVFL  AMAGSLVFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.669 bgG   0 bgS  3.092 cS  6.195
+G  1   69          VLFEDAVAY  VLFEDAVAY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.067 bgG  -1 bgS  2.000 cS  7.467
+G  1   70        TLIAIFPYARL  TLIAIFPYL o  0 ip -99 il -99 dp   8 dl   2  cedar_pos sS 15.224 bgG   0 bgS  2.267 cS 13.410
+G  1   71         FLESELSIRI  FLSELSIRI o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  9.200 bgG   0 bgS  7.522 cS  3.182
+G  1   72          FLDEFMEGV  FLDEFMEGV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.850 bgG   0 bgS  6.972 cS  6.273
+G  1   73         TMIEEYDSGL  TMIEYDSGL o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS  8.487 bgG  -1 bgS  2.000 cS  6.887
+G  1   74          FICAIIVVV  FICAIIVVV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.891 bgG   0 bgS  3.506 cS  4.086
+G  1   75          LLAILTYYV  LLAILTYYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.128 bgG   0 bgS  2.370 cS  9.233
+G  1   76         GLFGDIYLAI  GLFGDIYAI o  0 ip -99 il -99 dp   7 dl   1  prime_pos sS  7.550 bgG  -1 bgS  2.000 cS  5.950
+G  1   77         FRSIYLNTLL  FRSIYLNTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.990 bgG  -1 bgS  2.000 cS  6.390
+G  1   78         AQDIYRASYY  AQDIYASYY o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  3.663 bgG  -1 bgS  2.000 cS  2.063
+G  1   79         RTNTAILETL  RTNAILETL o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 12.855 bgG  -1 bgS  2.000 cS 11.255
+G  1   80        VQFLSQVLWSR  FLSQVLWSR o  2 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.144 bgG   0 bgS  4.850 cS  5.264
+G  1   81          FYGKTILWF  FYGKTILWF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.406 bgG  -1 bgS  2.000 cS  3.806
+G  1   82         ELAGIGILTV  ELAGIILTV o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  8.036 bgG  -1 bgS  2.000 cS  6.436
+G  1   83          YTSEILSPI  YTSEILSPI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.044 bgG   0 bgS  3.088 cS  8.574
+G  1   84          TYLPSAWNF  TYLPSAWNF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.461 bgG  -1 bgS  2.000 cS  5.861
+G  1   85         SRTNTAILEV  RTNTAILEV o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.405 bgG   0 bgS  5.082 cS  3.340
+G  1   86        RLDSTLLLYHA  RLDSLLYHA o  0 ip -99 il -99 dp   4 dl   2  cedar_pos sS 13.335 bgG  -1 bgS  2.000 cS 11.735
+G  1   87          VLDDSETTI  VLDDSETTI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.881 bgG  -1 bgS  2.000 cS  2.281
+G  1   88          YMLTLHTKL  YMLTLHTKL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.626 bgG   0 bgS  3.750 cS  5.626
+G  1   89        MPLVILIVLVL  MLVILIVLV o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS  7.625 bgG   0 bgS  5.703 cS  3.063
+G  1   90         AMPFSIFYPM  AMFSIFYPM o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 12.954 bgG  -1 bgS  2.000 cS 11.354
+G  1   91         LIDDYGVEEV  LIDDYVEEV o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  8.739 bgG  -1 bgS  2.000 cS  7.139
+G  1   92         RALFALLEIL  RLFALLEIL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 11.289 bgG  -1 bgS  2.000 cS  9.689
+G  1   93        RLMVAVEEAFI  RLMAVEEAF o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 10.758 bgG  -1 bgS  2.000 cS  9.158
+G  1   94          LLFALHFSA  LLFALHFSA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.908 bgG  -1 bgS  2.000 cS  8.308
+G  1   95          FLIYLDVSV  FLIYLDVSV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.499 bgG   0 bgS  4.355 cS  9.015
+G  1   96          RMQYSMECF  RMQYSMECF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.164 bgG  -1 bgS  2.000 cS  8.564
+G  1   97         MMPFSIVYIV  MMFSIVYIV o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 12.872 bgG   0 bgS  2.567 cS 10.818
+G  1   98         YMMMWDCWHA  YMMWDCWHA o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 16.640 bgG   0 bgS  4.232 cS 13.255
+G  1   99          GLGPGFSSY  GLGPGFSSY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.212 bgG  -1 bgS  2.000 cS  3.612
+G  1  100          LMRDHMPPV  LMRDHMPPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.943 bgG   0 bgS  4.118 cS  5.649
+G  1  101          YTDFHCQYV  YTDFHCQYV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 11.437 bgG   0 bgS  2.968 cS  9.063
+G  1  102          HVIQILSFV  HVIQILSFV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  8.056 bgG   0 bgS  3.428 cS  5.314
+G  1  103          VLDGFIPGT  VLDGFIPGT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.793 bgG  -1 bgS  2.000 cS  4.193
+G  1  104         LFRIKFKEPL  FRIKFKEPL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.903 bgG   0 bgS  2.481 cS  0.918
+G  1  105          HIAKSLFEV  HIAKSLFEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.080 bgG   0 bgS  2.246 cS  7.284
+G  1  106         RLFGEAPREL  RLFGEAPEL o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 12.052 bgG  -1 bgS  2.000 cS 10.452
+G  1  107          HLNGLLREV  HLNGLLREV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.670 bgG  -1 bgS  2.000 cS 10.070
+G  1  108          ILSPSAHEL  ILSPSAHEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.574 bgG   0 bgS  5.631 cS  3.069
+G  1  109          YLCAGAVYF  YLCAGAVYF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.852 bgG   0 bgS  6.611 cS  2.564
+G  1  110         SILMHGLVSL  ILMHGLVSL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.916 bgG   0 bgS  5.282 cS  9.691
+G  1  111         FLGAGLFLYF  FLAGLFLYF o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 12.522 bgG   0 bgS  4.907 cS  8.596
+G  1  112          ILIVMFPFL  ILIVMFPFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.178 bgG   0 bgS  6.329 cS  3.115
+G  1  113        FLMASISSFLL  FLMASISSL o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 17.346 bgG   0 bgS  4.853 cS 13.463
+G  1  114        LIMQLMPFGCL  LIMQLMPCL o  0 ip -99 il -99 dp   7 dl   2  cedar_pos sS 11.305 bgG  -1 bgS  2.000 cS  9.705
+G  1  115          STVQLIMQL  STVQLIMQL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.841 bgG   0 bgS  2.709 cS  2.674
+G  1  116          FLAEHEYGL  FLAEHEYGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.229 bgG   0 bgS  3.492 cS 11.436
+G  1  117       QKRPIPIKYKAM  RPIPIKYAM o  2 ip -99 il -99 dp   7 dl   1  cedar_pos sS 11.272 bgG  -1 bgS  2.000 cS  9.672
+G  1  118          VQLEEEYEV  VQLEEEYEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.412 bgG  -1 bgS  2.000 cS  3.812
+G  1  119           CYMEAVAL  CYME-AVAL o  0 ip   4 il   1 dp -99 dl -99  prime_pos sS  7.075 bgG  -1 bgS  2.000 cS  5.475
+G  1  120        WTGATITVTIK  WTGATIVTI o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS  5.907 bgG  -1 bgS  2.000 cS  4.307
+G  1  121          KLSELHTYI  KLSELHTYI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.637 bgG   0 bgS  3.570 cS  6.781
+G  1  122          HLMWLERLY  HLMWLERLY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.969 bgG  -1 bgS  2.000 cS  6.369
+G  1  123         RTDVKAYNVT  RTDVKAYNV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.988 bgG  -1 bgS  2.000 cS  3.388
+G  1  124          LLHASFVTL  LLHASFVTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.072 bgG   0 bgS  2.636 cS  9.963
+G  1  125          TLAEDLNLL  TLAEDLNLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.154 bgG   0 bgS  4.832 cS  1.289
+G  1  126          AEHSLQVAY  AEHSLQVAY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.077 bgG  -1 bgS  2.000 cS  1.477
+G  1  127          NLRYFAKSL  NLRYFAKSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.732 bgG  -1 bgS  2.000 cS  1.132
+G  1  128          ALFALLEIL  ALFALLEIL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.792 bgG  -1 bgS  2.000 cS  6.192
+G  1  129          HPFMTDEEY  HPFMTDEEY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.658 bgG  -1 bgS  2.000 cS  2.058
+G  1  130         LPNEYAFVTT  LPNEYFVTT o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  8.713 bgG  -1 bgS  2.000 cS  7.113
+G  1  131         QIIHTYSNTV  QIIHYSNTV o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  7.794 bgG   0 bgS  4.246 cS  4.397
+G  1  132         RSMRTVYGLF  RSMRTVYGL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  6.509 bgG  -1 bgS  2.000 cS  4.909
+G  1  133          QLSCISTYV  QLSCISTYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.025 bgG   0 bgS  7.907 cS  3.699
+G  1  134          REVFLLKSL  REVFLLKSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.006 bgG  -1 bgS  2.000 cS  4.406
+G  1  135          MIISHLYLI  MIISHLYLI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.653 bgG  -1 bgS  2.000 cS  8.053
+G  1  136          LLFAAFSSA  LLFAAFSSA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.000 bgG  -1 bgS  2.000 cS  5.400
+G  1  137          RPRCLCTAV  RPRCLCTAV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.421 bgG  -1 bgS  2.000 cS  5.821
+G  1  138        IQMFTIVLVSY  QMFTILVSY o  1 ip -99 il -99 dp   5 dl   1  cedar_pos sS 14.349 bgG  -1 bgS  2.000 cS 12.749
+G  1  139          LTFNQCYGV  LTFNQCYGV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.387 bgG  -1 bgS  2.000 cS  2.787
+G  1  140          LMVPHSPSL  LMVPHSPSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 15.695 bgG  -1 bgS  2.000 cS 14.095
+G  1  141          YLDELIRNT  YLDELIRNT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.393 bgG   0 bgS  2.225 cS  5.612
+G  1  142          RLDSTLLLY  RLDSTLLLY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.692 bgG  -1 bgS  2.000 cS  7.092
+G  1  143          VYRPLHYPL  VYRPLHYPL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.442 bgG  -1 bgS  2.000 cS  7.842
+G  1  144          ASMPSSPPL  ASMPSSPPL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  7.586 bgG   0 bgS  5.084 cS  3.518
+G  1  145          ALLFLESEL  ALLFLESEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.567 bgG   0 bgS  3.275 cS  2.946
+G  1  146          LLAGTLAVV  LLAGTLAVV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.374 bgG  -1 bgS  2.000 cS  3.774
+G  1  147          RLVPYLEFL  RLVPYLEFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.461 bgG   0 bgS  7.173 cS  7.722
+G  1  148          YLLAIFSGL  YLLAIFSGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.186 bgG   0 bgS  4.065 cS  7.934
+G  1  149          RPHHDQRSL  RPHHDQRSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.891 bgG  -1 bgS  2.000 cS  3.291
+G  1  150         DYMIHIIEKW  YMIHIIEKW o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.158 bgG  -1 bgS  2.000 cS  6.558
+G  1  151         REFDKIELAY  REFKIELAY o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS  7.360 bgG  -1 bgS  2.000 cS  5.760
+G  1  152          ILDKVLVHL  ILDKVLVHL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.235 bgG   0 bgS  5.970 cS  4.459
+G  1  153        NAFSGEYIPTV  FSGEYIPTV o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.138 bgG   0 bgS  3.479 cS 10.355
+G  1  154          DHYAYSYYL  DHYAYSYYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.338 bgG  -1 bgS  2.000 cS  4.738
+G  1  155          MPLVILIVL  MPLVILIVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.516 bgG  -1 bgS  2.000 cS  0.916
+G  1  156         YEGQVISNGF  YEGQVISNF o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS  4.515 bgG  -1 bgS  2.000 cS  2.915
+G  1  157         VYHEIHIGYL  VYHEIHIYL o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  8.810 bgG  -1 bgS  2.000 cS  7.210
+G  1  158          FSGEYIPTV  FSGEYIPTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.138 bgG   0 bgS  3.479 cS 10.355
+G  1  159          LLFGMPPCL  LLFGMPPCL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.549 bgG   0 bgS  2.562 cS  9.500
+G  1  160          FIMGISILL  FIMGISILL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.938 bgG   0 bgS  6.257 cS  2.933
+G  1  161         LMASISSFLL  LMASISSFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.579 bgG  -1 bgS  2.000 cS  7.979
+G  1  162          FYGGILWCF  FYGGILWCF o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 12.592 bgG  -1 bgS  2.000 cS 10.992
+G  1  163          LLDEKGPEV  LLDEKGPEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.353 bgG   0 bgS  4.050 cS  5.113
+G  1  164          LIFNMLYWI  LIFNMLYWI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.726 bgG  -1 bgS  2.000 cS  6.126
+G  1  165        KRPIPIKYKAM  RPIPIKYAM o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS 11.272 bgG  -1 bgS  2.000 cS  9.672
+G  1  166         FLLRFLYTQL  FLLRFLYTL o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 13.921 bgG   0 bgS 10.709 cS  5.354
+G  1  167         WRNILLLSLH  WRNILLLSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.841 bgG  -1 bgS  2.000 cS  5.241
+G  1  168        IPDSIALIQQL  IPIALIQQL o  0 ip -99 il -99 dp   2 dl   2  cedar_pos sS  9.132 bgG  -1 bgS  2.000 cS  7.532
+G  1  169        MILTGILLIEI  ILTGILLEI o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS  8.756 bgG   0 bgS  2.398 cS  6.838
+G  1  170          RPIPIKYKA  RPIPIKYKA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.190 bgG  -1 bgS  2.000 cS  6.590
+G  1  171         MLSILALVRV  MLSILLVRV o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS 10.535 bgG   0 bgS  3.107 cS  8.050
+G  1  172          YLSNIIPAL  YLSNIIPAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.486 bgG   0 bgS  6.363 cS  9.395
+G  1  173          FLSDHLYLV  FLSDHLYLV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.205 bgG   0 bgS 11.667 cS  3.871
+G  1  174          LLSIIFFPA  LLSIIFFPA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.658 bgG  -1 bgS  2.000 cS  4.058
+G  1  175         LTDDRLFTCY  LTDRLFTCY o  0 ip -99 il -99 dp   2 dl   1  prime_pos sS  6.298 bgG  -1 bgS  2.000 cS  4.698
+G  1  176         TLSASAAWAV  TLSASAWAV o  0 ip -99 il -99 dp   5 dl   1  prime_pos sS 11.570 bgG  -1 bgS  2.000 cS  9.970
+G  1  177        GLAMAGSLVFL  LMAGSLVFL o  1 ip -99 il -99 dp   1 dl   1  cedar_pos sS 10.949 bgG   0 bgS  4.601 cS  7.269
+G  1  178          SLRSHHYSL  SLRSHHYSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.411 bgG  -1 bgS  2.000 cS  9.811
+G  1  179        FMQRLLGPQRV  FMQRLLQRV o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS 12.552 bgG  -1 bgS  2.000 cS 10.952
+G  1  180        RHDLPPYRVYL  RHDPYRVYL o  0 ip -99 il -99 dp   3 dl   2  cedar_pos sS 10.221 bgG  -1 bgS  2.000 cS  8.621
+G  1  181          YVVPGSPCL  YVVPGSPCL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.062 bgG   0 bgS  3.614 cS  5.171
+G  1  182         LLGCVMYTLL  LLGCVMYTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.743 bgG   0 bgS  4.250 cS  6.343
+G  1  183         FAVGSYVYSV  FVGSYVYSV o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 13.899 bgG  -1 bgS  2.000 cS 12.299
+G  1  184          WVMPVIPAL  WVMPVIPAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.348 bgG   0 bgS  4.340 cS  8.876
+G  1  185        LPALAFTFFSL  LLAFTFFSL o  0 ip -99 il -99 dp   1 dl   2  cedar_pos sS  8.646 bgG  -1 bgS  2.000 cS  7.046
+G  1  186          YYSKNLNSF  YYSKNLNSF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.423 bgG  -1 bgS  2.000 cS  6.823
+G  1  187          LLHGFSFYL  LLHGFSFYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.727 bgG   0 bgS  9.559 cS  3.080
+G  1  188         KFLESCDEVI  KFLESCDEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.633 bgG   0 bgS  3.380 cS  1.929
+G  1  189          AVGSYVYSV  AVGSYVYSV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  9.453 bgG  -1 bgS  2.000 cS  7.853
+G  1  190         KRIPLPPHLC  KRIPLPPHL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.026 bgG   0 bgS  6.235 cS  4.037
+G  1  191         KTSSGLYVFR  KTSSGLYVF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.377 bgG  -1 bgS  2.000 cS  4.777
+G  1  192          IAMAVLYLA  IAMAVLYLA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.880 bgG  -1 bgS  2.000 cS  2.280
+G  1  193          SYMIMEIEL  SYMIMEIEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.639 bgG  -1 bgS  2.000 cS  4.039
+G  1  194          QPSGIILDY  QPSGIILDY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.630 bgG  -1 bgS  2.000 cS  3.030
+G  1  195         RFLEYLPLRF  RFLEYLPRF o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 10.165 bgG  -1 bgS  2.000 cS  8.565
+G  1  196          ILNAMIAKI  ILNAMIAKI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.960 bgG  -1 bgS  2.000 cS  4.360
+G  1  197          FIDCYLLAI  FIDCYLLAI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.970 bgG  -1 bgS  2.000 cS  8.370
+G  1  198         VYRPLHYPLL  VYRPLHYPL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.442 bgG   0 bgS  2.967 cS  7.068
+G  1  199          MMMWDCWHA  MMMWDCWHA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.922 bgG  -1 bgS  2.000 cS 13.322
+G  1  200        ILAALFLGLGV  ILAALFLGV o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS  8.470 bgG  -1 bgS  2.000 cS  6.870
+G  1  201        RTNTGILETLK  RTNGILETL o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 12.238 bgG  -1 bgS  2.000 cS 10.638
+G  1  202          LLIASVTWL  LLIASVTWL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.458 bgG   0 bgS  3.034 cS  6.031
+G  1  203         LMTLHGFMMY  LMLHGFMMY o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  9.068 bgG  -1 bgS  2.000 cS  7.468
+G  1  204          RLDYFMFAV  RLDYFMFAV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS 10.541 bgG   0 bgS  7.293 cS  4.707
+G  1  205        LMASISSFLLV  LMISSFLLV o  0 ip -99 il -99 dp   2 dl   2  cedar_pos sS 10.446 bgG   0 bgS  2.077 cS  8.785
+G  1  206          YIHGRGWAL  YIHGRGWAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.314 bgG   0 bgS  2.324 cS  2.455
+G  1  207          IMDQVPFSV  IMDQVPFSV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.006 bgG   0 bgS  2.217 cS 10.232
+G  1  208          REHALLAYM  REHALLAYM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.969 bgG  -1 bgS  2.000 cS  7.369
+G  1  209        VLICLRLLMRY  VLICLLMRY o  0 ip -99 il -99 dp   4 dl   2  cedar_pos sS  8.724 bgG  -1 bgS  2.000 cS  7.124
+G  1  210         DTVEYPYTSF  DTVEYPYSF o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS 10.556 bgG  -1 bgS  2.000 cS  8.956
+G  1  211          MLIGIPVYV  MLIGIPVYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.135 bgG   0 bgS  5.018 cS 10.120
+G  1  212          RLDAVLMEV  RLDAVLMEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 13.673 bgG   0 bgS  4.196 cS 10.316
+G  1  213          RIECIFFSV  RIECIFFSV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.861 bgG  -1 bgS  2.000 cS  7.261
+G  1  214         RYYVGHKAKF  YYVGHKAKF o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.277 bgG  -1 bgS  2.000 cS  1.677
+G  1  215          CLNEYHLFL  CLNEYHLFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.241 bgG   0 bgS  2.608 cS  5.154
+G  1  216          YFFWGLWAL  YFFWGLWAL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 12.722 bgG   0 bgS  2.361 cS 10.833
+G  1  217          FYNDIILMV  FYNDIILMV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.379 bgG   0 bgS  4.133 cS  7.072
+G  1  218          LMFWASSSI  LMFWASSSI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.137 bgG  -1 bgS  2.000 cS  8.537
+G  1  219        ARLQFSCYSSL  RLQFSCYSL o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS 14.875 bgG   0 bgS  2.530 cS 12.851
+G  1  220          IMRTYTYEI  IMRTYTYEI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.577 bgG  -1 bgS  2.000 cS  8.977
+G  1  221        ITVARCMKMAY  ITVARCMAY o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS  2.786 bgG  -1 bgS  2.000 cS  1.186
+G  1  222          YMDGTMSQV  YMDGTMSQV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.878 bgG  -1 bgS  2.000 cS  9.278
+G  1  223          YEHEDVKEA  YEHEDVKEA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.856 bgG  -1 bgS  2.000 cS  2.256
+G  1  224          IMSSSLFNL  IMSSSLFNL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.578 bgG  -1 bgS  2.000 cS  9.978
+G  1  225         VVVPCEPPEV  VVVPCPPEV o  0 ip -99 il -99 dp   5 dl   1  cedar_pos sS  8.725 bgG  -1 bgS  2.000 cS  7.125
+G  1  226         SSEIISFKSL  SEIISFKSL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.501 bgG  -1 bgS  2.000 cS  2.901
+G  1  227          LMASISSFL  LMASISSFL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.579 bgG  -1 bgS  2.000 cS  7.979
+G  1  228         VMIIVSSLAV  VMIISSLAV o  0 ip -99 il -99 dp   4 dl   1  cedar_pos sS  8.338 bgG  -1 bgS  2.000 cS  6.738
+G  1  229          FIYQYYSSI  FIYQYYSSI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.767 bgG  -1 bgS  2.000 cS  4.167
+G  1  230          ILTDIEEKV  ILTDIEEKV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.163 bgG  -1 bgS  2.000 cS  2.563
+G  1  231         LVLFEDAVAY  LLFEDAVAY o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 10.335 bgG  -1 bgS  2.000 cS  8.735
+G  1  232          LLGPNSFEV  LLGPNSFEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.908 bgG   0 bgS  3.421 cS  7.172
+G  1  233         EYYSKNLNSF  YYSKNLNSF o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.423 bgG  -1 bgS  2.000 cS  6.823
+G  1  234          FLGEYIPTV  FLGEYIPTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 17.775 bgG   0 bgS  8.647 cS 10.858
+G  1  235          FLNVLFPLL  FLNVLFPLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 11.214 bgG   0 bgS  5.226 cS  7.034
+G  1  236        ETMQCSELYHM  TMQCSLYHM o  1 ip -99 il -99 dp   5 dl   1  cedar_pos sS 12.406 bgG  -1 bgS  2.000 cS 10.806
+G  1  237         LLFLTIFIYA  LLFTIFIYA o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS  7.134 bgG   0 bgS  5.084 cS  3.067
+G  1  238         RTAVYHEIHI  RTAVYHEHI o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  6.620 bgG  -1 bgS  2.000 cS  5.020
+G  1  239         FLMASISSFL  FLMASISSL o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 17.346 bgG   0 bgS  4.853 cS 13.463
+G  1  240          LVFPLVMGV  LVFPLVMGV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.158 bgG  -1 bgS  2.000 cS  5.558
+G  1  241          RLIKHYPGI  RLIKHYPGI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.528 bgG  -1 bgS  2.000 cS  5.928
+G  1  242          ELMRDINSM  ELMRDINSM o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.787 bgG  -1 bgS  2.000 cS  4.187
+G  1  243        ITCQSLRSPMY  ITCQSLPMY o  0 ip -99 il -99 dp   6 dl   2  cedar_pos sS  8.358 bgG  -1 bgS  2.000 cS  6.758
+G  1  244          YMFLASPSV  YMFLASPSV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.242 bgG   0 bgS  6.701 cS  4.882
+G  1  245          MMPFSIVYI  MMPFSIVYI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.092 bgG   0 bgS  5.453 cS  2.730
+G  1  246          QHQPNPFEV  QHQPNPFEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.328 bgG  -1 bgS  2.000 cS  4.728
+G  1  247          FLIQTEQKL  FLIQTEQKL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 10.064 bgG  -1 bgS  2.000 cS  8.464
+G  1  248          LYPEFIASI  LYPEFIASI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.629 bgG  -1 bgS  2.000 cS  4.029
+G  1  249        LQTIKDIASPI  QTIKDIASI o  1 ip -99 il -99 dp   8 dl   1  cedar_pos sS  5.652 bgG  -1 bgS  2.000 cS  4.052
+G  1  250         LLKAELVAGL  LLAELVAGL o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  7.274 bgG  -1 bgS  2.000 cS  5.674
+G  1  251          DANSFLQSV  DANSFLQSV o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  4.589 bgG  -1 bgS  2.000 cS  2.989
+G  1  252         FMDMAILVES  FMMAILVES o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS 13.341 bgG  -1 bgS  2.000 cS 11.741
+G  1  253          FVGALSFSI  FVGALSFSI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.348 bgG  -1 bgS  2.000 cS  6.748
+G  1  254          FARAHALMF  FARAHALMF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.312 bgG  -1 bgS  2.000 cS  1.712
+G  1  255         LAMAGSLVFL  LMAGSLVFL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 10.949 bgG  -1 bgS  2.000 cS  9.349
+G  1  256          LLVDLAEEL  LLVDLAEEL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.442 bgG  -1 bgS  2.000 cS  6.842
+G  1  257         FTLMYEERAV  FTLMYEEAV o  0 ip -99 il -99 dp   7 dl   1  cedar_pos sS  8.504 bgG  -1 bgS  2.000 cS  6.904
+G  1  258        YMMMWDCWHAV  MMMWDCWHV o  1 ip -99 il -99 dp   8 dl   1  cedar_pos sS 19.142 bgG   0 bgS  5.746 cS 14.546
+G  1  259          SEIISFKSL  SEIISFKSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.501 bgG  -1 bgS  2.000 cS  2.901
+G  1  260          MTLHGFMMY  MTLHGFMMY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.257 bgG  -1 bgS  2.000 cS  4.657
+G  1  261          SPMEKAISL  SPMEKAISL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.797 bgG   0 bgS  2.204 cS  3.034
+G  1  262          REIEGRVMF  REIEGRVMF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.496 bgG  -1 bgS  2.000 cS  2.896
+G  1  263          TSDYLSQSY  TSDYLSQSY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.925 bgG  -1 bgS  2.000 cS  4.325
+G  1  264        DHREIEGRVMF  REIEGRVMF o  2 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.496 bgG  -1 bgS  2.000 cS  2.896
+G  1  265        VRRASVCLITL  RRASVCLTL o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS  4.954 bgG  -1 bgS  2.000 cS  3.354
+G  1  266        VFTQSFITVSI  FTQSFIVSI o  1 ip -99 il -99 dp   6 dl   1  cedar_pos sS 12.007 bgG   0 bgS  4.502 cS  8.405
+G  1  267          LQGSILAYL  LQGSILAYL o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  6.648 bgG  -1 bgS  2.000 cS  5.048
+G  1  268          HIIRLMLEY  HIIRLMLEY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.482 bgG  -1 bgS  2.000 cS  5.882
+G  1  269          RVIHLLVEK  RVIHLLVEK o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.362 bgG  -1 bgS  2.000 cS  5.762
+G  1  270         YMMNSVQENF  YMMNSVQEF o  0 ip -99 il -99 dp   8 dl   1  cedar_pos sS 13.873 bgG   0 bgS  5.296 cS  9.637
+G  1  271         KPKKENLWRM  KPKENLWRM o  0 ip -99 il -99 dp   2 dl   1  cedar_pos sS  4.198 bgG  -1 bgS  2.000 cS  2.598
+G  1  272          KMIGNHLWV  KMIGNHLWV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.243 bgG  -1 bgS  2.000 cS  5.643
+G  1  273          VLNPFIYML  VLNPFIYML o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS 14.609 bgG   0 bgS  6.080 cS  9.745
+G  1  274          FAIADTAYV  FAIADTAYV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.705 bgG  -1 bgS  2.000 cS  3.105
+G  1  275          SLAPLSPRV  SLAPLSPRV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.663 bgG   0 bgS  5.529 cS  5.240
+G  1  276          RVSTLRVSL  RVSTLRVSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.361 bgG  -1 bgS  2.000 cS  4.761
+G  1  277          MEAIRLYQF  MEAIRLYQF o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  4.397 bgG  -1 bgS  2.000 cS  2.797
+G  1  278          FLNDLLSVL  FLNDLLSVL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.899 bgG   0 bgS  7.289 cS  3.067
+G  1  279        EKTSSGLYVFR  KTSSGLYVF o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.377 bgG  -1 bgS  2.000 cS  4.777
+G  1  280          FMFVNSLLL  FMFVNSLLL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.986 bgG   0 bgS  5.297 cS  2.748
+G  1  281         RILAALFLGL  RLAALFLGL o  0 ip -99 il -99 dp   1 dl   1  cedar_pos sS 10.211 bgG  -1 bgS  2.000 cS  8.611
+G  1  282          FEDKSVAYT  FEDKSVAYT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.768 bgG  -1 bgS  2.000 cS  1.168
+G  1  283        NRHDCWSLISL  RHDWSLISL o  1 ip -99 il -99 dp   3 dl   1  cedar_pos sS 10.140 bgG  -1 bgS  2.000 cS  8.540
+G  1  284        METLHIIYLEA  ETLHIIYEA o  1 ip -99 il -99 dp   7 dl   1  cedar_pos sS  8.147 bgG  -1 bgS  2.000 cS  6.547
+G  1  285          KPFCVLISL  KPFCVLISL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.864 bgG   0 bgS  5.851 cS  3.183
+G  1  286          YLEPGPVTV  YLEPGPVTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.712 bgG   0 bgS  8.234 cS  3.125
+G  1  287          TESPFEQHI  TESPFEQHI o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  4.566 bgG  -1 bgS  2.000 cS  2.966
+G  1  288          LPNEYAFVT  LPNEYAFVT o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.201 bgG  -1 bgS  2.000 cS  1.601
+G  1  289        MMDYPYPTNFL  MMDPYPTNF o  0 ip -99 il -99 dp   3 dl   1  cedar_pos sS 12.554 bgG   0 bgS  5.477 cS  8.173
+G  1  290          ILNVDIFTL  ILNVDIFTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.177 bgG   0 bgS  4.735 cS  3.389
+G  1  291          QLLVSLWGL  QLLVSLWGL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.649 bgG   0 bgS  3.821 cS  5.592
+G  1  292          NLQREEYTV  NLQREEYTV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.395 bgG  -1 bgS  2.000 cS  1.795
+G  1  293         IMQTLAGELY  IMQTLAELY o  0 ip -99 il -99 dp   6 dl   1  cedar_pos sS  5.940 bgG  -1 bgS  2.000 cS  4.340
+G  1  294        MLEYQKILWKV  MLQKILWKV o  0 ip -99 il -99 dp   2 dl   2  cedar_pos sS 14.235 bgG   0 bgS  4.858 cS 10.349
+G  1  295          ETMQCSELY  ETMQCSELY o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.516 bgG  -1 bgS  2.000 cS  1.916
+G  1  296          EVRALLTQY  EVRALLTQY o  0 ip -99 il -99 dp -99 dl -99  prime_pos sS  2.500 bgG  -1 bgS  2.000 cS  0.900
+G  1  297          KLKAIPTTL  KLKAIPTTL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  6.483 bgG   0 bgS  4.613 cS  2.792
+G  1  298          FVTETPLEV  FVTETPLEV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.154 bgG   0 bgS  6.013 cS  3.344
+G  1  299          TLHGFMMYL  TLHGFMMYL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  8.407 bgG   0 bgS  7.679 cS  2.263
+G  1  300         SVLNYFKPYL  VLNYFKPYL o  1 ip -99 il -99 dp -99 dl -99  cedar_pos sS  9.941 bgG   0 bgS  5.179 cS  5.798
+G  1  301          MLLKHDVSL  MLLKHDVSL o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  7.513 bgG   0 bgS  6.657 cS  2.188
+G  1  302          FQAQHIAMA  FQAQHIAMA o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  3.049 bgG  -1 bgS  2.000 cS  1.449
+G  1  303          AYQSIKVRI  AYQSIKVRI o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  2.090 bgG  -1 bgS  2.000 cS  0.490
+G  1  304          HIVEISTPV  HIVEISTPV o  0 ip -99 il -99 dp -99 dl -99  cedar_pos sS  5.470 bgG   0 bgS  6.369 cS  0.375
+## Trash cluster (95 outliers)
+#Trash1                 AYRDLQTRK	cedar_pos
+#Trash2                 HSVSSAFKK	cedar_pos
+#Trash3                 HESRTNTAIL	cedar_pos
+#Trash4                 VVVGADGVGK	cedar_pos
+#Trash5                 GTSAPRKKK	prime_pos
+#Trash6                 SVTNEFCLK	prime_pos
+#Trash7                 TPLPGTRVRA	cedar_pos
+#Trash8                 HDLGRLHSC	cedar_pos
+#Trash9                 HVKITDFGR	cedar_pos
+#Trash10                VDNPLMCRL	cedar_pos
+#Trash11                VTIGPRLLL	cedar_pos
+#Trash12                LPRAKKLIL	cedar_pos
+#Trash13                SPMIVGSPW	prime_pos
+#Trash14                QEECLWMAV	cedar_pos
+#Trash15                GPEELGLPM	prime_pos
+#Trash16                IPINPRRCL	cedar_pos
+#Trash17                SEKLRHMLL	cedar_pos
+#Trash18                DDIYPIDFY	cedar_pos
+#Trash19                GSILAYLVV	cedar_pos
+#Trash20                ASNASSAAK	prime_pos
+#Trash21                LTSTVQLIM	cedar_pos
+#Trash22                SCSRAVPQV	cedar_pos
+#Trash23                AATPVGSLY	cedar_pos
+#Trash24                LLLASTSGA	cedar_pos
+#Trash25                QDVSVQVER	cedar_pos
+#Trash26                CISNVFMQR	cedar_pos
+#Trash27                MRMNQGVCC	cedar_pos
+#Trash28                GADGVGKSA	cedar_pos
+#Trash29                CILGKLFTKK	prime_pos
+#Trash30                VADINDHAL	cedar_pos
+#Trash31                YPVIFKSIM	cedar_pos
+#Trash32                QCEEVARVL	cedar_pos
+#Trash33                GLGKGTYGV	cedar_pos
+#Trash34                LAIGFICAI	prime_pos
+#Trash35                SAAWAVHPS	prime_pos
+#Trash36                RVYKCIFNH	cedar_pos
+#Trash37                FPKKIQMLA	cedar_pos
+#Trash38                RLRKRNEYR	cedar_pos
+#Trash39                KSQREFVRR	prime_pos
+#Trash40                FMLLTQARI	cedar_pos
+#Trash41                VLAMAIYKQ	cedar_pos
+#Trash42                VVVGAVGVGK	cedar_pos
+#Trash43                AGQHIAKSLF	cedar_pos
+#Trash44                REFDKIELA	cedar_pos
+#Trash45                SCMGGMNWR	cedar_pos
+#Trash46                GEEDGAGGHSL	cedar_pos
+#Trash47                KVFEHVGSR	cedar_pos
+#Trash48                QATEAERSF	cedar_pos
+#Trash49                TMIEEYDSG	cedar_pos
+#Trash50                HESRTNTAI	cedar_pos
+#Trash51                YKLVVVGAV	cedar_pos
+#Trash52                MPIEPGDIGC	cedar_pos
+#Trash53                VRTLLSQVNK	cedar_pos
+#Trash54                DMKARQKAL	cedar_pos
+#Trash55                RAKLLGAEEK	cedar_pos
+#Trash56                TEDYMIHII	cedar_pos
+#Trash57                KARLPVGAY	cedar_pos
+#Trash58                CTIAVVNFL	cedar_pos
+#Trash59                NTVILETLK	cedar_pos
+#Trash60                LRTKVYAEL	cedar_pos
+#Trash61                TPTVPSSSF	cedar_pos
+#Trash62                EEMEPLPVM	cedar_pos
+#Trash63                RVRVMAIYK	cedar_pos
+#Trash64                APARLERRHSA	cedar_pos
+#Trash65                HSCVMASLR	cedar_pos
+#Trash66                IPLSDNTIF	cedar_pos
+#Trash67                VSKILPSTW	cedar_pos
+#Trash68                ALALAQKGV	cedar_pos
+#Trash69                ITDFGRAKL	cedar_pos
+#Trash70                CISSCNPNL	cedar_pos
+#Trash71                IYKAPCENW	cedar_pos
+#Trash72                GQFLTPNSH	cedar_pos
+#Trash73                NLFNRYLAL	cedar_pos
+#Trash74                EVIVPLSGW	cedar_pos
+#Trash75                DENITTIQF	cedar_pos
+#Trash76                CILGKLFTK	prime_pos
+#Trash77                CVRVSGQGL	cedar_pos
+#Trash78                TAHLNCNLF	cedar_pos
+#Trash79                FRQKTNLIL	cedar_pos
+#Trash80                LGNVWCFPY	cedar_pos
+#Trash81                NTPNVHRTK	prime_pos
+#Trash82                PSDTRQMLFY	cedar_pos
+#Trash83                KVDPIGHVY	cedar_pos
+#Trash84                VERASAIAW	cedar_pos
+#Trash85                GADGVGKSAL	cedar_pos
+#Trash86                DMKARQKALV	cedar_pos
+#Trash87                LYNGMEHLI	cedar_pos
+#Trash88                RVCGPCSTY	cedar_pos
+#Trash89                RPHVPESAF	cedar_pos
+#Trash90                EVADAATLTM	cedar_pos
+#Trash91                GRIAFFLKY	cedar_pos
+#Trash92                FAFQEYDSF	prime_pos
+#Trash93                AQDIYRASY	cedar_pos
+#Trash94                LRAAFFGKCF	cedar_pos
+#Trash95                PYMFLSEWI	cedar_pos
+# group 0, size 261: Final KLD sum after 132200 epochs - 6.665804
+# group 1, size 305: Final KLD sum after 132200 epochs - 6.219911
+# Trash cluster: removed 95 outliers
+#
+# Final number of non-empty clusters: 2
+
+### Final KLD sum after 132200 iterations: 6.425526
