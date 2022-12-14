@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 import multiprocessing
 import itertools
 
@@ -60,8 +60,8 @@ def args_parser():
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
-                                                                   'within the standard amino acid alphabet. To '
-                                                                   'disable, input "false". "false" by default.')
+                                                                    'within the standard amino acid alphabet. To '
+                                                                    'disable, input "false". "false" by default.')
     return parser.parse_args()
 
 
@@ -96,9 +96,11 @@ def main():
         results[trainname] = {}
         for hla in ['HLA-A0201', 'HLA-A1101', 'HLA-A2402', 'HLA-B0702', 'HLA-B1501', 'HLA-B3501']:
             # Manually gets split everytime
-            kf = KFold(5, shuffle=True, random_state=13)
+            skf = StratifiedKFold(n_splits=5, random_state=13, shuffle=True)
             train_dataset = dataset.query('HLA==@hla').copy()
-            for i, (train_idx, test_idx) in enumerate(kf.split(train_dataset['Peptide'], train_dataset['agg_label'])):
+            for i, (train_idx, test_idx) in enumerate(skf.split(X=train_dataset['Peptide'].values,
+                                                                y=train_dataset['agg_label'].values,
+                                                                groups=train_dataset['agg_label'].values)):
                 train_dataset.iloc[test_idx, list(train_dataset.columns).index('fold')] = i
             # Do weights loops
             for invert in [True, False]:

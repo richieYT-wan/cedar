@@ -149,8 +149,16 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     y_train_pred, y_train_score = model.predict(x_train), model.predict_proba(x_train)[:, 1]
     y_val_pred, y_val_score = model.predict(x_valid), model.predict_proba(x_valid)[:, 1]
     # Get the metrics and save them
-    train_metrics = get_metrics(y_train, y_train_score, y_train_pred)
-    valid_metrics = get_metrics(y_valid, y_val_score, y_val_pred)
+    try:
+        train_metrics = get_metrics(y_train, y_train_score, y_train_pred)
+    except:
+        print(train_dataframe.head())
+        raise ValueError(f'{encoding_kwargs}')
+    try:
+        valid_metrics = get_metrics(y_valid, y_val_score, y_val_pred)
+    except:
+        print(train_dataframe.head())
+        raise ValueError(f'{encoding_kwargs}')
     y_pred_test = model.predict_proba(x_test)[:, 1]
 
     return model, train_metrics, valid_metrics, y_pred_test
