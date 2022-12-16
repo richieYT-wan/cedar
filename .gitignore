@@ -210,6 +210,7 @@ output/reshaped/
 output/bootstrapping/trainset_models.pkl
 output/nn_manual_tune_qsub/checkpoints/
 output/*221207*/
+output/*2212*/
 output/nn_manual_tune_qsub_batchsize32/
 .DS_Store
 notebook/cedar_results_related.csv

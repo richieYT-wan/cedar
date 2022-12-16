@@ -21,7 +21,6 @@ from src.metrics import get_nested_feature_importance
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
 
-
 N_CORES = 36
 
 
@@ -63,9 +62,9 @@ def args_parser():
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
-                                                                   'within the standard amino acid alphabet. To '
-                                                                   'disable, input "false". "false" by default.')
-    parser.add_argument('-add_rank', type = str2bool, default = True, help ='Whether to add rank as a feature or not')
+                                                                    'within the standard amino acid alphabet. To '
+                                                                    'disable, input "false". "false" by default.')
+    parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
     return parser.parse_args()
 
 
@@ -85,6 +84,7 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
     merged_dataset = pd.read_csv(f'{args["datadir"]}221112_cedar_prime_merged_fold.csv')
+    hybrid_dataset = pd.read_csv(f'{args["datadir"]}221215_hybrid_cedarpos_primeneg_10fold.csv')
     ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
     prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -95,7 +95,8 @@ def main():
                                          'merged']), 'please input -trainset as either "cedar", "prime" or "merged"'
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset,
-                'merged': merged_dataset}
+                'merged': merged_dataset,
+                'hybrid': hybrid_dataset}
     train_dataset = trainmap[args['trainset']]
 
     # DEFINING COLS
@@ -168,9 +169,9 @@ def main():
                             # Training model and getting feature importances
                             print('Training')
                             trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
-                                                                                    ics_dict=ics_dict,
-                                                                                    encoding_kwargs=encoding_kwargs,
-                                                                                    n_jobs=10)
+                                                                                        ics_dict=ics_dict,
+                                                                                        encoding_kwargs=encoding_kwargs,
+                                                                                        n_jobs=10)
                             fi = get_nested_feature_importance(trained_models)
                             fn = AA_KEYS + ['rank'] + mut_cols
                             # Saving Feature importances as dataframe
@@ -181,11 +182,11 @@ def main():
 
                             # EVAL AND BOOTSTRAPPING ON CEDAR
                             _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_dataset,
-                                                                            trained_models,
-                                                                            ics_dict, train_dataset,
-                                                                            encoding_kwargs,
-                                                                            concatenated=True,
-                                                                            only_concat=True)
+                                                                                trained_models,
+                                                                                ics_dict, train_dataset,
+                                                                                encoding_kwargs,
+                                                                                concatenated=True,
+                                                                                only_concat=True)
                             #
                             cedar_preds_df.drop(columns=aa_cols).to_csv(
                                 f'{args["outdir"]}raw/cedar_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
@@ -199,11 +200,11 @@ def main():
 
                             # EVAL AND BOOTSTRAPPING ON PRIME
                             _, prime_preds_df = evaluate_trained_models_sklearn(prime_dataset,
-                                                                            trained_models,
-                                                                            ics_dict, train_dataset,
-                                                                            encoding_kwargs,
-                                                                            concatenated=False,
-                                                                            only_concat=False)
+                                                                                trained_models,
+                                                                                ics_dict, train_dataset,
+                                                                                encoding_kwargs,
+                                                                                concatenated=False,
+                                                                                only_concat=False)
 
                             # Pre-saving results before bootstrapping
                             prime_preds_df.drop(columns=aa_cols).to_csv(
@@ -218,11 +219,11 @@ def main():
 
                             # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
                             _, prime_switch_preds_df = evaluate_trained_models_sklearn(prime_switch_dataset,
-                                                                                   trained_models,
-                                                                                   ics_dict, train_dataset,
-                                                                                   encoding_kwargs,
-                                                                                   concatenated=False,
-                                                                                   only_concat=False)
+                                                                                       trained_models,
+                                                                                       ics_dict, train_dataset,
+                                                                                       encoding_kwargs,
+                                                                                       concatenated=False,
+                                                                                       only_concat=False)
 
                             # Pre-saving results before bootstrapping
                             prime_switch_preds_df.drop(columns=aa_cols).to_csv(
@@ -239,11 +240,11 @@ def main():
                             # ///////////////////////////
                             # EVAL AND BOOTSTRAPPING ON IBEL
                             _, ibel_preds_df = evaluate_trained_models_sklearn(ibel_dataset,
-                                                                           trained_models,
-                                                                           ics_dict, train_dataset,
-                                                                           encoding_kwargs,
-                                                                           concatenated=False,
-                                                                           only_concat=False)
+                                                                               trained_models,
+                                                                               ics_dict, train_dataset,
+                                                                               encoding_kwargs,
+                                                                               concatenated=False,
+                                                                               only_concat=False)
 
                             # Pre-saving results before bootstrapping
                             ibel_preds_df.drop(columns=aa_cols).to_csv(
@@ -260,11 +261,11 @@ def main():
                             if args['trainset'].lower() == 'merged':
                                 # EVAL AND BOOTSTRAPPING ON IBEL
                                 _, merged_preds_df = evaluate_trained_models_sklearn(merged_dataset,
-                                                                                 trained_models,
-                                                                                 ics_dict, train_dataset,
-                                                                                 encoding_kwargs,
-                                                                                 concatenated=False,
-                                                                                 only_concat=False)
+                                                                                     trained_models,
+                                                                                     ics_dict, train_dataset,
+                                                                                     encoding_kwargs,
+                                                                                     concatenated=False,
+                                                                                     only_concat=False)
 
                                 # Pre-saving results before bootstrapping
                                 merged_preds_df.drop(columns=aa_cols).to_csv(
@@ -276,6 +277,26 @@ def main():
                                                                                  evalset='MERGED', n_rounds=10000,
                                                                                  n_jobs=N_CORES)
                                 mega_df = mega_df.append(merged_bootstrapped_df)
+
+                            if args['trainset'].lower() == 'hybrid':
+                                # EVAL AND BOOTSTRAPPING ON IBEL
+                                _, hybrid_preds_df = evaluate_trained_models_sklearn(hybrid_dataset,
+                                                                                     trained_models,
+                                                                                     ics_dict, train_dataset,
+                                                                                     encoding_kwargs,
+                                                                                     concatenated=False,
+                                                                                     only_concat=False)
+
+                                # Pre-saving results before bootstrapping
+                                hybrid_preds_df.drop(columns=aa_cols).to_csv(
+                                    f'{args["outdir"]}raw/merged_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                    index=False)
+                                # Bootstrapping (PRIME)
+                                hybrid_bootstrapped_df = final_bootstrap_wrapper(hybrid_preds_df, args, blsm_name,
+                                                                                 ic_name, pep_col, rank_col, key,
+                                                                                 evalset='MERGED', n_rounds=10000,
+                                                                                 n_jobs=N_CORES)
+                                mega_df = mega_df.append(hybrid_bootstrapped_df)
 
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
