@@ -91,13 +91,14 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
     # Setting trainset
-    assert (args['trainset'].lower() in ['cedar', 'prime',
-                                         'merged']), 'please input -trainset as either "cedar", "prime" or "merged"'
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset,
                 'merged': merged_dataset,
                 'hybrid': hybrid_dataset}
+    assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
+
     train_dataset = trainmap[args['trainset']]
+
 
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
