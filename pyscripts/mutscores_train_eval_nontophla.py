@@ -92,6 +92,7 @@ def main():
                            target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
                            mask_aa=False)
     results = {}
+    hla = 'non_top'
     for train_dataset, trainname in zip([cedar_dataset, prime_dataset], ['cedar', 'prime']):
         results[trainname] = {}
         # Manually gets split everytime
