@@ -26,7 +26,7 @@ N_CORES = 36
 
 
 def final_bootstrap_wrapper(preds_df, args, filename, hla,
-                            ic_name, evalset,
+                            ic_name, trainset, evalset,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
@@ -37,7 +37,9 @@ def final_bootstrap_wrapper(preds_df, args, filename, hla,
     bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
     bootstrapped_df['hla'] = hla
+
     bootstrapped_df['evalset'] = evalset.upper()
+    bootstrapped_df['evalset'] = trainset.upper()
 
     bootstrapped_df.to_csv(
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',
@@ -142,6 +144,7 @@ def main():
                     index=False)
                 # Bootstrapping (CEDAR)
                 cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
+                                                                trainset=trainname,
                                                                 evalset='CEDAR', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(cedar_bootstrapped_df)
@@ -160,7 +163,7 @@ def main():
                     index=False)
                 # Bootstrapping (PRIME)
                 prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, filename, hla, ic_name,
-                                                                evalset='PRIME', n_rounds=10000,
+                                                                trainset=trainname,evalset='PRIME', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(prime_bootstrapped_df)
 
