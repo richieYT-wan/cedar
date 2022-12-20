@@ -113,8 +113,9 @@ def main():
                 # creating filename
                 filename = f'{trainname}_onehot_{"-".join(ic_name.split(" "))}_nontopHLA'
                 # Using the same model and hyperparameters
-                model = RandomForestClassifier(n_estimators=100, max_depth=5, ccp_alpha=5e-7)
-                # Training model and getting feature importances
+                # model = RandomForestClassifier(n_estimators=100, max_depth=5, ccp_alpha=5e-7)
+                model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
+                                               max_depth=8, ccp_alpha=9.945e-6)                # Training model and getting feature importances
                 print('Training')
                 trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                             ics_dict=ics_dict,
