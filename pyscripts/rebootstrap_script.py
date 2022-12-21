@@ -4,7 +4,7 @@ import os, sys
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
-
+import multiprocessing
 from src.bootstrap import bootstrap_eval
 from src.utils import pkl_dump
 # Parsing and re-bootstrapping all results in a HLA specific manner
@@ -31,7 +31,7 @@ for trainset in ['cedar', 'prime']:
                 tmp = preds_df.query('HLA not in @top_hlas')
             scores = tmp[pred_col].values
             labels = tmp['agg_label'].values
-            bootstrapped_df, mean_rocs = bootstrap_eval(scores, labels, n_rounds=10000, n_jobs = 8)
+            bootstrapped_df, mean_rocs = bootstrap_eval(scores, labels, n_rounds=10000, n_jobs = multiprocessing.cpu_count()-2)
             bootstrapped_df['trainset']=trainset
             bootstrapped_df['evalset']=evalset
             bootstrapped_df['weight']=weight
