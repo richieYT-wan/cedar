@@ -91,7 +91,8 @@ def get_metrics(y_true, y_score, y_pred=None, threshold=0.5, keep=False):
         metrics['prauc'] = auc(recall, precision)
         metrics['AP'] = average_precision_score(y_true, y_score)
     except:
-        print(all(y_true == 0), all(y_true == 1))
+        print('Couldn\'t get AUCs/etc because there\'s only one class in the dataset')
+        print(f'Only negatives: {all(y_true == 0)}, Only positives: {all(y_true == 1)}')
     metrics['auc_01'] = roc_auc_score(y_true, y_score, max_fpr=0.1)
     metrics['f1'] = f1_score(y_true, y_pred)
     metrics['accuracy'] = accuracy_score(y_true, y_pred)
