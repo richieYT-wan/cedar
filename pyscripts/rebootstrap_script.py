@@ -42,7 +42,7 @@ for trainset in ['cedar', 'prime']:
             mean_rocs_list.append(mean_rocs)
             mean_rocs_ids.append(dict(trainset=trainset, evalset=evalset, weight=weight, hla=hla))
 
-pd.concat(concat_df).to_csv(f"{PATH}concat_df.csv", index=False)
+pd.concat(concat_df).to_csv(f"{PATH}rebootstrapped_hla_spec_df.csv", index=False)
 pkl_dump(mean_rocs_list, f'{PATH}rocs_list.pkl')
 pkl_dump(mean_rocs_ids, f'{PATH}rocs_ids.pkl')
 
