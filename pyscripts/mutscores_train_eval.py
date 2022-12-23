@@ -83,6 +83,7 @@ def main():
     # LOADING DATA AND STUFF
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     cedar_dataset_randomfold = pd.read_csv(f'{args["datadir"]}221222_cedar_related_random10fold.csv')
+    cedar_noa11 = pd.read_csv(f'{args["datadir"]}221223_cedar_noa1101_10fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
     merged_dataset = pd.read_csv(f'{args["datadir"]}221112_cedar_prime_merged_fold.csv')
     hybrid_dataset = pd.read_csv(f'{args["datadir"]}221215_hybrid_cedarpos_primeneg_10fold.csv')
@@ -96,7 +97,8 @@ def main():
                 'prime': prime_dataset,
                 'merged': merged_dataset,
                 'hybrid': hybrid_dataset,
-                'cedar_random': cedar_dataset_randomfold}
+                'cedar_random': cedar_dataset_randomfold,
+                'cedar_noa11':cedar_noa11}
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
     train_dataset = trainmap[args['trainset']]
@@ -292,7 +294,7 @@ def main():
 
                                 # Pre-saving results before bootstrapping
                                 hybrid_preds_df.drop(columns=aa_cols).to_csv(
-                                    f'{args["outdir"]}raw/merged_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                    f'{args["outdir"]}raw/hybrid_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
                                     index=False)
                                 # Bootstrapping (PRIME)
                                 hybrid_bootstrapped_df = final_bootstrap_wrapper(hybrid_preds_df, args, blsm_name,
@@ -300,6 +302,24 @@ def main():
                                                                                  evalset='HYBRID', n_rounds=10000,
                                                                                  n_jobs=N_CORES)
                                 mega_df = mega_df.append(hybrid_bootstrapped_df)
+                            if args['trainset'].lower() == 'cedar_noa11':
+                                _, cedar_noa11_preds = evaluate_trained_models_sklearn(hybrid_dataset,
+                                                                                     trained_models,
+                                                                                     ics_dict, train_dataset,
+                                                                                     encoding_kwargs,
+                                                                                     concatenated=False,
+                                                                                     only_concat=False)
+
+                                # Pre-saving results before bootstrapping
+                                cedar_noa11_preds.drop(columns=aa_cols).to_csv(
+                                    f'{args["outdir"]}raw/cedarnoa11__preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                    index=False)
+                                # Bootstrapping (PRIME)
+                                cedar_noa11_bootstrapped_df = final_bootstrap_wrapper(cedar_noa11_preds, args, blsm_name,
+                                                                                 ic_name, pep_col, rank_col, key,
+                                                                                 evalset='CEDAR_NoA11', n_rounds=10000,
+                                                                                 n_jobs=N_CORES)
+                                mega_df = mega_df.append(cedar_noa11_bootstrapped_df)
 
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
