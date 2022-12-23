@@ -149,7 +149,41 @@ def main():
                     df_fi.to_csv(
                         f'{args["outdir"]}raw/featimps_{filename}.csv',
                         index=False)
+                    # EVAL ON CEDAR A11 + REST
+                    _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_a11_rest,
+                                                                        trained_models,
+                                                                        ics_dict, train_dataset,
+                                                                        encoding_kwargs,
+                                                                        concatenated=True,
+                                                                        only_concat=True)
+                    #
+                    cedar_preds_df.to_csv(
+                        f'{args["outdir"]}raw/cedar_a11_rest_preds_{filename}.csv',
+                        index=False)
+                    # Bootstrapping (CEDAR)
+                    cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
+                                                                    trainset=trainname,
+                                                                    evalset='CEDAR_A11_REST', n_rounds=10000,
+                                                                    n_jobs=N_CORES)
+                    mega_df = mega_df.append(cedar_bootstrapped_df)
 
+                    # EVAL ON CEDAR TOP HLAS
+                    _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_tops,
+                                                                        trained_models,
+                                                                        ics_dict, train_dataset,
+                                                                        encoding_kwargs,
+                                                                        concatenated=True,
+                                                                        only_concat=True)
+                    #
+                    cedar_preds_df.to_csv(
+                        f'{args["outdir"]}raw/cedar_tops_preds_{filename}.csv',
+                        index=False)
+                    # Bootstrapping (CEDAR)
+                    cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
+                                                                    trainset=trainname,
+                                                                    evalset='CEDAR_TOP_HLAS', n_rounds=10000,
+                                                                    n_jobs=N_CORES)
+                    mega_df = mega_df.append(cedar_bootstrapped_df)
                     # EVAL AND BOOTSTRAPPING ON CEDAR
                     _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_dataset,
                                                                         trained_models,
