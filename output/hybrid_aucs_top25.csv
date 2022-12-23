@@ -1,0 +1,26 @@
+encoding	weight	pep_col	key	mean_auc_HYBRID
+onehot	Inverted KL	icore_mut	core_blsm_mut_score-core_mutation_score	0.7812002253191941
+onehot	Inverted KL	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.780816963946502
+onehot	Inverted Shannon	icore_mut	core_blsm_mut_score-core_mutation_score	0.7805781652804726
+onehot	Inverted Shannon	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.779493383255959
+onehot	None	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7787194618296882
+onehot	None	icore_mut	core_blsm_mut_score-core_mutation_score	0.7784284021212409
+onehot	Inverted KL	Peptide	core_blsm_mut_score-core_mutation_score	0.7765735921625696
+onehot	Inverted Shannon	Peptide	core_blsm_mut_score-core_mutation_score	0.7762540851017671
+onehot	Inverted Mask	icore_mut	core_blsm_mut_score-core_mutation_score	0.7757744684649271
+onehot	Inverted Mask	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7748610409693499
+onehot	Inverted KL	Peptide	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7746657624108436
+onehot	Inverted Shannon	Peptide	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7741663501952148
+onehot	KL	icore_mut	core_blsm_mut_score-core_mutation_score	0.7733243225455337
+onehot	Shannon	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7733046432438476
+onehot	Shannon	icore_mut	core_blsm_mut_score-core_mutation_score	0.7730817697153379
+onehot	KL	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7727022404868185
+onehot	Mask	icore_mut	core_blsm_mut_score-core_mutation_score	0.7716180758793294
+onehot	Mask	icore_mut	dissimilarity_score-core_blsm_mut_score-core_mutation_score	0.7706015055800517
+onehot	Inverted KL	icore_mut	core_blsm_mut_score	0.7684906647610601
+onehot	Inverted KL	icore_mut	dissimilarity_score-core_blsm_mut_score	0.7674600931105235
+onehot	Inverted Shannon	icore_mut	core_blsm_mut_score	0.7671372165379409
+onehot	Inverted Shannon	icore_mut	dissimilarity_score-core_blsm_mut_score	0.7661858454454603
+onehot	Inverted Mask	Peptide	core_blsm_mut_score-core_mutation_score	0.7656501869312914
+onehot	Inverted KL	Peptide	core_blsm_mut_score	0.7653238997978283
+onehot	Inverted Shannon	Peptide	core_blsm_mut_score	0.7648646605920754
