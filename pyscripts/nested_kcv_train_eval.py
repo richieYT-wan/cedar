@@ -110,7 +110,7 @@ def main():
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
 
-    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score', 'ratio_rank']
+    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
