@@ -6,7 +6,7 @@ source activate phd
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=${HOMEDIR}pyscripts/
 DATADIR=../data/mutant/
-OUTDIR=../output/221122_mutscore_cedar_fixed/
+OUTDIR=../output/221223_cedar_a11rest_vs_top/
 ICSDIR=../data/ic_dicts/
 cd ${PYDIR}
 pwd

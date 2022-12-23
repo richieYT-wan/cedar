@@ -107,12 +107,12 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score', 'ratio_rank']
+    cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score']#, 'ratio_rank']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
 
-    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score', 'ratio_rank']
+    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score']#, 'ratio_rank']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
