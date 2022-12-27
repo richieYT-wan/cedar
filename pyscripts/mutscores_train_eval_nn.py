@@ -107,12 +107,12 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score', 'ratio_rank']
+    cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
 
-    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score', 'ratio_rank']
+    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
@@ -134,7 +134,7 @@ def main():
     mega_df = pd.DataFrame()
 
     print('Starting loops')
-    for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut', None]:
+    for rank_col in ['EL_rank_mut', None]:
         results_related[rank_col] = {}
         encoding_kwargs['rank_col'] = rank_col
         encoding_kwargs['add_rank'] = False if rank_col is None else True
