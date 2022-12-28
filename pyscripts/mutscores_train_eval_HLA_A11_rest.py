@@ -143,7 +143,7 @@ def main():
                                                                                 encoding_kwargs=encoding_kwargs,
                                                                                 n_jobs=10)
                     fi = get_nested_feature_importance(trained_models)
-                    fn = AA_KEYS + mut_cols
+                    fn = AA_KEYS + ['rank'] + mut_cols
                     # Saving Feature importances as dataframe
                     df_fi = pd.DataFrame(fi, index=fn).T
                     df_fi.to_csv(
