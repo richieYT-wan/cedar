@@ -120,6 +120,7 @@ def main():
                     else:
                         ic_name = 'Inverted ' + ic_name
                 # creating filename
+                start = dt.now()
                 filename = f'trainCedar_onehot_{"-".join(ic_name.split(" "))}_{hla.replace(",","x")}_onlyrank'
                 pred_filename = f'_preds_onehot_{"-".join(ic_name.split(" "))}_Peptide_EL_rank_mut_only_rank'
                 # Using the same model and hyperparameters
@@ -142,7 +143,9 @@ def main():
                                                                 evalset='PRIME_REST', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(prime_bootstrapped_df)
-
+                end = dt.now()
+                elapsed = divmod((end-start).seconds,60)
+                print(f'elapsed : {elapsed[0]} minutes, {elapsed[1]} seconds')
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 

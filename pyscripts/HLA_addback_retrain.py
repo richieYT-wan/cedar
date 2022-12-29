@@ -125,6 +125,7 @@ def main():
                     else:
                         ic_name = 'Inverted ' + ic_name
                 # creating filename
+                start = dt.now()
                 filename = f'{trainname}_onehot_{"-".join(ic_name.split(" "))}_{hla.replace(",","x")}_onlyrank'
                 # Using the same model and hyperparameters
                 # model = RandomForestClassifier(n_estimators=100, max_depth=5, ccp_alpha=5e-7)
@@ -185,7 +186,9 @@ def main():
                                                                 trainset=trainname,evalset='PRIME', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(prime_bootstrapped_df)
-
+                end = dt.now()
+                elapsed=  divmod((end-start).seconds, 60)
+                print(f'SINGLE RUN ELAPSED : {elapsed[0]} minutes, {elapsed[1]} seconds')
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 
