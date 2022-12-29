@@ -80,11 +80,11 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_a11_rest = pd.read_csv(f'{args["datadir"]}221223_cedar_a11_rest_10fold.csv')
-    cedar_tops = pd.read_csv(f'{args["datadir"]}221223_cedar_tops_10fold.csv')
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
-    ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
+    # cedar_a11_rest = pd.read_csv(f'{args["datadir"]}221223_cedar_a11_rest_10fold.csv')
+    # cedar_tops = pd.read_csv(f'{args["datadir"]}221223_cedar_tops_10fold.csv')
+    cedar_df = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
+    prime_df = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
+    # ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -102,7 +102,8 @@ def main():
     # add_back is a given set of HLA to add back to the "rest" of the dataset
     for add_back in addback_list:
         rest = [x for x in top_hlas if x not in add_back]
-        train_dataset = cedar_dataset.query('HLA not in @top_hlas or HLA in @add_back')
+        train_dataset = cedar_df.query('HLA not in @top_hlas or HLA in @add_back')
+        prime_dataset = prime_df.query('HLA not in @top_hlas or HLA in @add_back')
         # Random 10fold split
         skf = StratifiedKFold(n_splits=10, random_state=13, shuffle=True)
         train_dataset = train_dataset.query('HLA==@hla').copy()
@@ -143,8 +144,8 @@ def main():
                 df_fi.to_csv(
                     f'{args["outdir"]}raw/featimps_{filename}.csv',
                     index=False)
-                # EVAL ON CEDAR A11 + REST
-                _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_a11_rest,
+                # train dataset = cedar dataset
+                _, cedar_preds_df = evaluate_trained_models_sklearn(train_dataset,
                                                                     trained_models,
                                                                     ics_dict, train_dataset,
                                                                     encoding_kwargs,
@@ -152,7 +153,7 @@ def main():
                                                                     only_concat=True)
                 #
                 cedar_preds_df.to_csv(
-                    f'{args["outdir"]}raw/cedar_a11_rest_preds_{filename}.csv',
+                    f'{args["outdir"]}raw/cedar_filtered_preds_{filename}.csv',
                     index=False)
                 # Bootstrapping (CEDAR)
                 cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
@@ -161,34 +162,6 @@ def main():
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(cedar_bootstrapped_df)
 
-                # EVAL ON CEDAR TOP HLAS
-                _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_tops,
-                                                                    trained_models,
-                                                                    ics_dict, train_dataset,
-                                                                    encoding_kwargs,
-                                                                    concatenated=True,
-                                                                    only_concat=True)
-                #
-                cedar_preds_df.to_csv(
-                    f'{args["outdir"]}raw/cedar_tops_preds_{filename}.csv',
-                    index=False)
-                # Bootstrapping (CEDAR)
-                cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
-                                                                trainset=trainname,
-                                                                evalset='CEDAR_TOP_HLAS', n_rounds=10000,
-                                                                n_jobs=N_CORES)
-                mega_df = mega_df.append(cedar_bootstrapped_df)
-                # EVAL AND BOOTSTRAPPING ON CEDAR
-                _, cedar_preds_df = evaluate_trained_models_sklearn(cedar_dataset,
-                                                                    trained_models,
-                                                                    ics_dict, train_dataset,
-                                                                    encoding_kwargs,
-                                                                    concatenated=True,
-                                                                    only_concat=True)
-                #
-                cedar_preds_df.to_csv(
-                    f'{args["outdir"]}raw/cedar_preds_{filename}.csv',
-                    index=False)
                 # Bootstrapping (CEDAR)
                 cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
                                                                 trainset=trainname,
@@ -206,7 +179,7 @@ def main():
 
                 # Pre-saving results before bootstrapping
                 prime_preds_df.to_csv(
-                    f'{args["outdir"]}raw/prime_preds_{filename}.csv',
+                    f'{args["outdir"]}raw/prime_filtered_preds_{filename}.csv',
                     index=False)
                 # Bootstrapping (PRIME)
                 prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, filename, hla, ic_name,
@@ -214,20 +187,6 @@ def main():
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(prime_bootstrapped_df)
 
-                _, ibel_preds_df = evaluate_trained_models_sklearn(ibel_dataset,
-                                                                   trained_models,
-                                                                   ics_dict, train_dataset,
-                                                                   encoding_kwargs,
-                                                                   concatenated=False,
-                                                                   only_concat=False)
-                ibel_preds_df.to_csv(
-                    f'{args["outdir"]}raw/ibel_preds_{filename}.csv',
-                    index=False)
-                # Bootstrapping (PRIME)
-                ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, filename, hla, ic_name,
-                                                                trainset=trainname, evalset='IBEL', n_rounds=10000,
-                                                                n_jobs=N_CORES)
-                mega_df = mega_df.append(ibel_bootstrapped_df)
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 

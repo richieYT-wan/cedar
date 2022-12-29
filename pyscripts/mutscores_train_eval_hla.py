@@ -107,7 +107,6 @@ def main():
                 train_dataset = dataset.query('HLA not in @top_hlas').copy()
                 cedar_dataset = cedar_df.query('HLA not in @top_hlas').copy()
                 prime_dataset = prime_df.query('HLA not in @top_hlas').copy()
-
             for i, (train_idx, test_idx) in enumerate(skf.split(X=train_dataset['Peptide'].values,
                                                                 y=train_dataset['agg_label'].values,
                                                                 groups=train_dataset['agg_label'].values)):
