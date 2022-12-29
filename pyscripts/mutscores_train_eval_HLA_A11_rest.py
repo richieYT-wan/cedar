@@ -231,7 +231,7 @@ def main():
                         index=False)
                     # Bootstrapping (PRIME)
                     ibel_bootstrapped_df = final_bootstrap_wrapper(ibel_preds_df, args, filename, hla, ic_name,
-                                                                    trainset=trainname, evalset='PRIME', n_rounds=10000,
+                                                                    trainset=trainname, evalset='IBEL', n_rounds=10000,
                                                                     n_jobs=N_CORES)
                     mega_df = mega_df.append(ibel_bootstrapped_df)
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
