@@ -155,17 +155,10 @@ def main():
                 cedar_preds_df.to_csv(
                     f'{args["outdir"]}raw/cedar_filtered_preds_{filename}.csv',
                     index=False)
-                # Bootstrapping (CEDAR)
-                cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
-                                                                trainset=trainname,
-                                                                evalset='CEDAR_A11_REST', n_rounds=10000,
-                                                                n_jobs=N_CORES)
-                mega_df = mega_df.append(cedar_bootstrapped_df)
 
-                # Bootstrapping (CEDAR)
                 cedar_bootstrapped_df = final_bootstrap_wrapper(cedar_preds_df, args, filename, hla, ic_name,
                                                                 trainset=trainname,
-                                                                evalset='CEDAR', n_rounds=10000,
+                                                                evalset='CEDAR_REST', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(cedar_bootstrapped_df)
 
@@ -183,7 +176,7 @@ def main():
                     index=False)
                 # Bootstrapping (PRIME)
                 prime_bootstrapped_df = final_bootstrap_wrapper(prime_preds_df, args, filename, hla, ic_name,
-                                                                trainset=trainname,evalset='PRIME', n_rounds=10000,
+                                                                trainset=trainname,evalset='PRIME_REST', n_rounds=10000,
                                                                 n_jobs=N_CORES)
                 mega_df = mega_df.append(prime_bootstrapped_df)
                 end = dt.now()
