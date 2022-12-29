@@ -55,7 +55,7 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/mutant/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/221212_HLA_specific_model/')
+    parser.add_argument('-outdir', type=str, default='../output/221212_HLA_specific_model_FIXED/')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
@@ -79,8 +79,8 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
+    cedar_df = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
+    prime_df = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -93,12 +93,21 @@ def main():
                            target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
                            mask_aa=False)
     results = {}
-    for dataset, trainname in zip([cedar_dataset, prime_dataset], ['cedar', 'prime']):
+    top_hlas = ['HLA-A0201', 'HLA-A1101', 'HLA-A2402', 'HLA-B0702', 'HLA-B1501', 'HLA-B3501']
+    for dataset, trainname in zip([cedar_df, prime_df], ['cedar', 'prime']):
         results[trainname] = {}
-        for hla in ['HLA-A0201', 'HLA-A1101', 'HLA-A2402', 'HLA-B0702', 'HLA-B1501', 'HLA-B3501']:
+        for hla in ['HLA-A0201', 'HLA-A1101', 'HLA-A2402', 'HLA-B0702', 'HLA-B1501', 'HLA-B3501', 'non-top']:
             # Manually gets split everytime
             skf = StratifiedKFold(n_splits=5, random_state=13, shuffle=True)
-            train_dataset = dataset.query('HLA==@hla').copy()
+            if hla != 'non-top':
+                train_dataset = dataset.query('HLA==@hla').copy()
+                cedar_dataset = cedar_df.query('HLA==@hla').copy()
+                prime_dataset = prime_df.query('HLA==@hla').copy()
+            elif hla == 'non-top':
+                train_dataset = dataset.query('HLA not in @top_hlas').copy()
+                cedar_dataset = cedar_df.query('HLA not in @top_hlas').copy()
+                prime_dataset = prime_df.query('HLA not in @top_hlas').copy()
+
             for i, (train_idx, test_idx) in enumerate(skf.split(X=train_dataset['Peptide'].values,
                                                                 y=train_dataset['agg_label'].values,
                                                                 groups=train_dataset['agg_label'].values)):
