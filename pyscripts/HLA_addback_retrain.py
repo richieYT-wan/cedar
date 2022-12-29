@@ -106,7 +106,6 @@ def main():
         prime_dataset = prime_df.query('HLA not in @top_hlas or HLA in @add_back')
         # Random 10fold split
         skf = StratifiedKFold(n_splits=10, random_state=13, shuffle=True)
-        train_dataset = train_dataset.query('HLA==@hla').copy()
         for i, (train_idx, test_idx) in enumerate(skf.split(X=train_dataset['Peptide'].values,
                                                             y=train_dataset['agg_label'].values,
                                                             groups=train_dataset['agg_label'].values)):
