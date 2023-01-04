@@ -119,3 +119,39 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
     mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None])
     # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
     return result_df, mean_roc_curve
+
+
+def get_pval(sample_a, sample_b):
+    """
+    Returns the bootstrapped pval that sample_a > sample_b
+    Ex: sample_a is the AUCs for a given cdt
+        sample_b is the AUCs for another condition
+        --> Check that condition A works better than B
+    Args:
+        sample_a: an array-like of values of size N
+        sample_b: an array-like of values of size N
+
+    Returns:
+        pval : P value
+        sig : significance symbol
+    """
+    # If both are not the same size can't do the comparison
+    assert len(sample_a)==len(sample_b), 'Provided samples don\'t have the same length!'\
+                                        f'Sample A: {len(sample_a)}, Sample B: {len(sample_b)}'
+
+    pval = 1 - (len((sample_a > sample_b).astype(int).nonzero()[0]) / len(sample_a))
+
+    sig = '*' if pval < .05 and pval >= 0.01 else '**' if pval < .01 and pval >= 0.001 \
+        else '***' if pval < 0.001 and pval >= 0.0001 else '****' if pval < 0.0001 else 'ns'
+    return pval, sig
+
+
+def plot_pval(axis, pval, sig, x1, x2, y, h=0.015):
+    # Rounds the label to the relevant decimal
+    pvstr = str(pval)
+    label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
+    # Drawing Pval */ns rectangles
+    # x1, x2 = 0, 1
+    # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
+    axis.plot([x1, x1, x2, x2], [y, y + h, y + h, y], lw=2, c='k')
+    axis.text((x1 + x2) * .5, y + h, label, ha='center', va='bottom', color='k')
