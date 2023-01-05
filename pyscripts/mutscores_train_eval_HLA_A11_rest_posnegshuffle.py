@@ -157,9 +157,9 @@ def main():
                     _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
                                                                train_dataset, encoding_kwargs,
                                                                concatenated=True, only_concat=True)
-                    preds.to_csv(f'{args["outdir"]}raw/{evalset}_preds_{filename}.csv', index=False)
+                    preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
                     bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                              trainset=trainname, evalset=evalset,
+                                                              trainset=trainname, evalset=evalname,
                                                               n_rounds=10000, n_jobs=N_CORES)
                     mega_df = mega_df.append(bootstrapped_df)
                 # EVAL ON CEDAR A11 + REST
