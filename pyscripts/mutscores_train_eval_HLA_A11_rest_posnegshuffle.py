@@ -110,7 +110,6 @@ def main():
     cedar_rest_a11neg = pd.concat([cedar_rest, cedar_a11.query('agg_label==0')])
     cedar_rest_a11pos = pd.concat([cedar_rest, cedar_a11.query('agg_label==1')])
 
-
     for train_dataset, trainname in zip([cedar_rest, cedar_a11, cedar_rest_a11neg, cedar_rest_a11pos],
                                         ['rest', 'A11', 'rest_A11neg', 'rest_A11pos']):
         skf = StratifiedKFold(n_splits=10, random_state=13, shuffle=True)
@@ -138,7 +137,8 @@ def main():
                 # model = RandomForestClassifier(n_estimators=100, max_depth=5, ccp_alpha=5e-7)
 
                 model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
-                                               max_depth=8, ccp_alpha=9.945e-6)                    # Training model and getting feature importances
+                                               max_depth=8,
+                                               ccp_alpha=9.945e-6)  # Training model and getting feature importances
                 print('Training')
                 trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                             ics_dict=ics_dict,
@@ -152,8 +152,9 @@ def main():
                     f'{args["outdir"]}raw/featimps_{filename}.csv',
                     index=False)
 
-                for evalset, evalname in zip([cedar_a11_rest, cedar_a11, cedar_tops, cedar_rest_a11pos, cedar_rest_a11neg],
-                                             ['rest_A11', 'A11', 'Tops', 'rest_A11pos', 'rest_A11neg']):
+                for evalset, evalname in zip(
+                        [cedar_a11_rest, cedar_a11, cedar_rest, cedar_tops, cedar_rest_a11pos, cedar_rest_a11neg],
+                        ['rest_A11', 'A11', 'rest', 'Tops', 'rest_A11pos', 'rest_A11neg']):
                     _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
                                                                train_dataset, encoding_kwargs,
                                                                concatenated=True, only_concat=True)
