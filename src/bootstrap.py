@@ -149,6 +149,7 @@ def get_pval(sample_a, sample_b):
 def plot_pval(axis, pval, sig, x1, x2, y, h=0.015):
     # Rounds the label to the relevant decimal
     pvstr = str(pval)
+    if sig == '****':print(pval)
     label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
     # Drawing Pval */ns rectangles
     # x1, x2 = 0, 1
