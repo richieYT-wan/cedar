@@ -156,10 +156,10 @@ def main():
               }
     for best_kwargs, ics_dict, ic_name, id_name in [best_cedar, best_prime, best_avg, best_extra, best_extra2]:
         for hp, model in zip([rf_hp, xgb_hp], [RandomForestClassifier, XGBClassifier]):
-            params_list = list(ParameterSampler(hp, n_iter=args["n_iter"]))
+            params_list = list(ParameterSampler(hp, n_iter=args["n_iter"], random_state=13))
             random_search_wrapper = partial(random_search, model_constructor=model,
                                             train_dataset= cedar_dataset, ics_dict=ics_dict,encoding_kwargs=best_kwargs)
-            output = Parallel(n_jobs=N_CORES//9)(delayed(random_search_wrapper)(param=param) for param in params_list)
+            output = Parallel(n_jobs=3)(delayed(random_search_wrapper)(param=param) for param in params_list)
             best_hyperparams = list(reversed(sorted(output, key=lambda x: x[1])))[0][0]
             best_model = model(**best_hyperparams)
             trained_models, _, _ = nested_kcv_train_sklearn(cedar_dataset, best_model, ics_dict, best_kwargs, n_jobs=9)
