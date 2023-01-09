@@ -11,5 +11,5 @@ ICSDIR=../data/ic_dicts/
 N_ITER=400
 cd ${PYDIR}
 pwd
-python3 ./mutscores_train_eval.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -n_iter ${N_ITER} -ncores 40  > 'hp_retune.txt'
+python3 ./hyperparams_retune.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -n_iter ${N_ITER} -ncores 40  > 'hp_retune.txt'
 
