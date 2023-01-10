@@ -8,8 +8,8 @@ PYDIR=${HOMEDIR}pyscripts/
 DATADIR=../data/mutant/
 OUTDIR=../output/221122_mutscore_cedar_fixed/
 ICSDIR=../data/ic_dicts/
-N_ITER=400
+FRAC_ITER=0.6
 cd ${PYDIR}
 pwd
-python3 ./hyperparams_retune.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -n_iter ${N_ITER} -ncores 40  > 'hp_retune.txt'
+python3 ./hyperparams_retune.py -datadir ${DATADIR} -outdir ${OUTDIR} -icsdir ${ICSDIR} -frac_iter ${FRAC_ITER} -ncores 40  > 'hp_retune.txt'
 

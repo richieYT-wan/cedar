@@ -81,7 +81,10 @@ def args_parser():
                                                                     'within the standard amino acid alphabet. To '
                                                                     'disable, input "false". "false" by default.')
     parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
-    parser.add_argument('-n_iter', type=int, default=350, help='Number of iterations for random search')
+    parser.add_argument('-frac_iter', type=float, default=.67, help='The proportion of how many hyperparams '
+                                                                    'combination (out of the total) to test. By '
+                                                                    'default, 0.67 of the grid will be randomly '
+                                                                    'sampled')
     return parser.parse_args()
 
 
@@ -156,7 +159,8 @@ def main():
               }
     for best_kwargs, ics_dict, ic_name, id_name in [best_cedar, best_prime, best_avg, best_extra, best_extra2]:
         for hp, model in zip([rf_hp, xgb_hp], [RandomForestClassifier, XGBClassifier]):
-            params_list = list(ParameterSampler(hp, n_iter=args["n_iter"], random_state=13))
+            n_iter = int(args['frac_iter']*len(list(ParameterGrid(hp))))
+            params_list = list(ParameterSampler(hp, n_iter=n_iter, random_state=13))
             random_search_wrapper = partial(random_search, model_constructor=model,
                                             train_dataset= cedar_dataset, ics_dict=ics_dict,encoding_kwargs=best_kwargs)
             output = Parallel(n_jobs=1)(delayed(random_search_wrapper)(param=param) for param in params_list)
