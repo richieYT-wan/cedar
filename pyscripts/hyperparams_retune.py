@@ -149,8 +149,8 @@ def main():
     xgb_hp = {'n_estimators': [10, 50, 100, 200, 300],
               'max_depth': [4, 6, 8],
               'learning_rate': [.1, .3, .5],
-              'alpha': np.logspace(-15, -3, 7),
-              'lambda': np.logspace(-15, -3, 7),
+              'alpha': np.logspace(-15, -2, 7),
+              'lambda': np.logspace(-15, -2, 7),
               'colsample_by_tree': np.linspace(0.5, 1.1, 3),
               'subsample': [0.6, .8, 1]
               }
@@ -159,7 +159,7 @@ def main():
             params_list = list(ParameterSampler(hp, n_iter=args["n_iter"], random_state=13))
             random_search_wrapper = partial(random_search, model_constructor=model,
                                             train_dataset= cedar_dataset, ics_dict=ics_dict,encoding_kwargs=best_kwargs)
-            output = Parallel(n_jobs=3)(delayed(random_search_wrapper)(param=param) for param in params_list)
+            output = Parallel(n_jobs=1)(delayed(random_search_wrapper)(param=param) for param in params_list)
             best_hyperparams = list(reversed(sorted(output, key=lambda x: x[1])))[0][0]
             best_model = model(**best_hyperparams)
             trained_models, _, _ = nested_kcv_train_sklearn(cedar_dataset, best_model, ics_dict, best_kwargs, n_jobs=9)
@@ -171,7 +171,7 @@ def main():
                 _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict, train_dataframe=cedar_dataset,
                                                            encoding_kwargs=best_kwargs, concatenated=True, only_concat=True)
                 preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{fn}.csv', index=False)
-                bootstrapped_df = final_bootstrap_wrapper(preds, args, id_name = id_name, model_name = model.__name__, ic_name=ic_name, pep_col = best_kwargs['pep_col'],
+                bootstrapped_df = final_bootstrap_wrapper(preds, args, id_name = id_name, model_name = model.__name__, ic_name=ic_name, pep_col = best_kwargs['seq_col'],
                                                           rank_col = best_kwargs['rank_col'], key = key, evalset=evalname, n_rounds=10000, n_jobs=N_CORES)
                 mega_df.append(bootstrapped_df)
 
