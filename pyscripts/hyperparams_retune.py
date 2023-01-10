@@ -170,7 +170,7 @@ def main():
             for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset],['CEDAR','PRIME','IBEL']):
                 _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict, train_dataframe=cedar_dataset,
                                                            encoding_kwargs=best_kwargs, concatenated=True, only_concat=True)
-                pd.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{fn}.csv', index=False)
+                preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{fn}.csv', index=False)
                 bootstrapped_df = final_bootstrap_wrapper(preds, args, id_name = id_name, model_name = model.__name__, ic_name=ic_name, pep_col = best_kwargs['pep_col'],
                                                           rank_col = best_kwargs['rank_col'], key = key, evalset=evalname, n_rounds=10000, n_jobs=N_CORES)
                 mega_df.append(bootstrapped_df)
