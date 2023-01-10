@@ -107,7 +107,7 @@ def main():
     # Baseline is cedar_rest
     cedar_noa11neg = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A1101" and agg_label==0)').index)
     cedar_noa11pos = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A1101" and agg_label==1)').index)
-    cedar_noa11 = cedar_dataset.query('HLA!="HLA-A1101')
+    cedar_noa11 = cedar_dataset.query('HLA!="HLA-A1101"')
 
     for train_dataset, trainname in zip([cedar_dataset, cedar_noa11neg, cedar_noa11pos, cedar_noa11],
                                         ['all', 'all_noA11neg', 'all_noA11pos', 'all_noA11']):
