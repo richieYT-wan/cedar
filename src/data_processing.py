@@ -85,7 +85,11 @@ def verify_df(df, seq_col, hla_col, target_col):
         df[hla_col] = df[hla_col].apply(lambda x: 'HLA-' + x)
     df[hla_col] = df[hla_col].apply(lambda x: x.replace('*', '').replace(':', ''))
     # Check HLA only in subset
-    df = df.query(f'{hla_col} in @HLAS')
+    try:
+        df = df.query(f'{hla_col} in @HLAS')
+    except:
+        print(type(df), type(HLAS), HLAS, hla_col)
+        raise ValueError(f'{type(df)}, {type(HLAS)}, {HLAS}, {hla_col}')
 
     return df
 
@@ -104,9 +108,9 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
                            'standardize': False}
     essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
     keys_check = [x in encoding_kwargs.keys() for x in essential_keys]
-    keys_check_dict = {k:v for (k,v) in zip(essential_keys,keys_check) if v ==False}
+    keys_check_dict = {k: v for (k, v) in zip(essential_keys, keys_check) if v == False}
     assert all(keys_check), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
-                                  f"{list(keys_check_dict.keys())} are missing!"
+                            f"{list(keys_check_dict.keys())} are missing!"
 
     if mode_eval:
         if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
@@ -238,6 +242,7 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
 
     """
     # if 'len' not in df.columns:
+
     df['len'] = df[seq_col].apply(len)
     if max_len is not None:
         df = df.query('len<=@max_len')
@@ -263,12 +268,12 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
         else:
             weights[idx_min] = 0
             weights[idx_max] = 1
-    # Else we get the weight with the 1-IC depending on the IC dict provided
+
     else:
-        if invert:
-            weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
+        if invert:  # If invert, then uses the actual IC as weight
+            weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(0,1)) \
                                 for l, hla, pad in zip(lens, hlas, pads)])
-        else:
+        else:  # Else we get the weight with the 1-IC depending on the IC dict provided
             weights = 1 - np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
                                     for l, hla, pad in zip(lens, hlas, pads)])
 
@@ -403,9 +408,8 @@ def to_tensors(x, y, device='cpu'):
     return x, y
 
 
-def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                      seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                      mask=False, invert=False,
+def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='Peptide',
+                      hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False,
                       add_rank=False, add_aaprop=False, remove_pep=False):
     """
         Computes the frequencies as the main features
@@ -482,8 +486,7 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
             x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
         # Here, invert is False (so using 1-IC, to up-weigh non-anchor positions for non anc mutations
         x_non, y_non = get_array_dataset(non_ancs, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
-                                         target_col,
-                                         invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
+                                         target_col, invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
         # Same
         if mut_col is not None and type(mut_col) == list:
             if len(mut_col) > 0:
