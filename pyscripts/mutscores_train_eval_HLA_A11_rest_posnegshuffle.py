@@ -83,7 +83,7 @@ def main():
     cedar_tops = pd.read_csv(f'{args["datadir"]}221223_cedar_tops_10fold.csv')
     cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
-
+    ibel_dataset = pd.read_csv(f'{args["datadir"]}221217_ibel_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
