@@ -60,6 +60,8 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+
+    parser.add_argument('-input_type', type = str, default ='Peptide', help ='Peptide or icore_mut')
     parser.add_argument('-mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
                                                                     'within the standard amino acid alphabet. To '
                                                                     'disable, input "false". "false" by default.')
@@ -86,13 +88,13 @@ def main():
     ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
-
+    assert args['input_type'] in ['Peptide', 'icore_mut'], f'Wrong input {args["input"]}. should be Peptide or icore_mut'
     # Setting trainset
     mega_df = pd.DataFrame()
     print('Starting loops')
     encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
                            add_aaprop=False, remove_pep=False, standardize=True,
-                           target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
+                           target_col='agg_label', seq_col=args['input_type'], rank_col='EL_rank_mut', hla_col='HLA',
                            mask_aa=False)
 
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
