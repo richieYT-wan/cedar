@@ -167,7 +167,7 @@ def main():
                             index=False)
                         for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset],
                                                      ['CEDAR','PRIME','IBEL']):
-                            preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
+                            _, preds  = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
                                                                     train_dataset, encoding_kwargs,
                                                                     concatenated=True, only_concat=True)
                             preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
