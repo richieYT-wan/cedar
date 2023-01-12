@@ -139,7 +139,7 @@ def main():
                         # Set args
                         encoding_kwargs['invert'] = invert
                         encoding_kwargs['mask'] = True if 'Mask' in ic_name else False
-                        encoding_kwargs['pep_col'] = pep_col
+                        encoding_kwargs['seq_col'] = pep_col
                         encoding_kwargs['rank_col'] =rank_col
                         # Load params
                         if invert:
