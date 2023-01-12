@@ -107,12 +107,12 @@ def main():
     mcs = list(np.unique(mcs))
 
     # Baseline is cedar_rest
-    cedar_noa11neg = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A0301" and agg_label==0)').index)
-    cedar_noa11pos = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A0301" and agg_label==1)').index)
-    cedar_noa11 = cedar_dataset.query('HLA!="HLA-A1101"')
+    cedar_noA03neg = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A0301" and agg_label==0)').index)
+    cedar_noA03pos = cedar_dataset.drop(index=cedar_dataset.query('(HLA=="HLA-A0301" and agg_label==1)').index)
+    cedar_noA03 = cedar_dataset.query('HLA!="HLA-A0301"')
 
-    for train_dataset, trainname in zip([cedar_dataset, cedar_noa11neg, cedar_noa11pos, cedar_noa11],
-                                        ['all', 'all_noA11neg', 'all_noA11pos', 'all_noA11']):
+    for train_dataset, trainname in zip([cedar_dataset, cedar_noA03neg, cedar_noA03pos, cedar_noA03],
+                                        ['all', 'all_noA03neg', 'all_noA03pos', 'all_noA03']):
         if trainname != 'all':
             skf = StratifiedKFold(n_splits=10, random_state=13, shuffle=True)
             for i, (train_idx, test_idx) in enumerate(skf.split(X=train_dataset['Peptide'].values,
@@ -154,8 +154,8 @@ def main():
                     f'{args["outdir"]}raw/featimps_{filename}.csv',
                     index=False)
 
-                for evalset, evalname in zip([cedar_dataset, cedar_noa11neg, cedar_noa11pos, cedar_noa11, prime_dataset, ibel_dataset],
-                                        ['all', 'all_noA11neg', 'all_noA11pos', 'all_noA11', 'prime', 'ibel']):
+                for evalset, evalname in zip([cedar_dataset, cedar_noA03neg, cedar_noA03pos, cedar_noA03, prime_dataset, ibel_dataset],
+                                        ['all', 'all_noA03neg', 'all_noA03pos', 'all_noA03', 'prime', 'ibel']):
                     _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
                                                                train_dataset, encoding_kwargs,
                                                                concatenated=True, only_concat=True)
