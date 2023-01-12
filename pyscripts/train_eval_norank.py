@@ -171,7 +171,7 @@ def main():
                                                                     train_dataset, encoding_kwargs,
                                                                     concatenated=True, only_concat=True)
                             preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
-                            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, train_nm, blsm_name,
+                            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, train_nm, blsm_name, ic_name,
                                                                       pep_col, rank_col, key=key, evalset=evalname,
                                                                       n_rounds=10000, n_jobs=N_CORES)
                             mega_df = mega_df.append(bootstrapped_df)
