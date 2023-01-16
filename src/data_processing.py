@@ -332,52 +332,52 @@ def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
     valid_data = dataframe.query('fold == @fold_inner')
     return train_data, valid_data
 
-
-def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                       seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                       wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
-                       mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
-    """
-
-    Args:
-        df:
-        ics_dict:
-        device:
-        dataset:
-        max_len:
-        encoding:
-        blosum_matrix:
-        seq_col:
-        hla_col:
-        target_col:
-        rank_col:
-        wt_col:
-        feat_cols:
-        mask:
-        invert:
-        add_rank:
-        add_aaprop:
-        remove_pep:
-
-    Returns:
-        x, y (torch.Tensor): Tensors containing features and labels
-    """
-    df = verify_df(df, seq_col, hla_col, target_col)
-
-    assert dataset in ['aafreq',
-                       'mutation'], f'Please provide a proper dataset name. You provided {dataset}, when it should be either "aafreq" or "mutation"'
-    if dataset == 'aafreq':
-        x, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix, seq_col,
-                                hla_col, target_col, rank_col, mask, invert, add_rank,
-                                add_aaprop, remove_pep)
-    elif dataset == 'mutation':
-        # Flatten and concat all the X to return a single tensor
-        # Whatever reads it (model, wrapper, etc) should extract & reshape/view the
-        # underlying tensors back into its shape
-        x, y = get_mutation_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                                    seq_col, wt_col, feat_cols, target_col, hla_col, mask, invert)
-
-    return x, y
+# TODO: fix this whatever it is
+# def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+#                        seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
+#                        wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
+#                        mask=False, invert=False, add_rank=False, add_aaprop=False, remove_pep=False):
+#     """
+#
+#     Args:
+#         df:
+#         ics_dict:
+#         device:
+#         dataset:
+#         max_len:
+#         encoding:
+#         blosum_matrix:
+#         seq_col:
+#         hla_col:
+#         target_col:
+#         rank_col:
+#         wt_col:
+#         feat_cols:
+#         mask:
+#         invert:
+#         add_rank:
+#         add_aaprop:
+#         remove_pep:
+#
+#     Returns:
+#         x, y (torch.Tensor): Tensors containing features and labels
+#     """
+#     df = verify_df(df, seq_col, hla_col, target_col)
+#
+#     assert dataset in ['aafreq',
+#                        'mutation'], f'Please provide a proper dataset name. You provided {dataset}, when it should be either "aafreq" or "mutation"'
+#     if dataset == 'aafreq':
+#         x, y = get_freq_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix, seq_col,
+#                                 hla_col, target_col, rank_col, mask, invert, add_rank,
+#                                 add_aaprop, remove_pep)
+#     elif dataset == 'mutation':
+#         # Flatten and concat all the X to return a single tensor
+#         # Whatever reads it (model, wrapper, etc) should extract & reshape/view the
+#         # underlying tensors back into its shape
+#         x, y = get_mutation_tensors(df, ics_dict, device, max_len, encoding, blosum_matrix,
+#                                     seq_col, wt_col, feat_cols, target_col, hla_col, mask, invert)
+#
+#     return x, y
 
 
 def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,

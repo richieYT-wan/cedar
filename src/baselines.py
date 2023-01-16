@@ -28,7 +28,7 @@ def plot_baseline_roc(axis, dataset, neoepi_only=True):
               linestyle='--', lw=0.75, color='c')
 
 
-def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, auc01=False):
+def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, auc01=False, fmt ='.1%'):
     if binder is not None and anchor_mutation is not None:
       df = dataset.query('binder==@binder and anchor_mutation==@anchor_mutation').copÏy()
     else:
@@ -55,14 +55,14 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
     auc_mixmhc = roc_auc_score(df['agg_label'].values, -1*df['MixMHCrank'].values)
     if auc01:
         auc01_mixmhc = roc_auc_score(df['agg_label'].values, -1*df['MixMHCrank'].values, max_fpr=0.1)
-
-    label_mixmhcrank = f'NetMHCrank: AUC={round(auc_mixmhc, 3)}, AUC01={round(auc01_mixmhc, 3)}' if auc01 else f'MixMHCrank: AUC={round(auc_mixmhc, 3)}'
-
-    label_NetMHCrank= f'NetMHCrank: AUC={round(auc_netmhc, 3)}, AUC01={round(auc01_netmhc,3)}' if auc01 else f'NetMHCrank: AUC={round(auc_netmhc, 3)}'
-
-    label_PRIME= f'PRIME: AUC={round(auc_prime, 3)}, AUC01={round(auc01_prime,3)}' if auc01 else f'PRIME: AUC={round(auc_prime, 3)}'
-
-    label_NN_Align= f'NN_Align: AUC={round(auc_nnalign, 3)}, AUC01={round(auc01_nnalign,3)}' if auc01 else f'NN_Align: AUC={round(auc_nnalign, 3)}'
+    label_mixmhcrank = f'NetMHCrank: AUC={auc_mixmhc:{fmt}}, AUC01={auc01_mixmhc:{fmt}}' if auc01 \
+                       else f'MixMHCrank: AUC={auc_mixmhc:{fmt}}'
+    label_NetMHCrank= f'NetMHCrank: AUC={auc_netmhc:{fmt}}, AUC01={auc01_netmhc:{fmt}}' if auc01 \
+                       else f'NetMHCrank: AUC={auc_netmhc:{fmt}}'
+    label_PRIME= f'PRIME: AUC={auc_prime:{fmt}}, AUC01={auc01_prime:{fmt}}' if auc01 \
+                       else f'PRIME: AUC={auc_prime:{fmt}}'
+    label_NN_Align= f'NN_Align: AUC={auc_nnalign:{fmt}}, AUC01={auc01_nnalign:{fmt}}' if auc01 \
+                       else f'NN_Align: AUC={auc_nnalign:{fmt}}'
 
     axis.plot(fpr_netmhc, tpr_netmhc, label=label_NetMHCrank, #f'NetMHCrank: AUC = {round(auc_netmhc, 3)}',
               linestyle='--', lw=0.75, color='m')
