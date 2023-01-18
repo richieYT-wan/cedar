@@ -146,7 +146,7 @@ def get_pval(sample_a, sample_b):
     return pval, sig
 
 
-def plot_pval(axis, pval, sig, x1, x2, y, h=0.015):
+def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
     # Rounds the label to the relevant decimal
     pvstr = str(pval)
     if sig == '****':print(pval)
@@ -154,5 +154,5 @@ def plot_pval(axis, pval, sig, x1, x2, y, h=0.015):
     # Drawing Pval */ns rectangles
     # x1, x2 = 0, 1
     # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
-    axis.plot([x1, x1, x2, x2], [y, y + h, y + h, y], lw=2, c='k')
-    axis.text((x1 + x2) * .5, y + h, label, ha='center', va='bottom', color='k')
+    axis.plot([x0, x0, x1, x1], [y, y + h, y + h, y], lw=2, c=color)
+    axis.text((x0 + x1) * .5, y + h, label, ha='center', va='bottom', color=color)

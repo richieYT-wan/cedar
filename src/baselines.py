@@ -64,6 +64,7 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
     label_NN_Align= f'NN_Align: AUC={auc_nnalign:{fmt}}, AUC01={auc01_nnalign:{fmt}}' if auc01 \
                        else f'NN_Align: AUC={auc_nnalign:{fmt}}'
 
+    axis.plot([0,1],[0,1], label='Random', ls=':', lw=0.5, c='k')
     axis.plot(fpr_netmhc, tpr_netmhc, label=label_NetMHCrank, #f'NetMHCrank: AUC = {round(auc_netmhc, 3)}',
               linestyle='--', lw=0.75, color='m')
     axis.plot(fpr_prime, tpr_prime, label=label_PRIME, #f'PRIME: AUC = {round(auc_prime, 3)}',
@@ -72,5 +73,4 @@ def plot_related_baseline_roc(axis, dataset, binder=None, anchor_mutation=None, 
               linestyle='--', lw=0.75, color='c')
     axis.plot(fpr_mixmhc, tpr_mixmhc, label=label_mixmhcrank,
               linestyle='--', lw=0.75, color='y')
-    axis.plot([0,1],[0,1], label='Random', ls=':', lw=0.5, c='k')
 
