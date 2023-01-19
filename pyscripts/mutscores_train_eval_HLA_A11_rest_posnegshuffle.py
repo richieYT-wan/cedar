@@ -25,7 +25,7 @@ from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_mo
 N_CORES = 36
 
 
-def final_bootstrap_wrapper(preds_df, args, filename,
+def final_bootstrap_wrapper(preds_df, args, filename, hla,
                             ic_name, trainset, evalset,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
@@ -36,9 +36,10 @@ def final_bootstrap_wrapper(preds_df, args, filename,
                                                 n_rounds=n_rounds, n_jobs=n_jobs)
     bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
-    bootstrapped_df['evalset'] = evalset
-    bootstrapped_df['trainset'] = trainset
-    bootstrapped_df['key'] = 'only_rank'
+    bootstrapped_df['hla'] = hla
+    bootstrapped_df['evalset'] = evalset.upper()
+    bootstrapped_df['trainset'] = trainset.upper()
+    bootstrapped_df['key'] = filename.split('_')[-1]
     key = filename.split('-')[-1]
     bootstrapped_df.to_csv(
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',

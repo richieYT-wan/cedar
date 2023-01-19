@@ -222,25 +222,25 @@ def main():
                                                                             n_jobs=N_CORES)
                             mega_df = mega_df.append(prime_bootstrapped_df)
 
-                            # # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
-                            # _, prime_switch_preds_df = evaluate_trained_models_sklearn(prime_switch_dataset,
-                            #                                                            trained_models,
-                            #                                                            ics_dict, train_dataset,
-                            #                                                            encoding_kwargs,
-                            #                                                            concatenated=False,
-                            #                                                            only_concat=False)
-                            #
-                            # # Pre-saving results before bootstrapping
-                            # prime_switch_preds_df.drop(columns=aa_cols).to_csv(
-                            #     f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
-                            #     index=False)
-                            # # Bootstrapping (PRIME)
-                            # prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args,
-                            #                                                        blsm_name, ic_name,
-                            #                                                        pep_col, rank_col, key,
-                            #                                                        evalset='PRIME_AC', n_rounds=10000,
-                            #                                                        n_jobs=N_CORES)
-                            # mega_df = mega_df.append(prime_switch_bootstrapped_df)
+                            # EVAL AND BOOTSTRAPPING ON PRIME SWITCH
+                            _, prime_switch_preds_df = evaluate_trained_models_sklearn(prime_switch_dataset,
+                                                                                       trained_models,
+                                                                                       ics_dict, train_dataset,
+                                                                                       encoding_kwargs,
+                                                                                       concatenated=False,
+                                                                                       only_concat=False)
+
+                            # Pre-saving results before bootstrapping
+                            prime_switch_preds_df.drop(columns=aa_cols).to_csv(
+                                f'{args["outdir"]}raw/prime_switch_preds_{blsm_name}_{"-".join(ic_name.split(" "))}_{pep_col}_{rank_col}_{key}.csv',
+                                index=False)
+                            # Bootstrapping (PRIME)
+                            prime_switch_bootstrapped_df = final_bootstrap_wrapper(prime_switch_preds_df, args,
+                                                                                   blsm_name, ic_name,
+                                                                                   pep_col, rank_col, key,
+                                                                                   evalset='PRIME_AC', n_rounds=10000,
+                                                                                   n_jobs=N_CORES)
+                            mega_df = mega_df.append(prime_switch_bootstrapped_df)
 
                             # ///////////////////////////
                             # EVAL AND BOOTSTRAPPING ON IBEL

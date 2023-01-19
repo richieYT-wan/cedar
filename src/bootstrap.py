@@ -149,10 +149,13 @@ def get_pval(sample_a, sample_b):
 def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
     # Rounds the label to the relevant decimal
     pvstr = str(pval)
-    if sig == '****':print(pval)
-    label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
+    if sig == '****':
+        print(pval)
+        label = f'{sig}, p={pval:.1e}'
+    else:
+        label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
     # Drawing Pval */ns rectangles
     # x1, x2 = 0, 1
     # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
-    axis.plot([x0, x0, x1, x1], [y, y + h, y + h, y], lw=2, c=color)
+    axis.plot([x0, x0, x1, x1], [y, y + h/1.25, y + h/1.25, y], lw=1.5, c=color)
     axis.text((x0 + x1) * .5, y + h, label, ha='center', va='bottom', color=color)
