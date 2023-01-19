@@ -6,7 +6,7 @@ source activate phd
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=${HOMEDIR}pyscripts/
 DATADIR=../data/mutant/
-OUTDIR=../output/230119_rest_AXX_posnegshuffle/
+OUTDIR=../output/230119_rest_AXX_posnegshuffle_pep/
 ICSDIR=../data/ic_dicts/
 INPUT_TYPE=Peptide
 cd ${PYDIR}
