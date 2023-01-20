@@ -108,56 +108,47 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
-
-    # Getting "best" encodings here
-    best_cedar = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
-                       add_aaprop=False, remove_pep=False, standardize=True, invert=True,
-                       target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
-                       mut_col=aa_cols, mask_aa=False),
+    best_cedar = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True, invert=True,
+                      add_aaprop=False, remove_pep=False, standardize=True, target_col='agg_label', seq_col='icore_mut',
+                      rank_col='EL_rank_mut', hla_col='HLA',
+                      mut_col=aa_cols),
                   ics_kl, 'Inverted KL', 'Best CEDAR')
 
-    best_prime = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=True, add_rank=True,
-                       add_aaprop=False, remove_pep=False, standardize=True, invert=False,
-                       target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
-                       mut_col=['dissimilarity_score', 'blsm_mut_score'], mask_aa=False),
+    best_prime = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=True, add_rank=True, invert=False,
+                      add_aaprop=False, remove_pep=False, standardize=True, target_col='agg_label', seq_col='icore_mut',
+                      rank_col='EL_rank_mut', hla_col='HLA',
+                      mut_col=['core_blsm_mut_score', 'core_mutation_score']),
                   ics_shannon, 'Mask', 'Best PRIME')
 
-    best_avg = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=True, add_rank=True,
-                     add_aaprop=False, remove_pep=False, standardize=True, invert=False,
-                     target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
-                     mut_col=['core_blsm_mut_score', 'core_mutation_score'], mask_aa=False),
-                ics_shannon, 'Mask', 'Best AVG')
-
-    best_extra = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
-                       add_aaprop=False, remove_pep=False, standardize=True, invert=False,
-                       target_col='agg_label', seq_col='Peptide', rank_col='EL_rank_mut', hla_col='HLA',
-                       mut_col=['dissimilarity_score', 'blsm_mut_score'], mask_aa=False),
-                  ics_kl, 'KL', 'Extra KL Peptide')
-
-    best_extra2 = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
-                        add_aaprop=False, remove_pep=False, standardize=True, invert=False,
-                        target_col='agg_label', seq_col='icore_mut', rank_col='EL_rank_mut', hla_col='HLA',
-                        mut_col=['dissimilarity_score', 'blsm_mut_score'], mask_aa=False),
-                   ics_kl, 'KL', 'Extra KL icore_mut')
-    # Add one extra condition using the best avg kwargs but with a KL info content
+    best_ibel = (dict(max_len=12, encoding='blosum', blosum_matrix=BL62_VALUES, mask=True, add_rank=True, invert=False,
+                     add_aaprop=False, remove_pep=False, standardize=True, target_col='agg_label', seq_col='Peptide',
+                     rank_col='trueHLA_EL_rank', hla_col='HLA',
+                     mut_col=['dissimilarity_score', 'core_blsm_mut_score']),
+                 ics_shannon, 'Mask', 'Best IBEL')
+    # KL for this one
+    best_agg = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True, invert=False,
+                    add_aaprop=False, remove_pep=False, standardize=True, target_col='agg_label', seq_col='icore_mut',
+                    rank_col='EL_rank_mut', hla_col='HLA',
+                    mut_col=['dissimilarity_score', 'blsm_mut_score']),
+                ics_kl, 'KL', 'Compromise')
 
     mega_df = []
     print('Starting loops')
-    rf_hp = {'n_estimators': [10, 50, 100, 200, 300],
-             'max_depth': [3, 5, 7, 8, 9],
+    rf_hp = {'n_estimators': [50, 100, 200, 300],
+             'max_depth': [4,6,8,10],
              'criterion': ['gini', 'entropy'],
              'ccp_alpha': np.logspace(-12, -3, 7),
-             'min_samples_leaf': [1, 3, 5, 7, 9]}  # 5*3*2*4*3 = 360 combi
+             'min_samples_leaf': [1, 3, 5, 7, 9]}
 
-    xgb_hp = {'n_estimators': [10, 50, 100, 200, 300],
+    xgb_hp = {'n_estimators': [50, 100, 200, 300],
               'max_depth': [4, 6, 8],
               'learning_rate': [.1, .3, .5],
-              'alpha': np.logspace(-15, -2, 7),
-              'lambda': np.logspace(-15, -2, 7),
+              'alpha': np.logspace(-12, -2, 6),
+              'lambda': np.logspace(-12, -2, 6),
               'colsample_by_tree': np.linspace(0.5, 1.1, 3),
-              'subsample': [0.6, .8, 1]
+              'subsample': [0.5, .75, 1]
               }
-    for best_kwargs, ics_dict, ic_name, id_name in [best_cedar, best_prime, best_avg, best_extra, best_extra2]:
+    for best_kwargs, ics_dict, ic_name, id_name in [best_cedar, best_prime, best_ibel, best_agg]:
         for hp, model in zip([rf_hp, xgb_hp], [RandomForestClassifier, XGBClassifier]):
             n_iter = int(args['frac_iter']*len(list(ParameterGrid(hp))))
             params_list = list(ParameterSampler(hp, n_iter=n_iter, random_state=13))
