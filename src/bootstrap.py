@@ -5,7 +5,6 @@ from joblib import Parallel, delayed
 from functools import partial
 from tqdm.auto import tqdm
 from src.metrics import get_metrics, get_mean_roc_curve
-
 N_CORES = multiprocessing.cpu_count() - 2
 
 

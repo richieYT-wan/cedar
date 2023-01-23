@@ -8,11 +8,9 @@ import itertools
 from tqdm.auto import tqdm
 from datetime import datetime as dt
 import os, sys
-
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
-
 # Custom fct imports
 from src.utils import pkl_load, pkl_dump
 import argparse

@@ -8,6 +8,12 @@ import torch
 import matplotlib.patheffects as path_effects
 
 
+def convert_hla(hla):
+    if not hla.startswith('HLA-'):
+        hla = 'HLA-' + hla
+    return hla.replace('*', '').replace(':', '')
+
+
 def add_median_labels(ax, fmt='.1%'):
     lines = ax.get_lines()
     boxes = [c for c in ax.get_children() if type(c).__name__ == 'PathPatch']
