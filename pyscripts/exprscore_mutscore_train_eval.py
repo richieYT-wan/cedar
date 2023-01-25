@@ -85,11 +85,7 @@ def main():
     prime_dataset = pd.read_csv(f'{args["datadir"]}230125_prime_related_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230125_nepdb_normal_pepx.csv')
     ibel_dataset = pd.read_csv(f'{args["datadir"]}230125_ibel_normal_pepx.csv')
-    # TODO : Nepdb and sine-ibel
-    # sine_ibel_dataset = pd.read_csv(f'{args["datadir"]}sine-ibel.csv')
-    # nepdb_dataset = pd.read_csv(f'{args["datadir"]}nepdb.csv')
 
-    prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
