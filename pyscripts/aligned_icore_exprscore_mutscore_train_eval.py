@@ -23,7 +23,6 @@ from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_mo
 
 N_CORES = 36
 
-
 def final_bootstrap_wrapper(preds_df, args, filename, blsm_name,
                             ic_name, pep_col, rank_col, key, evalset,
                             n_rounds=10000, n_jobs=36):
@@ -53,9 +52,9 @@ def args_parser():
     parser = argparse.ArgumentParser(
         description='Script to crossvalidate and evaluate methods that use aa frequency as encoding')
 
-    parser.add_argument('-datadir', type=str, default='../data/mutant/',
+    parser.add_argument('-datadir', type=str, default='../data/pepx/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/230125_expr_mutscores/')
+    parser.add_argument('-outdir', type=str, default='../output/230125_aligned_icore_exprscore_mutscore/')
     parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
@@ -81,25 +80,17 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}221028_cedar_related_newcore_fold.csv')
-    cedar_noa11 = pd.read_csv(f'{args["datadir"]}221223_cedar_noa1101_10fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}221117_prime_related_newcore_fold.csv')
-    merged_dataset = pd.read_csv(f'{args["datadir"]}221112_cedar_prime_merged_fold.csv')
-    hybrid_dataset = pd.read_csv(f'{args["datadir"]}221215_hybrid_cedarpos_primeneg_10fold.csv')
-    ibel_dataset = pd.read_csv(f'{args["datadir"]}221117_ibel_merged_fold.csv')
-    # TODO : Nepdb and sine-ibel
-    # sine_ibel_dataset = pd.read_csv(f'{args["datadir"]}sine-ibel.csv')
-    # nepdb_dataset = pd.read_csv(f'{args["datadir"]}nepdb.csv')
+    cedar_dataset = pd.read_csv(f'{args["datadir"]}230125_cedar_aligned_pepx_fold.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}230125_prime_aligned_pepx.csv')
+    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230125_nepdb_aligned_pepx.csv')
+    ibel_dataset = pd.read_csv(f'{args["datadir"]}230125_ibel_aligned_pepx.csv')
 
-    prime_switch_dataset = pd.read_csv(f'{args["datadir"]}221122_prime_AC_switch.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
 
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
-                'prime': prime_dataset,
-                'merged': merged_dataset,
-                'hybrid': hybrid_dataset}
+                'prime': prime_dataset}
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
     train_dataset = trainmap[args['trainset']]
@@ -108,23 +99,14 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['dissimilarity_score', 'blsm_mut_score', 'mutation_score']#, 'ratio_rank']
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mutation_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
-
-    cols_ = ['dissimilarity_score', 'core_blsm_mut_score', 'core_mutation_score']#, 'ratio_rank']
-    for L in range(0, len(cols_) + 1):
-        for mc in itertools.combinations(cols_, L):
-            mcs.append(list(mc))
-    # TODO : Expr cols
-
-    # cols_ = ['TPM 1 ', 'TPM 2', 'TPM 3']#, 'ratio_rank']
-    # for L in range(0, len(cols_) + 1):
-    #     for mc in itertools.combinations(cols_, L):
-    #         mcs.append(list(mc))
     mcs.append(aa_cols)
     mcs = list(np.unique(mcs))
+    tpm_cols = ['Total Peptide TPM', 'Total Scaled Peptide TPM', 'Total Gene TPM']
+    mcs.extend([x+[b] for x in mcs for b in tpm_cols])
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
                        'encoding': 'onehot',
@@ -134,14 +116,12 @@ def main():
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True}
-    results_related = {}
+
     mega_df = pd.DataFrame()
     print('Starting loops')
-    for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
-        results_related[rank_col] = {}
+    for rank_col in ['EL_rank_mut']:
         encoding_kwargs['rank_col'] = rank_col
-        for pep_col in ['Peptide', 'icore_mut']:
-            results_related[rank_col][pep_col] = {}
+        for pep_col in ['icore_mut']:
             encoding_kwargs['seq_col'] = pep_col
             for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
                 key = '-'.join(mut_cols)
@@ -149,8 +129,6 @@ def main():
                     key = 'only_rank'
                 elif key == 'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8':
                     key = 'aa_props'
-
-                results_related[rank_col][pep_col][key] = {}
                 encoding_kwargs['mut_col'] = mut_cols
                 # megaloops for encoding-weighting
                 for encoding, blosum_matrix, blsm_name in tqdm(zip(['onehot', 'blosum', 'blosum'],
@@ -159,7 +137,6 @@ def main():
                                                                desc='encoding', leave=False, position=1):
                     encoding_kwargs['encoding'] = encoding
                     encoding_kwargs['blosum_matrix'] = blosum_matrix
-                    results_related[rank_col][pep_col][key][blsm_name] = {}
                     for invert in [True, False]:
                         for ic_name, ics_dict in tqdm(
                                 zip(['Mask', 'KL', 'None', 'Shannon'], [ics_shannon, ics_kl, None, ics_shannon]),
@@ -192,10 +169,14 @@ def main():
                                 f'{args["outdir"]}raw/featimps_{filename}.csv',
                                 index=False)
 
-                            for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset, sine_ibel_dataset, nepdb_dataset],
-                                                         ['CEDAR', 'PRIME', 'IBEL', 'SINE_IBEL', 'NEPDB']):
-                                _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict, train_dataset,
-                                                                           encoding_kwargs, concatenated=True, only_concat=True)
+                            for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset, nepdb_dataset],
+                                                         ['CEDAR', 'PRIME', 'IBEL', 'NEPDB']):
+                                # FULLY FILTERED + Mean_pred
+                                evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
+                                _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
+                                                                           train_dataset,
+                                                                           encoding_kwargs, concatenated=False,
+                                                                           only_concat=True)
                                 # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                                 preds.drop(columns=aa_cols).to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
 
