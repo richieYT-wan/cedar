@@ -107,12 +107,10 @@ def main():
                        'add_aaprop': False,
                        'remove_pep': False,
                        'standardize': True}
-    results_related = {}
     mega_df = pd.DataFrame()
     print('Starting loops')
 
     for rank_col in ['trueHLA_EL_rank', 'EL_rank_mut']:
-        results_related[rank_col] = {}
         encoding_kwargs['rank_col'] = rank_col
         pep_col = 'Peptide' if rank_col == "trueHLA_EL_rank" else 'icore_mut'
         encoding_kwargs['seq_col'] = pep_col
@@ -135,7 +133,6 @@ def main():
             elif key == 'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8':
                 key = 'aa_props'
 
-            results_related[rank_col][pep_col][key] = {}
             encoding_kwargs['mut_col'] = mut_cols
             # megaloops for encoding-weighting
             for encoding, blosum_matrix, blsm_name in tqdm(zip(['onehot', 'blosum', 'blosum'],
@@ -144,7 +141,6 @@ def main():
                                                            desc='encoding', leave=False, position=1):
                 encoding_kwargs['encoding'] = encoding
                 encoding_kwargs['blosum_matrix'] = blosum_matrix
-                results_related[rank_col][pep_col][key][blsm_name] = {}
                 for invert in [True, False]:
                     for ic_name, ics_dict in tqdm(
                             zip(['Mask', 'KL', 'None', 'Shannon'], [ics_shannon, ics_kl, None, ics_shannon]),
