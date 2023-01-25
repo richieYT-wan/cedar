@@ -53,6 +53,8 @@ for k in AA_KEYS:
     MUT_MATRIX[k]['-'] = -3
 MUT_MATRIX['-']['-'] = 1
 BL62_MUT['-']['-'] = 1
+
+
 # Alignment stuff used in mutation type
 def smith_waterman_alignment(query="VLLP", database="VLILP", scoring_scheme=BL62, gap_open=-2, gap_extension=-1):
     # Matrix imensions
@@ -266,14 +268,14 @@ def get_mutation_pos(mutant, wildtype, mut_type):
         return str(-1)
 
 
-def get_anchor(allele, ic_dict, threshold=0.1615):
+def get_anchor(allele, ic_dict, l=9, threshold=0.1615):
     """
     rank is the % rank at which we take the IC ; will use .25
     threshold is the threshold for info content to count as anchor
     ONLY USE 9MER MOTIF ; Use core/wt_core to check if anchor mutation if len!=9
     """
     try:
-        info_content = ic_dict[9][allele][.25]
+        info_content = ic_dict[l][allele][.25]
     except:
         raise ValueError(allele)
 
@@ -293,6 +295,10 @@ def get_anchor_mutation(mutant, wildtype, mut_core, wt_core, len_, anchor, mut_t
             return False
         else:
             return any([x in anchor for x in get_mutation_pos(mut_core, wt_core, mut_type)])
+
+
+def get_anchor_mutation_mutwt(mutant, wildtype, anchor):
+    return any([x in anchor for x in get_mutation_pos(mutant, wildtype, 'substitution')])
 
 
 def get_binder_type(mut_rank, wt_rank):
@@ -356,3 +362,25 @@ def get_mutation_score(mutation_positions, mutant, wildtype):
         return -1
     else:
         return score
+
+
+  # Gets all the scores etc for a given mutant and wt col.
+  #   These can either be Peptide vs wild_type, or icore_mut vs icore_wt(aligned or not), or core_mut vs core_wt etc
+def pipeline_mutation_scores(df, mut_col, wt_col, ics_dict, threshold=.1615, prefix=''):
+
+    df = df.copy()
+    df[f'{prefix}len_mut'] = df[mut_col].apply(len)
+    df[f'{prefix}len_wt'] = df[wt_col].apply(len)
+    assert (df[f'{prefix}len_wt']==df[f'{prefix}len_mut']).all(), 'input lengths for wt vs mut don\'t match!'
+    df[f'{prefix}anchor'] = df.apply(lambda x: get_anchor(x['HLA'].replace(':','').replace('*',''),
+                                                          ics_dict, l=x[f'{prefix}len_mut'], threshold=threshold), axis=1)
+
+    df[f'{prefix}mutation_position'] = df.apply(lambda x: get_mutation_pos(x[mut_col], x[wt_col], 'substitution'), axis=1)
+    df[f'{prefix}anchor_mutation'] = df.apply(lambda x: get_anchor_mutation_mutwt(x[mut_col], x[wt_col],
+                                                                                  x[f'{prefix}anchor']), axis=1)
+    df[f'{prefix}mut_score'] = df.apply(lambda x: get_mutation_score(x[f'{prefix}mutation_position'],
+                                                                     x[mut_col], x[wt_col]), axis=1)
+    df[f'{prefix}blsm_mut_score'] = df.apply(lambda x: get_blsm_mutation_score(x[f'{prefix}mutation_position'],
+                                                                               x[mut_col], x[wt_col]), axis=1)
+    return df
+

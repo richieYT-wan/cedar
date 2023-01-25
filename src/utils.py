@@ -5,8 +5,9 @@ import pandas as pd
 from IPython.display import display_html
 from itertools import chain, cycle
 import torch
+from matplotlib import pyplot as plt
 import matplotlib.patheffects as path_effects
-
+import seaborn as sns
 
 def convert_hla(hla):
     if not hla.startswith('HLA-'):
@@ -279,9 +280,9 @@ def parse_netmhcpan_shift(row, netmhc_xls):
         return argmin['Pos'], argmin['Peptide'], argmin['core'], argmin['icore'], argmin['EL_Rank']
 
 
-def pipeline_netmhcpan_xls(df, xls_or_filename, xls_suffix):
+def pipeline_netmhcpan_xls_shift(df, xls_or_filename, xls_suffix):
     """
-    Assumes df and XLS have the save seq_id for parsing
+    Assumes df and XLS have the save seq_id for parsing, uses SCORE SHIFT
     """
     if type(xls_or_filename) == str:
         xls = read_xls_parse_shift(xls_or_filename)
@@ -294,6 +295,59 @@ def pipeline_netmhcpan_xls(df, xls_or_filename, xls_suffix):
                                        axis=1, result_type='expand').add_suffix(xls_suffix),
                               left_index=True, right_index=True)
     return merged_results
+
+
+def parse_netmhcpan_full(row, netmhc_xls):
+    hla = row['HLA'].replace(':', '')
+    #
+    seq_id = row['seq_id']
+    # print(hla, row)
+    tmp = netmhc_xls.query('@netmhc_xls.base.ID==@seq_id')
+    tmp = tmp[[x for x in tmp.columns if x[0] == hla or x[0] == 'base']]
+    return tmp[(hla, 'icore')].item(), tmp[(hla, 'core')].item(), tmp[(hla, 'EL_Rank')].item()
+
+
+
+def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full'):
+    """
+    ASSUMES BOTH ARE THE DF AND THE XLS ARE SORTED THE SAME WAY.
+    i.e. DF is the same dataframe that was saved for NetMHCpan
+    Args:
+        df:
+        xls_or_filename:
+        xls_suffix:
+
+    Returns:
+
+    """
+    seq_ids = [f'>seq_{i}' for i in range(1, len(df)+1)]
+    if type(xls_or_filename) == str:
+        xls = read_netmhcpan_results(xls_or_filename)
+        xls[('base', 'ID')] = seq_ids
+    elif type(xls_or_filename) == pd.DataFrame:
+        xls = xls_or_filename
+    else:
+        raise TypeError('The second argument `xls_or_filename` should either be a string or the parsed excel xls file.')
+    df['seq_id'] = seq_ids
+    if f'icore{col_suffix}' not in df.columns:
+        print('here')
+        df[['icore'+col_suffix, 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
+    else:
+        print('there')
+        df[['TMP', 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
+        del df['TMP']
+    return df
+
+
+
+def get_plot_corr(df, cols, which='spearman', title='', figsize=(13,12.5), palette='viridis'):
+    corr = df[cols].corr(which)
+    f,a = plt.subplots(1,1, figsize=figsize)
+    sns.heatmap(corr.round(2), center=0, xticklabels= corr.columns ,yticklabels=corr.columns,
+                cmap=palette,vmax=1, vmin=-1, annot=True, square=True, annot_kws={'weight':'semibold'})
+    a.set_xticklabels(a.get_xticklabels(), rotation=30, fontweight='semibold')
+    a.set_yticklabels(a.get_yticklabels(), fontweight='semibold')
+
 
 
 def set_hla(df):
