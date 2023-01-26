@@ -176,7 +176,8 @@ def main():
                         for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset, nepdb_dataset],
                                                      ['CEDAR', 'PRIME', 'IBEL', 'SINE_IBEL', 'NEPDB']):
                             # FULLY FILTERED + Mean_pred
-                            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
+                            if not evalset.equals(train_dataset):
+                                evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
                             _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict, train_dataset,
                                                                        encoding_kwargs, concatenated=False, only_concat=True)
                             # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
