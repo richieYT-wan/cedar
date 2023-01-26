@@ -100,13 +100,14 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mutation_score']
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
 
     mcs.append(aa_cols)
     mcs = list(np.unique(mcs))
+    mcs.extend([aa_cols + [x] for x in cols_])
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
                        'encoding': 'onehot',
