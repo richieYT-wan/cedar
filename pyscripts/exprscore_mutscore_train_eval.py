@@ -174,7 +174,7 @@ def main():
                             index=False)
 
                         for evalset, evalname in zip([cedar_dataset, prime_dataset, ibel_dataset, nepdb_dataset],
-                                                     ['CEDAR', 'PRIME', 'IBEL', 'SINE_IBEL', 'NEPDB']):
+                                                     ['CEDAR', 'PRIME', 'IBEL', 'NEPDB']):
                             # FULLY FILTERED + Mean_pred
                             if not evalset.equals(train_dataset):
                                 evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
