@@ -128,10 +128,11 @@ def main():
 
         for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
             key = '-'.join(mut_cols)
+
             if key == '':
                 key = 'only_rank'
-            elif key == 'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8':
-                key = 'aa_props'
+            key.replace('aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8', 'aa_props')
+            key.replace(' ', '-')
 
             encoding_kwargs['mut_col'] = mut_cols
             # megaloops for encoding-weighting
