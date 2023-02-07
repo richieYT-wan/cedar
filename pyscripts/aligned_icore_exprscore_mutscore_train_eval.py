@@ -64,6 +64,7 @@ def args_parser():
                                                                     'within the standard amino acid alphabet. To '
                                                                     'disable, input "false". "false" by default.')
     parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
+    parser.add_argument('-add_wtrank', type=str2bool, default=False, help='Whether to add WT rank as a feature')
     return parser.parse_args()
 
 
@@ -99,13 +100,23 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
+
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'EL_rank_wt_aligned'] if args[
+        "add_wtrank"] else ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
+
     mcs.append(aa_cols)
     mcs = list(np.unique(mcs))
     mcs.extend([aa_cols + [x] for x in cols_])
+    if args["add_wtrank"]:
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_mut_score', 'EL_rank_wt_aligned']])
+    # Adding TPM cols
     tpm_cols = ['Total Peptide TPM', 'Total Scaled Peptide TPM', 'Total Gene TPM']
     mcs.extend([x+[b] for x in mcs for b in tpm_cols])
     # DEFINING KWARGS

@@ -65,6 +65,7 @@ def args_parser():
                                                                     'within the standard amino acid alphabet. To '
                                                                     'disable, input "false". "false" by default.')
     parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
+    parser.add_argument('-add_wtrank', type=str2bool, default=False, help = 'Whether to add WT rank as a feature')
     return parser.parse_args()
 
 
@@ -100,7 +101,9 @@ def main():
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
-    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
+
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'EL_rank_wt_aligned'] if args[
+        "add_wtrank"] else ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
@@ -108,15 +111,15 @@ def main():
     mcs.append(aa_cols)
     mcs = list(np.unique(mcs))
     mcs.extend([aa_cols + [x] for x in cols_])
+    if args["add_wtrank"]:
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_mut_score', 'EL_rank_wt_aligned']])
     # DEFINING KWARGS
-    encoding_kwargs = {'max_len': 12,
-                       'encoding': 'onehot',
-                       'blosum_matrix': None,
-                       'mask': False,  # Using Shannon ICs, true if both mask and name is "shannon"
-                       'add_rank': args['add_rank'],
-                       'add_aaprop': False,
-                       'remove_pep': False,
-                       'standardize': True}
+    encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=args['add_rank'],
+                           add_aaprop=False, remove_pep=False, standardize=True)
     mega_df = pd.DataFrame()
 
     print('Starting loops')
@@ -125,7 +128,7 @@ def main():
         for pep_col in ['icore_mut']:
             encoding_kwargs['seq_col'] = pep_col
             for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
-                key = '-'.join(mut_cols)
+                key = '-'.join(mut_cols).replace('aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8','aa_props')
                 if key == '':
                     key = 'only_rank'
                 elif key == 'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8':

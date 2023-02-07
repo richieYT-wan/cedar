@@ -330,10 +330,10 @@ def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full'):
         raise TypeError('The second argument `xls_or_filename` should either be a string or the parsed excel xls file.')
     df['seq_id'] = seq_ids
     if f'icore{col_suffix}' not in df.columns:
-        print('here')
+        # print('here')
         df[['icore'+col_suffix, 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
     else:
-        print('there')
+        # print('there')
         df[['TMP', 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
         del df['TMP']
     return df
