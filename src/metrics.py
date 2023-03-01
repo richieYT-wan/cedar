@@ -45,7 +45,7 @@ def get_predictions(df, models, ics_dict, encoding_kwargs):
     # If models list is a torch model, use forward
     elif issubclass(model_class, nn.Module):
         # This only works for models that inherit from NetParent
-        x, y = to_tensors(x,y, device=models[0].device)
+        x, y = to_tensors(x, y, device=models[0].device)
         with torch.no_grad():
             average_predictions = [model(x).detach().cpu().numpy() for model in models]
 
@@ -134,7 +134,7 @@ def plot_roc_auc_fold(results_dict, palette='hsv', n_colors=None, fig=None, ax=N
     return fig, ax
 
 
-def get_mean_roc_curve(roc_curves, extra_key=None):
+def get_mean_roc_curve(roc_curves, extra_key=None, auc01=False):
     """
     Assumes a single-level dict, i.e. roc_curves_dict has all the outer folds, and no inner folds
     Or it is the sub-dict that contains all the inner folds for a given outer fold.
@@ -153,6 +153,7 @@ def get_mean_roc_curve(roc_curves, extra_key=None):
     # Base fpr to interpolate
     tprs = []
     aucs = []
+    aucs_01 = []
     if type(roc_curves) == dict:
         if extra_key is not None:
             max_n = max([len(v[extra_key]['roc_curve'][0]) for k, v in roc_curves.items() \
@@ -185,7 +186,6 @@ def get_mean_roc_curve(roc_curves, extra_key=None):
                 aucs.append(v['auc'])
 
     elif type(roc_curves) == list:
-        # TODO FIX
         # THIS HERE ASSUMES THE RESULTS ARE IN FORMAT [((fpr, tpr), auc) ...]
         max_n = max([len(x[0][0]) for x in roc_curves])
         base_fpr = np.linspace(0, 1, max_n)
@@ -199,14 +199,23 @@ def get_mean_roc_curve(roc_curves, extra_key=None):
             # Saving to the list so we can stack and compute the mean and std
             tprs.append(tpr)
             aucs.append(curves[1])
+            if auc01:
+                aucs_01.append(curves[-1])
 
     mean_auc = np.mean(aucs)
+    if auc01:
+        mean_auc01 = np.mean(aucs_01)
+
     tprs = np.stack(tprs)
     mean_tprs = tprs.mean(axis=0)
     std_tprs = tprs.std(axis=0)
     upper = np.minimum(mean_tprs + std_tprs, 1)
     lower = mean_tprs - std_tprs
-    return base_fpr, mean_tprs, lower, upper, mean_auc
+
+    if auc01:
+        return base_fpr, mean_tprs, lower, upper, mean_auc, mean_auc01
+    else:
+        return base_fpr, mean_tprs, lower, upper, mean_auc
 
 
 def get_mean_pr_curve(pr_curves, extra_key=None):
@@ -332,7 +341,7 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
     return f, ax
 
 
-def get_roc(df, score='pred_score', target='agg_label', binder=None, anchor_mutation=None):
+def get_roc(df, score='pred', target='agg_label', binder=None, anchor_mutation=None):
     """
     Args:
         df: DF containing the prediction or scores
@@ -351,9 +360,13 @@ def get_roc(df, score='pred_score', target='agg_label', binder=None, anchor_muta
         auc = roc_auc_score(df[target].values, df[score].values)
         auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
     except KeyError:
-        fpr, tpr, _ = roc_curve(df[target].values, df['mean_pred'].values)
-        auc = roc_auc_score(df[target].values, df['mean_pred'].values)
-        auc01 = roc_auc_score(df[target].values, df[score].values, max_fpr=0.1)
+        print('here')
+        try:
+            fpr, tpr, _ = roc_curve(df[target].values, df['mean_pred'].values)
+            auc = roc_auc_score(df[target].values, df['mean_pred'].values)
+            auc01 = roc_auc_score(df[target].values, df['mean_pred'].values, max_fpr=0.1)
+        except:
+            raise KeyError(f'{target} or "mean_pred" not in df\'s columns!')
     output = {"roc": (fpr, tpr),
               "auc": auc,
               "auc01": auc01,

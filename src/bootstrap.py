@@ -5,10 +5,11 @@ from joblib import Parallel, delayed
 from functools import partial
 from tqdm.auto import tqdm
 from src.metrics import get_metrics, get_mean_roc_curve
+
 N_CORES = multiprocessing.cpu_count() - 2
 
 
-def bootstrap_wrapper(y_score, y_true, seed):
+def bootstrap_wrapper(y_score, y_true, seed, auc01=False):
     np.random.seed(seed)
     sample_idx = np.random.randint(0, len(y_score), len(y_score))
     sample_score = y_score[sample_idx]
@@ -20,7 +21,9 @@ def bootstrap_wrapper(y_score, y_true, seed):
         return pd.DataFrame(), (None, None, None, None)
 
     # Save to get mean curves after
-    roc_curve = (test_results.pop('roc_curve'), test_results['auc'])
+
+    roc_curve = (test_results.pop('roc_curve'), test_results['auc'], test_results['auc_01']) if auc01 \
+        else (test_results.pop('roc_curve'), test_results['auc'])
     # Delete PR curve and not saving because we don't use it at the moment
     _ = (test_results.pop('pr_curve'), test_results['prauc'])
     return pd.DataFrame(test_results, index=[0]), roc_curve
@@ -79,21 +82,21 @@ def bootstrap_downsample(df, downsample_label, downsample_number, score_col, tar
     return result_df, mean_roc_curve
 
 
-def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES):
+def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False):
     wrapper = partial(bootstrap_wrapper,
-                      y_score=y_score, y_true=y_true)
+                      y_score=y_score, y_true=y_true, auc01=auc01)
     print('Sampling')
     output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in
                                      tqdm(range(n_rounds), desc='Bootstrapping rounds', position=1, leave=False))
 
     print('Making results DF and curves')
     result_df = pd.concat([x[0] for x in output])
-    mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None])
+    mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None], auc01=auc01)
     # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
     return result_df, mean_roc_curve
 
 
-def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_jobs=N_CORES):
+def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_jobs=N_CORES, auc01=False):
     """
     Does the same as bootstrap_eval but with a custom score_columns instead of taking as input the arrays
     of scores and labels
@@ -109,7 +112,7 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
     """
     scores = -1 * df[score_col].values if 'rank' in score_col.lower() else df[score_col].values
     labels = df[target_col].values
-    wrapper = partial(bootstrap_wrapper, y_score=scores, y_true=labels)
+    wrapper = partial(bootstrap_wrapper, y_score=scores, y_true=labels, auc01=auc01)
     output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in
                                      tqdm(range(n_rounds), desc='Bootstrapping rounds', position=1, leave=False))
 
@@ -135,8 +138,8 @@ def get_pval(sample_a, sample_b):
         sig : significance symbol
     """
     # If both are not the same size can't do the comparison
-    assert len(sample_a)==len(sample_b), 'Provided samples don\'t have the same length!'\
-                                        f'Sample A: {len(sample_a)}, Sample B: {len(sample_b)}'
+    assert len(sample_a) == len(sample_b), 'Provided samples don\'t have the same length!' \
+                                           f'Sample A: {len(sample_a)}, Sample B: {len(sample_b)}'
 
     pval = 1 - (len((sample_a > sample_b).astype(int).nonzero()[0]) / len(sample_a))
 
@@ -156,5 +159,5 @@ def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
     # Drawing Pval */ns rectangles
     # x1, x2 = 0, 1
     # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
-    axis.plot([x0, x0, x1, x1], [y, y + h/1.25, y + h/1.25, y], lw=1.5, c=color)
+    axis.plot([x0, x0, x1, x1], [y, y + h / 1.25, y + h / 1.25, y], lw=1.5, c=color)
     axis.text((x0 + x1) * .5, y + h, label, ha='center', va='bottom', color=color)

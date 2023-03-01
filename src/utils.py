@@ -9,6 +9,14 @@ from matplotlib import pyplot as plt
 import matplotlib.patheffects as path_effects
 import seaborn as sns
 
+
+def get_palette(palette, n_colors):
+    """ 'stretches' stupid fucking palette to have more contrast"""
+    pal = sns.color_palette(palette, n_colors=int(n_colors*2))
+    palette = [pal[i] for i in range(1, 1+int(n_colors*2), 2)]
+    return palette
+
+
 def convert_hla(hla):
     if not hla.startswith('HLA-'):
         hla = 'HLA-' + hla
@@ -297,8 +305,12 @@ def pipeline_netmhcpan_xls_shift(df, xls_or_filename, xls_suffix):
     return merged_results
 
 
-def parse_netmhcpan_full(row, netmhc_xls):
-    hla = row['HLA'].replace(':', '')
+def parse_netmhcpan_full(row, netmhc_xls, exp=False):
+    if exp:
+        hla = row['HLA']
+    else:
+        hla = row['HLA'].replace(':', '')
+
     #
     seq_id = row['seq_id']
     # print(hla, row)
@@ -308,7 +320,7 @@ def parse_netmhcpan_full(row, netmhc_xls):
 
 
 
-def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full'):
+def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full', exp=False):
     """
     ASSUMES BOTH ARE THE DF AND THE XLS ARE SORTED THE SAME WAY.
     i.e. DF is the same dataframe that was saved for NetMHCpan
@@ -316,7 +328,7 @@ def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full'):
         df:
         xls_or_filename:
         xls_suffix:
-
+        exp:True if it's the output from netmhcpanExp
     Returns:
 
     """
