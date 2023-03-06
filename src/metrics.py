@@ -8,6 +8,7 @@ import seaborn as sns
 from torch import nn as nn
 
 from src.data_processing import verify_df, get_dataset, to_tensors
+from src.utils import get_palette
 
 mpl.rcParams['figure.dpi'] = 180
 sns.set_style('darkgrid')
@@ -299,7 +300,7 @@ def get_nested_feature_importance(models):
     return np.mean(np.stack(feat_importances), axis=0)
 
 
-def plot_feature_importance(importance, names, title='', ax=None, label_number=False):
+def plot_feature_importance(importance, names, title='', ax=None, label_number=False, palette='viridis_r'):
     # Create arrays from feature importance and feature names
     feature_importance = np.array(importance)
     feature_names = np.array(names)
@@ -311,13 +312,12 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
     # Sort the DataFrame in order decreasing feature importance
     fi_df.sort_values(by=['feature_importance'], ascending=False, inplace=True)
 
-    sns.set_palette('viridis')
     if ax is None:
         # Define size of bar plot
         f, ax = plt.subplots(1, 1, figsize=(7, 6))
         # Plot Searborn bar chart
         sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'],
-                    ax=ax, palette='viridis_r')
+                    ax=ax, palette=get_palette(palette, n_colors=len(feature_names)))
         # Add chart labels
         plt.xticks(ax.get_xticks(), (ax.get_xticks() * 100).round(1))
         plt.xlabel('Percentage importance [%]', fontsize=12)
@@ -326,7 +326,7 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
             ax.set_title(title, fontweight='semibold', fontsize=14)
     else:
         sns.barplot(x=fi_df['feature_importance'], y=fi_df['feature_names'],
-                    ax=ax, palette='viridis_r')
+                    ax=ax, palette=get_palette(palette, n_colors=len(feature_names)))
         # Add chart labels
         # ax.set_xticks((ax.get_xticks() * 100).round(1))
         ax.set_xticklabels((ax.get_xticks() * 100).round(1))
