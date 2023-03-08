@@ -65,7 +65,10 @@ def args_parser():
                                                                     'within the standard amino acid alphabet. To '
                                                                     'disable, input "false". "false" by default.')
     parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
-    parser.add_argument('-add_wtrank', type=str2bool, default=False, help = 'Whether to add WT rank as a feature')
+    parser.add_argument('-add_wtrank', type=str2bool, default=False,
+                        help='Whether to add WT rank as a feature and ratiorank')
+    parser.add_argument('-add_foreignness', type=str2bool, default=False,
+                        help='Whether to add foreignness score as a feature')
     return parser.parse_args()
 
 
@@ -82,10 +85,10 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}230125_cedar_aligned_icore.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}230125_prime_aligned_icore.csv')
-    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230125_nepdb_aligned_icore.csv')
-    ibel_dataset = pd.read_csv(f'{args["datadir"]}230125_ibel_aligned_icore.csv')
+    cedar_dataset = pd.read_csv(f'{args["datadir"]}230308_cedar_aligned_icore.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}230308_prime_aligned_icore.csv')
+    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230308_nepdb_aligned_icore.csv')
+    ibel_dataset = pd.read_csv(f'{args["datadir"]}230308_ibel_aligned_icore.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -97,13 +100,17 @@ def main():
 
     train_dataset = trainmap[args['trainset']]
 
-
     # DEFINING COLS
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
 
-    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'EL_rank_wt_aligned'] if args[
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'EL_rank_wt_aligned',
+             'ratio_rank'] if args[
         "add_wtrank"] else ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
+
+    if args["add_foreignness"] and "foreignness_score" in cedar_dataset.columns:
+        cols_.append("foreignness_score")
+
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
@@ -111,12 +118,22 @@ def main():
     mcs.append(aa_cols)
     mcs = list(np.unique(mcs))
     mcs.extend([aa_cols + [x] for x in cols_])
+
     if args["add_wtrank"]:
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend(
+            [aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'EL_rank_wt_aligned', 'ratio_rank']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'EL_rank_wt_aligned', 'ratio_rank']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'EL_rank_wt_aligned', 'ratio_rank']])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'EL_rank_wt_aligned', 'ratio_rank']])
+        mcs.extend([aa_cols + ['icore_mut_score', 'EL_rank_wt_aligned', 'ratio_rank']])
+
+    if args["add_foreignness"]:
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_mut_score', "foreignness_score"]])
+
     # DEFINING KWARGS
     encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=args['add_rank'],
                            add_aaprop=False, remove_pep=False, standardize=True)
@@ -128,7 +145,8 @@ def main():
         for pep_col in ['icore_mut']:
             encoding_kwargs['seq_col'] = pep_col
             for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
-                key = '-'.join(mut_cols).replace('aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8','aa_props')
+                key = '-'.join(mut_cols).replace(
+                    'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8', 'aa_props')
                 if key == '':
                     key = 'only_rank'
                 elif key == 'aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8':
@@ -183,10 +201,13 @@ def main():
                                                                            encoding_kwargs, concatenated=False,
                                                                            only_concat=False)
                                 # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-                                preds.drop(columns=aa_cols).to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
+                                preds.drop(columns=aa_cols).to_csv(
+                                    f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
 
-                                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, blsm_name, ic_name, pep_col, rank_col,
-                                                                          key, evalname, n_rounds=10000, n_jobs = args["ncores"])
+                                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, blsm_name, ic_name,
+                                                                          pep_col, rank_col,
+                                                                          key, evalname, n_rounds=10000,
+                                                                          n_jobs=args["ncores"])
                                 mega_df = mega_df.append(bootstrapped_df)
 
     mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)

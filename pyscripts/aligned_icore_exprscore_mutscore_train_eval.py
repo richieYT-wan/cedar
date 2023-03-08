@@ -65,6 +65,7 @@ def args_parser():
                                                                     'disable, input "false". "false" by default.')
     parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
     parser.add_argument('-add_wtrank', type=str2bool, default=False, help='Whether to add WT rank as a feature')
+    parser.add_argument('-add_foreignness', type=str2bool, default=False, help='Whether to add foreignness score as a feature')
     return parser.parse_args()
 
 
@@ -81,10 +82,10 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}230125_cedar_aligned_pepx_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}230125_prime_aligned_pepx.csv')
-    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230125_nepdb_aligned_pepx.csv')
-    ibel_dataset = pd.read_csv(f'{args["datadir"]}230125_ibel_aligned_pepx.csv')
+    cedar_dataset = pd.read_csv(f'{args["datadir"]}230308_cedar_aligned_pepx_fold.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}230308_prime_aligned_pepx.csv')
+    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230308_nepdb_aligned_pepx.csv')
+    ibel_dataset = pd.read_csv(f'{args["datadir"]}230308_ibel_aligned_pepx.csv')
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl.pkl')
@@ -101,8 +102,11 @@ def main():
     aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
     mcs = []
 
-    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'EL_rank_wt_aligned'] if args[
+    cols_ = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score', 'ratio_rank', 'EL_rank_wt_aligned'] if args[
         "add_wtrank"] else ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'icore_mut_score']
+    if args["add_foreignness"] and "foreignness_score" in cedar_dataset.columns:
+        cols_.append("foreignness_score")
+
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
@@ -111,13 +115,21 @@ def main():
     mcs = list(np.unique(mcs))
     mcs.extend([aa_cols + [x] for x in cols_])
     if args["add_wtrank"]:
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'EL_rank_wt_aligned']])
-        mcs.extend([aa_cols + ['icore_mut_score', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score','ratio_rank',  'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', 'ratio_rank', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'ratio_rank', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned']])
+        mcs.extend([aa_cols + ['icore_mut_score', 'ratio_rank', 'EL_rank_wt_aligned']])
+
+    if args["add_foreignness"]:
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_blsm_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', 'icore_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_dissimilarity_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_blsm_mut_score', "foreignness_score"]])
+        mcs.extend([aa_cols + ['icore_mut_score', "foreignness_score"]])
+
     # Adding TPM cols
-    tpm_cols = ['Total Peptide TPM', 'Total Scaled Peptide TPM', 'Total Gene TPM']
+    tpm_cols = ['Total_Peptide_TPM', 'Total_Scaled Peptide_TPM', 'Total_Gene_TPM']
     mcs.extend([x+[b] for x in mcs for b in tpm_cols])
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
