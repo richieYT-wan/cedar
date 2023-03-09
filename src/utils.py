@@ -316,7 +316,11 @@ def parse_netmhcpan_full(row, netmhc_xls, exp=False):
     # print(hla, row)
     tmp = netmhc_xls.query('@netmhc_xls.base.ID==@seq_id')
     tmp = tmp[[x for x in tmp.columns if x[0] == hla or x[0] == 'base']]
-    return tmp[(hla, 'icore')].item(), tmp[(hla, 'core')].item(), tmp[(hla, 'EL_Rank')].item()
+    try:
+        return tmp[(hla, 'icore')].item(), tmp[(hla, 'core')].item(), tmp[(hla, 'EL_Rank')].item()
+    except:
+        print(tmp, row)
+        raise ValueError
 
 
 
@@ -338,15 +342,15 @@ def pipeline_netmhcpan_xls_fullpep(df, xls_or_filename, col_suffix='_full', exp=
         xls[('base', 'ID')] = seq_ids
     elif type(xls_or_filename) == pd.DataFrame:
         xls = xls_or_filename
+        xls[('base','ID')] = seq_ids
     else:
         raise TypeError('The second argument `xls_or_filename` should either be a string or the parsed excel xls file.')
     df['seq_id'] = seq_ids
     if f'icore{col_suffix}' not in df.columns:
-        # print('here')
-        df[['icore'+col_suffix, 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
+
+        df[['icore'+col_suffix, 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, exp=exp, result_type='expand', axis=1)
     else:
-        # print('there')
-        df[['TMP', 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, result_type='expand', axis=1)
+        df[['TMP', 'core'+col_suffix, 'EL_rank'+col_suffix]] = df.apply(parse_netmhcpan_full, netmhc_xls=xls, exp=exp, result_type='expand', axis=1)
         del df['TMP']
     return df
 
