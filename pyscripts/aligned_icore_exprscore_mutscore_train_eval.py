@@ -129,7 +129,7 @@ def main():
         mcs.extend([aa_cols + ['icore_mut_score', "foreignness_score"]])
 
     # Adding TPM cols
-    tpm_cols = ['Total_Peptide_TPM', 'Total_Scaled Peptide_TPM', 'Total_Gene_TPM']
+    tpm_cols = ['Total_Peptide_TPM', 'Total_Scaled_Peptide_TPM', 'Total_Gene_TPM']
     mcs.extend([x+[b] for x in mcs for b in tpm_cols])
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
