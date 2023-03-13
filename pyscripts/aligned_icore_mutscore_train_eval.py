@@ -196,7 +196,9 @@ def main():
                                 # FULLY FILTERED + Mean_pred
                                 if not evalset.equals(train_dataset):
                                     evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
-                                _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict,
+                                evalset.drop_duplicates
+                                _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
+                                                                           trained_models, ics_dict,
                                                                            train_dataset,
                                                                            encoding_kwargs, concatenated=False,
                                                                            only_concat=False)
