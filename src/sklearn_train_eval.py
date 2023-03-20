@@ -254,7 +254,9 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
         test_results
         predictions_df
     """
+    print(encoding_kwargs)
     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=True)
+    print(encoding_kwargs)
     # Wrapper and parallel evaluation
     eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
                             train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)

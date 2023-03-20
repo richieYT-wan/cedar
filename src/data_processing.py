@@ -115,13 +115,13 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
     if mode_eval:
         if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
             if 'seq_col' not in encoding_kwargs.keys():
-                encoding_kwargs.update({'seq_col': 'Peptide'})
+                encoding_kwargs.update({'seq_col': 'icore_mut'})
             if 'hla_col' not in encoding_kwargs.keys():
                 encoding_kwargs.update({'hla_col': 'HLA'})
             if 'target_col' not in encoding_kwargs.keys():
                 encoding_kwargs.update({'target_col': 'agg_label'})
             if 'rank_col' not in encoding_kwargs.keys():
-                encoding_kwargs.update({'seq_col': 'trueHLA_EL_rank'})
+                encoding_kwargs.update({'rank_col': 'EL_rank_mut'})
 
         # This KWARGS not needed in eval mode since I'm using Pipeline and Pipeline
         del encoding_kwargs['standardize']

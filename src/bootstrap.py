@@ -83,6 +83,19 @@ def bootstrap_downsample(df, downsample_label, downsample_number, score_col, tar
 
 
 def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False):
+    """
+    Takes the score, true labels, returns bootstrapped DF + mean rocs
+    Args:
+        y_score:
+        y_true:
+        n_rounds:
+        n_jobs:
+        auc01:
+
+    Returns:
+        bootstrapped_df
+        mean_roc
+    """
     wrapper = partial(bootstrap_wrapper,
                       y_score=y_score, y_true=y_true, auc01=auc01)
     print('Sampling')
