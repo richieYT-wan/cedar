@@ -125,7 +125,11 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
 
 def get_pval(sample_a, sample_b):
     """
+    Null hypothesis : Sample A !>= Sample B
+    Alt. hypothesis : Sample A >> Sample B
+
     Returns the bootstrapped pval that sample_a > sample_b
+
     Ex: sample_a is the AUCs for a given cdt
         sample_b is the AUCs for another condition
         --> Check that condition A works better than B
@@ -153,7 +157,8 @@ def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
     pvstr = str(pval)
     if sig == '****':
         print(pval)
-        label = f'{sig}, p={pval:.1e}'
+        # label = f'{sig}, p={pval:.1e}'
+        label = f'{sig}, p<1e-4'
     else:
         label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
     # Drawing Pval */ns rectangles
