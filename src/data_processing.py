@@ -33,6 +33,9 @@ def _init(DATADIR):
     CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
     INT_TO_CHAR = dict((i, c) for i, c in enumerate(AA_KEYS))
 
+    CHAR_TO_INT['-']=-1
+    INT_TO_CHAR[-1]='-'
+
     BG = np.loadtxt(f'{MATRIXDIR}bg.freq.fmt', dtype=float)
     BG = dict((k, v) for k, v in zip(AA_KEYS, BG))
 
@@ -78,8 +81,11 @@ def verify_df(df, seq_col, hla_col, target_col):
     # Checks binary label
     assert ([int(x) for x in sorted(unique_labels)]) in [[0, 1], [0], [1]], f'Labels are not 0, 1! {unique_labels}'
     # Checks if any seq not in alphabet
-    df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS for z in x]))].index)
-    # print(df[hla_col])
+    try:
+        df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS and not z=='-' for z in x]))].index)
+    except:
+        print(len(df), df.columns, seq_col, AA_KEYS)
+        raise ValueError
     # Checks if HLAs have correct format
     if all(df[hla_col].apply(lambda x: not x.startswith('HLA-'))):
         df[hla_col] = df[hla_col].apply(lambda x: 'HLA-' + x)
@@ -121,7 +127,7 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
             if 'target_col' not in encoding_kwargs.keys():
                 encoding_kwargs.update({'target_col': 'agg_label'})
             if 'rank_col' not in encoding_kwargs.keys():
-                encoding_kwargs.update({'seq_col': 'trueHLA_EL_rank'})
+                encoding_kwargs.update({'seq_col': 'EL_rank_mut'})
 
         # This KWARGS not needed in eval mode since I'm using Pipeline and Pipeline
         del encoding_kwargs['standardize']
@@ -178,7 +184,7 @@ def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES)
         onehot_encoded = list()
         for value in int_encoded:
             letter = [0 for _ in range(len(AA_KEYS))]
-            letter[value] = 1
+            letter[value] = 1 if value != -1 else 0
             onehot_encoded.append(letter)
         tmp = np.array(onehot_encoded)
 
@@ -280,10 +286,54 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
     weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
     return weights
 
+# Here stuff for extra AA bulging out:
+
+def find_extra_aa(core, icore):
+    """
+    Finds the bulging out AA between an icore and its corresponding core, returning the extra AA as "frequencies"
+    Args:
+        core:
+        icore:
+
+    Returns:
+
+    """
+    assert len(core) == 9, f'Core is not of length 9 somehow: {core}'
+    if len(icore) == len(core) or len(icore) == 8:
+        return np.zeros((20)), np.array(0)
+
+    elif len(icore) > len(core):
+        results = []
+        j = 0
+        for i, char in enumerate(icore):
+            if char != core[j]:
+                results.append(char)
+            else:
+                j += 1
+        # Here changed to len icore - len core to get len of bulge
+        # return (encode(''.join(results)).sum(axis=0).numpy() / (len(icore)-len(core))).astype(np.float32)
+
+        # Here, changed to return the extra + the length so that we can do the weighted division
+        return encode(''.join(results)).sum(axis=0).numpy(), np.array(len(icore)-len(core))
+
+def batch_find_extra_aa(core_seqs, icore_seqs):
+    """
+    Same as above but by batch
+    Args:
+        core_seqs:
+        icore_seqs:
+
+    Returns:
+
+    """
+    mapped = list(map(find_extra_aa, core_seqs, icore_seqs))
+    encoded, lens = np.array([x[0] for x in mapped]), np.array([x[1] for x in mapped])
+    return encoded, lens
+
 
 def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES,
                           seq_col='Peptide', hla_col='HLA', target_col='agg_label', mask=False,
-                          invert=False):
+                          invert=False, return_weights=False):
     """
     Takes as input a df containing sequence, len, HLA;
     Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
@@ -304,13 +354,12 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
     df = verify_df(df, seq_col, hla_col, target_col)
-    if 'len' not in df.columns:
-        df['len'] = df[seq_col].apply(len)
+    # if 'len' not in df.columns:
+    df['len'] = df[seq_col].apply(len)
     if max_len is not None:
         df = df.query('len<=@max_len')
     else:
         max_len = df['len'].max()
-
     # Encoding the sequences
     encoded_sequences = encode_batch(df[seq_col].values, max_len, encoding=encoding, blosum_matrix=blosum_matrix)
     if ics_dict is not None:
@@ -320,11 +369,13 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         # In case we are not doing weighted sequence (either for onehot-input or frequency computation)
         weights = np.ones(encoded_sequences.shape)
     weighted_sequences = torch.from_numpy(weights) * encoded_sequences
-
-    if device is None:
-        return weighted_sequences.float()
+    if return_weights:
+        return weighted_sequences.float(), weights
     else:
-        return weighted_sequences.to(device).float()
+        if device is None:
+            return weighted_sequences.float()# weights.sum(axis=2)
+        else:
+            return weighted_sequences.to(device).float() #weights.sum(axis=2)
 
 
 def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
@@ -410,7 +461,8 @@ def to_tensors(x, y, device='cpu'):
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='Peptide',
                       hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False,
-                      add_rank=False, add_aaprop=False, remove_pep=False):
+                      add_rank=True, add_aaprop=False, remove_pep=False, icore_bulge=False,
+                      core_col='core_mut', icore_col = 'icore_mut'):
     """
         Computes the frequencies as the main features
         Takes as input a df containing sequence, len, HLA;
@@ -436,9 +488,20 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
-
-    x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
-                                                      seq_col, hla_col, target_col, mask, invert).numpy())
+    if icore_bulge:
+        seq_col=core_col
+        max_len=9
+        core_aa, weights = encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
+                                           seq_col, hla_col, target_col, mask, invert, return_weights=True)
+        extra_aa, extra_lens = batch_find_extra_aa(df[core_col].values, df[icore_col].values)
+        total_weights = weights.mean(axis=2).sum(axis=1) + extra_lens
+        # np.repeat(total_weights, axis=0, repeats=20).reshape(len(extra_lens), 20)
+        freqs = batch_compute_frequency(core_aa, total_weights)
+        extra_freqs = extra_aa / extra_lens.repeat(axis=0,repeats=20).reshape(len(extra_lens),20)
+        x = np.add(freqs, np.nan_to_num(extra_freqs))
+    else:
+        x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
+                                                      seq_col, hla_col, target_col, mask, invert, return_weights=False).numpy())
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
         x = np.concatenate([x, ranks], axis=1)
@@ -463,10 +526,10 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     return x, y
 
 
-def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
-                seq_col='Peptide', hla_col='HLA', target_col='agg_label', rank_col='trueHLA_EL_rank',
-                mut_col=None, adaptive=False, mask=False, invert=False, add_rank=False, add_aaprop=False,
-                remove_pep=False, mask_aa=None):
+def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='icore_mut',
+                hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mut_col=None, adaptive=False, mask=False,
+                invert=False, add_rank=False, add_aaprop=False, remove_pep=False, mask_aa=None,
+                icore_bulge=False, core_col='core_mut', icore_col='icore_mut'):
     """
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
@@ -498,7 +561,8 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
 
     else:
         x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
-                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep)
+                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep, icore_bulge=icore_bulge,
+                                 core_col=core_col, icore_col=icore_col)
         if mut_col is not None and type(mut_col) == list:
             if len(mut_col) > 0:
                 mut_scores = df[mut_col].values
@@ -540,7 +604,7 @@ def compute_frequency(encoded_sequence):
     return frequencies
 
 
-def batch_compute_frequency(encoded_sequences):
+def batch_compute_frequency(encoded_sequences, true_lens=None):
     """
 
     Args:
@@ -560,10 +624,15 @@ def batch_compute_frequency(encoded_sequences):
     #     else torch.bincount(non_zeros[:, 0]).unsqueeze(1)
 
     # This is the new way with mask and .all(dim=2) which works with both BLOSUM and OH
-    mask = (encoded_sequences == 0).all(2)  # checking on second dim
-    true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
-        np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
-    frequencies = encoded_sequences.sum(axis=1) / true_lens
+
+    # TODO : I might regret this hotfix at some point
+    if true_lens is None:
+        mask = (encoded_sequences == 0).all(2)  # checking on second dim
+        true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
+            np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
+        frequencies = encoded_sequences.sum(axis=1) / true_lens
+    else:
+        frequencies = encoded_sequences.sum(axis=1) / np.repeat(true_lens,axis=0, repeats=20).reshape(len(true_lens),20)
 
     return frequencies
 
