@@ -131,7 +131,10 @@ def main():
     # Adding TPM cols
     tpm_cols = ['Total_Peptide_TPM', 'Total_Scaled_Peptide_TPM', 'Total_Gene_TPM']
     mcs.extend([x+[b] for x in mcs for b in tpm_cols])
-    mcs = mcs[-101:]
+    filtered = filter(lambda x: 'onehot' in x and 'featimp' in x and 'Inverted-KL' in x, os.listdir(
+        '/home/projects/vaccine/people/yatwan/cedar/output/230308_aligned_exprscore_addwtrank_foreignness/raw'))
+    filtered = [x.split('EL_rank_mut_')[1].replace('.csv', '') for x in filtered]
+    mcs = [x for x in mcs if '-'.join(x) not in filtered]
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
                        'encoding': 'onehot',
