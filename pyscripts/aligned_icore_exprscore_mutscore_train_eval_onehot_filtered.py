@@ -152,13 +152,11 @@ def main():
         for pep_col in ['icore_mut']:
             encoding_kwargs['seq_col'] = pep_col
             for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
-                key = '-'.join(mut_cols)
+                key = '-'.join(mut_cols).replace('aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8',
+                            'aa_props')
                 if key == '':
                     key = 'only_rank'
-
-                key.replace('aliphatic_index-boman-hydrophobicity-isoelectric_point-VHSE1-VHSE3-VHSE7-VHSE8',
-                            'aa_props')
-                key.replace(' ', '-')
+                key = key.replace(' ', '-')
                 encoding_kwargs['mut_col'] = mut_cols
                 # megaloops for encoding-weighting
                 for encoding, blosum_matrix, blsm_name in tqdm(zip(['onehot'],
