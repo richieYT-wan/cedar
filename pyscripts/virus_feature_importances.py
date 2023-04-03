@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 import multiprocessing
 import itertools
@@ -18,7 +19,6 @@ import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, AA_KEYS
 from src.utils import mkdirs, convert_path, str2bool
 from src.metrics import get_nested_feature_importance
-from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
 
 def args_parser():
