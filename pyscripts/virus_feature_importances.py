@@ -108,7 +108,7 @@ def main():
                                                                            encoding_kwargs, concatenated=False,
                                                                            only_concat=False)
                 pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
-                auc = roc_auc_score(preds['agg_label'].values, pcol[pcol])
+                auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
                 df_fi['auc']=auc
                 feat_imps_df.append(df_fi)
     pd.concat(feat_imps_df).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
