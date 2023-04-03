@@ -27,20 +27,11 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/neoepi_viral/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/230125_aligned_icore_mutscore/')
-    parser.add_argument('-trainset', type=str, default='cedar')
+    parser.add_argument('-outdir', type=str, default='../output/230403_viral_featimp/')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
-    parser.add_argument('-mask_aa', type=str, default='false', help='Which AA to mask. has to be Capital letters and '
-                                                                    'within the standard amino acid alphabet. To '
-                                                                    'disable, input "false". "false" by default.')
-    parser.add_argument('-add_rank', type=str2bool, default=True, help='Whether to add rank as a feature or not')
-    parser.add_argument('-add_wtrank', type=str2bool, default=False,
-                        help='Whether to add WT rank as a feature and ratiorank')
-    parser.add_argument('-add_foreignness', type=str2bool, default=False,
-                        help='Whether to add foreignness score as a feature')
     return parser.parse_args()
 
 
@@ -97,7 +88,7 @@ def main():
                 trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                             ics_dict=ics_dict,
                                                                             encoding_kwargs=encoding_kwargs,
-                                                                            n_jobs=8)
+                                                                            n_jobs=N_CORES)
                 fi = get_nested_feature_importance(trained_models)
                 fn = AA_KEYS + ['rank']
                 # Saving Feature importances as dataframe
@@ -109,6 +100,7 @@ def main():
                 df_fi['ProportionViral'] = p_viral
                 df_fi['NpepViral'] = npep
                 df_fi['Weight'] = ic_name
+                df_fi['seed'] = seed
                 feat_imps_df.append(df_fi)
     pd.concat(feat_imps_df).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
 
