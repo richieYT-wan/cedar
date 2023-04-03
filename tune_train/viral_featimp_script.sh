@@ -9,5 +9,5 @@ PYDIR=${HOMEDIR}pyscripts/
 ICSDIR=../data/ic_dicts/
 cd ${PYDIR}
 pwd
-python3 ./aligned_icore_exprscore_mutscore_train_eval.py -icsdir ${ICSDIR} -ncores 39  > 'tmp.txt'
+python3 ./virus_feature_importances.py -icsdir ${ICSDIR} -ncores 39  > 'tmp.txt'
 

@@ -64,13 +64,13 @@ def main():
 
     feat_imps_df = []
 
-    for seed in np.linspace(0, 11, 10):
-        for ic_name, ics_dict, invert, mask in (['Inverted-Shannon', ics_shannon, True, False],
+    for seed in tqdm(np.linspace(0, 11, 10), desc='seed', position=0, leave=True):
+        for ic_name, ics_dict, invert, mask in tqdm((['Inverted-Shannon', ics_shannon, True, False],
                                                 ['Mask', ics_shannon, False, True]
-                                                ['None', None, False, False]):
+                                                ['None', None, False, False]), desc='encoding', position=1, leave=True):
             encoding_kwargs['mask']=mask
             encoding_kwargs['invert']=invert
-            for npep in n_viral:
+            for npep in tqdm(n_viral, desc='nviral', position=2, leave=True):
                 p_viral = 100*npep / (npep+len(cedar_dataset))
 
                 filename = f"NeoepiViral_Seed{seed}_{ic_name}_ProportionViral{p_viral:.2f}".replace(".","_")
