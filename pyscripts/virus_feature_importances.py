@@ -104,7 +104,7 @@ def main():
 
                 _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence','HLA','agg_label']),
                                                                            trained_models, ics_dict,
-                                                                           train_dataset,
+                                                                           dataset,
                                                                            encoding_kwargs, concatenated=False,
                                                                            only_concat=False)
                 pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
