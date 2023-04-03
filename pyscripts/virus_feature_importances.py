@@ -64,9 +64,9 @@ def main():
 
     feat_imps_df = []
 
-    for seed in tqdm(np.linspace(0, 11, 10), desc='seed', position=0, leave=True):
+    for seed in tqdm(np.arange(0, 11, 1), desc='seed', position=0,leave=True):
         for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', None, True, False),(['Mask', None, False, True]),(['None', None, False, False])],
-                                                    desc = 'weighting', position=1, leave=True)
+                                                    desc = 'weighting', position=1, leave=True):
             encoding_kwargs['mask']=mask
             encoding_kwargs['invert']=invert
             for npep in tqdm(n_viral, desc='nviral', position=2, leave=True):
