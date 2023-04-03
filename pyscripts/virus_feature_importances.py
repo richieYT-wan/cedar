@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
 import multiprocessing
 import itertools
 
@@ -84,7 +85,7 @@ def main():
                                                                max_depth=6, ccp_alpha=9.945e-6)
                 # Training model and getting feature importances
                 print('Training')
-                trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
+                trained_models, train_metrics, _ = nested_kcv_train_sklearn(dataset, model,
                                                                             ics_dict=ics_dict,
                                                                             encoding_kwargs=encoding_kwargs,
                                                                             n_jobs=N_CORES)
@@ -100,6 +101,15 @@ def main():
                 df_fi['NpepViral'] = npep
                 df_fi['Weight'] = ic_name
                 df_fi['seed'] = seed
+
+                _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
+                                                                           trained_models, ics_dict,
+                                                                           train_dataset,
+                                                                           encoding_kwargs, concatenated=False,
+                                                                           only_concat=False)
+                pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
+                auc = roc_auc_score(preds['agg_label'].values, pcol[pcol])
+                df_fi['auc']=auc
                 feat_imps_df.append(df_fi)
     pd.concat(feat_imps_df).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
 
