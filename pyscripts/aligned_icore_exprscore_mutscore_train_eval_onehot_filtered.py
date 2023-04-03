@@ -165,7 +165,7 @@ def main():
                                                                desc='encoding', leave=False, position=1):
                     encoding_kwargs['encoding'] = encoding
                     encoding_kwargs['blosum_matrix'] = blosum_matrix
-
+                    # Doing only Inverted Shannon, Mask, None
                     for invert, ic_name, ics_dict, mask in [(True, 'Shannon', ics_shannon, False),
                                                       (False, 'None', None, False),
                                                       (False, 'Mask', ics_shannon, True)]:
