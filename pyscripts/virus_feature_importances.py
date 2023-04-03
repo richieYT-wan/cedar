@@ -102,7 +102,7 @@ def main():
                 df_fi['Weight'] = ic_name
                 df_fi['seed'] = seed
 
-                _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
+                _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
                                                                            trained_models, ics_dict,
                                                                            train_dataset,
                                                                            encoding_kwargs, concatenated=False,
