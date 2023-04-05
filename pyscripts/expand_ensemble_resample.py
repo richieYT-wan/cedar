@@ -5,6 +5,7 @@ import multiprocessing
 import itertools
 
 from tqdm.auto import tqdm
+import sklearn
 from datetime import datetime as dt
 import os, sys
 
@@ -66,7 +67,9 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     expanded_y_pred_test = []
 
     # Here re-sample 10x
-    for resample in range(10):
+    for resample in range(1,11):
+        model = sklearn.base.clone(base_model)
+        model.set_params(random_state=(resample*seed)+resample+seed)
         tmp = train.sample(len(train), random_state=resample, replace=True)
         # Get datasets
         x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
