@@ -158,7 +158,7 @@ def main():
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset}
-    expandmap = {True: (nested_kcv_train_sklearn_expand, evaluate_trained_models_sklearn_expand),
+    expandmap = {True: (nested_kcv_train_sklearn_expand, evaluate_trained_models_sklearn),
                  False: (nested_kcv_train_sklearn, evaluate_trained_models_sklearn)}
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
@@ -177,25 +177,25 @@ def main():
     cdt_cedar = (dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True, seq_col='icore_mut', rank_col='EL_rank_mut', target_col ='agg_label', hla_col='HLA',
                         add_aaprop=False, remove_pep=False, standardize=True,
                         mask=False, invert=True,
-                        mut_cols = aa_cols+['EL_rank_wt_aligned','icore_dissimilarity_score','ratio_rank','Total_Gene_TPM']
+                        mut_col = aa_cols+['EL_rank_wt_aligned','icore_dissimilarity_score','ratio_rank','Total_Gene_TPM']
                         ), # Here it should be icore similarity score because it's not dissimilarity that we have
                     ics_shannon, 'OptCEDAR')
 
     cdt_prime = (dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True, seq_col='icore_mut', rank_col='EL_rank_mut', target_col ='agg_label', hla_col='HLA',
                         add_aaprop=False, remove_pep=False, standardize=True,
                         mask=True, invert=False,
-                        mut_cols = ['icore_dissimilarity_score', 'icore_blsm_mut_score']),
+                        mut_col = ['icore_dissimilarity_score', 'icore_blsm_mut_score']),
                     ics_shannon, 'OptPRIME')
 
     cdt_general = (dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True, seq_col='icore_mut', rank_col='EL_rank_mut', target_col ='agg_label', hla_col='HLA',
                           add_aaprop=False, remove_pep=False, standardize=True,
                           mask=False, invert=False,
-                          mut_cols = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank', 'Total_Gene_TPM']),
+                          mut_col = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank', 'Total_Gene_TPM']),
                      None, 'General')
 
 
     print('Starting loops')
-    for kwargs, ics_dict, condition in [cdt_base, cdt_cedar, cdt_prime, cdt_general]:
+    for encoding_kwargs, ics_dict, condition in [cdt_base, cdt_cedar, cdt_prime, cdt_general]:
         for expand_ensemble in [False, True]:
             train_fct, eval_fct = expandmap[expand_ensemble]
             filename = f'expandEnsemble{expand_ensemble}_Condition{condition}'
@@ -209,7 +209,7 @@ def main():
                                                                         encoding_kwargs=encoding_kwargs,
                                                                         n_jobs=args["ncores"])
             fi = get_nested_feature_importance(trained_models)
-            fn = AA_KEYS + ['rank'] + mut_cols
+            fn = AA_KEYS + ['rank'] + encoding_kwargs['mut_cols']
             # Saving Feature importances as dataframe
             df_fi = pd.DataFrame(fi, index=fn).T
             df_fi.to_csv(
