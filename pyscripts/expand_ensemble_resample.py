@@ -79,7 +79,7 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
         expanded_models.append(model)
-
+    print(expanded_models, type(expanded_models))
     return expanded_models
 
 def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kwargs: dict = None, n_jobs: int = None):
