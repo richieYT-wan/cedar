@@ -26,9 +26,45 @@ from src.utils import mkdirs, convert_path, str2bool
 from src.metrics import get_nested_feature_importance
 from src.bootstrap import bootstrap_eval
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
+import copy
 from copy import deepcopy
 
 N_CORES = 39
+
+
+def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
+    """
+    Assertion / checks for encoding kwargs and verify all the necessary key-values
+    are in
+    """
+    # Making a deep copy since dicts are mutable between fct calls
+    encoding_kwargs = copy.deepcopy(encoding_kwargs)
+    if encoding_kwargs is None:
+        encoding_kwargs = {'max_len': 12,
+                           'encoding': 'onehot',
+                           'blosum_matrix': None,
+                           'standardize': False}
+    essential_keys = ['max_len', 'encoding', 'blosum_matrix', 'standardize']
+    keys_check = [x in encoding_kwargs.keys() for x in essential_keys]
+    keys_check_dict = {k: v for (k, v) in zip(essential_keys, keys_check) if v == False}
+    assert all(keys_check), f'Encoding kwargs don\'t contain the essential key-value pairs! ' \
+                            f"{list(keys_check_dict.keys())} are missing!"
+
+    if mode_eval:
+        if any([(x not in encoding_kwargs.keys()) for x in ['seq_col', 'hla_col', 'target_col', 'rank_col']]):
+            if 'seq_col' not in encoding_kwargs.keys():
+                encoding_kwargs.update({'seq_col': 'icore_mut'})
+            if 'hla_col' not in encoding_kwargs.keys():
+                encoding_kwargs.update({'hla_col': 'HLA'})
+            if 'target_col' not in encoding_kwargs.keys():
+                encoding_kwargs.update({'target_col': 'agg_label'})
+            if 'rank_col' not in encoding_kwargs.keys():
+                encoding_kwargs.update({'rank_col': 'EL_rank_mut'})
+
+        # This KWARGS not needed in eval mode since I'm using Pipeline and Pipeline
+        del encoding_kwargs['standardize']
+    return encoding_kwargs
+
 
 def final_bootstrap_wrapper(preds_df, args, filename, expand, condition, evalset,
                             n_rounds=10000, n_jobs=36):
@@ -100,7 +136,8 @@ def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kw
         train_results
         test_results
     """
-    # encoding_kwargs = assert_en   coding_kwargs(encoding_kwargs, mode_eval=False)
+    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+
     models_dict = {}
     test_metrics = {}
     train_metrics = {}
@@ -226,7 +263,7 @@ def main():
             df_fi.to_csv(
                 f'{args["outdir"]}raw/featimps_{filename}.csv',
                 index=False)
-
+            encoding_kwargs['standardize']=True
             for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
                                          ['CEDAR', 'PRIME', 'NEPDB']):
                 # FULLY FILTERED + Mean_pred
