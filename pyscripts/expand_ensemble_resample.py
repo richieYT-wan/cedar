@@ -196,6 +196,7 @@ def main():
 
     print('Starting loops')
     for encoding_kwargs, ics_dict, condition in [cdt_base, cdt_cedar, cdt_prime, cdt_general]:
+        mut_cols = encoding_kwargs['mut_col'] is condition!='Base' else None
         for expand_ensemble in [False, True]:
             train_fct, eval_fct = expandmap[expand_ensemble]
             filename = f'expandEnsemble{expand_ensemble}_Condition{condition}'
@@ -209,7 +210,7 @@ def main():
                                                                         encoding_kwargs=encoding_kwargs,
                                                                         n_jobs=args["ncores"])
             fi = get_nested_feature_importance(trained_models)
-            fn = AA_KEYS + ['rank'] + encoding_kwargs['mut_col']
+            fn = AA_KEYS + ['rank'] + mut_cols if mut_cols is not None else AA_KEYS+['rank']
             # Saving Feature importances as dataframe
             df_fi = pd.DataFrame(fi, index=fn).T
             df_fi.to_csv(
