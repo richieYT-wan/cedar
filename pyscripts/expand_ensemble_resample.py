@@ -94,7 +94,7 @@ def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kw
         train_results
         test_results
     """
-    encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+    # encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
     models_dict = {}
     test_metrics = {}
     train_metrics = {}
