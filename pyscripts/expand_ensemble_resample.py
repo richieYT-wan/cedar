@@ -198,8 +198,8 @@ def main():
 
 
     print('Starting loops')
-    for encoding_kwargs, ics_dict, condition in [cdt_base, cdt_cedar, cdt_prime, cdt_general]:
-        mut_cols = encoding_kwargs['mut_col'] is condition!='Base' else None
+    for encoding_kwargs, ics_dict, condition in [cdt_general,cdt_base, cdt_cedar, cdt_prime]:
+        mut_cols = encoding_kwargs['mut_col'] if condition!='Base' else None
         for expand_ensemble in [False, True]:
             train_fct, eval_fct = expandmap[expand_ensemble]
             filename = f'expandEnsemble{expand_ensemble}_Condition{condition}'
