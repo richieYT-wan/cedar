@@ -196,7 +196,7 @@ def main():
                           mut_col = ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank', 'Total_Gene_TPM']),
                      None, 'General')
 
-
+    mega_df=pd.DataFrame()
     print('Starting loops')
     for encoding_kwargs, ics_dict, condition in [cdt_general,cdt_base, cdt_cedar, cdt_prime]:
         mut_cols = encoding_kwargs['mut_col'] if condition!='Base' else None
