@@ -1,13 +1,16 @@
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
 import multiprocessing
-from functools import partial
-from joblib import Parallel, delayed
 import itertools
 
 from tqdm.auto import tqdm
 import sklearn
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from joblib import Parallel, delayed
+from functools import partial
+
 from datetime import datetime as dt
 import os, sys
 
@@ -72,6 +75,8 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     for resample in range(1,11):
         model = sklearn.base.clone(base_model)
         model.set_params(random_state=(resample*seed)+resample+seed)
+        if standardize:
+            model = Pipeline([('scaler', StandardScaler()), ('model', model)])
         tmp = train.sample(len(train), random_state=resample, replace=True)
         # Get datasets
         x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
@@ -79,7 +84,6 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
         expanded_models.append(model)
-    print(expanded_models, type(expanded_models))
     return expanded_models
 
 def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kwargs: dict = None, n_jobs: int = None):
@@ -120,7 +124,8 @@ def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kw
             delayed(train_wrapper_)(fold_in=fold_in) for fold_in in tqdm(inner_folds,
                                                                          desc='Inner Folds',
                                                                          leave=False, position=1))
-        models_dict[fold_out] = [flatten_list(x[0]) for x in output]
+
+        models_dict[fold_out] = flatten_list(output)
 
     return models_dict, None, None
 
