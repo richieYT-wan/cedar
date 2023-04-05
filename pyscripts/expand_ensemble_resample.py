@@ -80,7 +80,7 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
 
     return expanded_models
 
-def nested_kcv_train_sklearn_expand():
+def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kwargs: dict = None, n_jobs: int = None):
     """
     Args:
         dataframe:
