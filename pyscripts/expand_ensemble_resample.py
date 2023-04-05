@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import multiprocessing
+from functools import partial
+from joblib import Parallel, delayed
 import itertools
 
 from tqdm.auto import tqdm
@@ -94,7 +96,7 @@ def nested_kcv_train_sklearn_expand(dataframe, base_model, ics_dict, encoding_kw
         train_results
         test_results
     """
-    # encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=False)
+    # encoding_kwargs = assert_en   coding_kwargs(encoding_kwargs, mode_eval=False)
     models_dict = {}
     test_metrics = {}
     train_metrics = {}
