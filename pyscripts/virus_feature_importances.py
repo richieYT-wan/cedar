@@ -125,7 +125,7 @@ def main():
     p_viral = [round(100 * x / (x+len(cedar_dataset)),2) for x in n_viral]
     feat_imps_df = []
     for seed in tqdm([0,1,2,3,4,5,6,7,8,10], desc='seed', leave=True):
-        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', None, True, False),(['Mask', None, False, True]),(['None', None, False, False])],
+        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', ics_shannon, True, False),(['Mask', ics_shannon, False, True]),(['None', None, False, False])],
                                                     desc = 'weighting', leave=True):
             encoding_kwargs['mask']=mask
             encoding_kwargs['invert']=invert
