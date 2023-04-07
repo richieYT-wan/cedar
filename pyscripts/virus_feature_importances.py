@@ -123,7 +123,6 @@ def main():
     n_viral = [int(x*len(cedar_dataset)) for x in np.arange(0, 10, 0.1) if x*len(cedar_dataset) <= len(viral_dataset)]
     p_viral = [round(100 * x / (x+len(cedar_dataset)),2) for x in n_viral]
     feat_imps_df = []
-<<<<<<< Updated upstream
 
     for seed in tqdm(np.arange(0, 11, 1), desc='seed', position=0,leave=True):
         for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', ics_shannon, True, False),
@@ -188,7 +187,6 @@ def main():
                 feat_imps_df.append(df_fi)
 
     pd.concat(feat_imps_df).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
-=======
     for seed in tqdm(np.arange(0, 10, 1), desc='seed', leave=True):
         for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', None, True, False),(['Mask', None, False, True]),(['None', None, False, False])],
                                                     desc = 'weighting', leave=True):
@@ -199,7 +197,6 @@ def main():
             output = Parallel(n_jobs=4)(delayed(partial_wrapper)(npep=npep) for npep in tqdm(n_viral, desc='nviral', leave=True))
             feat_imps_df.append(output)
     pd.concat(flatten_list(feat_imps_df)).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
->>>>>>> Stashed changes
 
 
 if __name__ == '__main__':
