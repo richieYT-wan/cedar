@@ -66,7 +66,9 @@ def main():
     feat_imps_df = []
 
     for seed in tqdm(np.arange(0, 11, 1), desc='seed', position=0,leave=True):
-        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', None, True, False),(['Mask', None, False, True]),(['None', None, False, False])],
+        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', ics_shannon, True, False),
+                                                     (['Mask', ics_shannon, False, True]),
+                                                     (['None', None, False, False])],
                                                     desc = 'weighting', position=1, leave=True):
             encoding_kwargs['mask']=mask
             encoding_kwargs['invert']=invert
@@ -75,7 +77,7 @@ def main():
 
                 filename = f"NeoepiViral_Seed{seed}_{ic_name}_ProportionViral{p_viral:.2f}".replace(".","_")
                 dataset = pd.concat([cedar_dataset, viral_dataset.sample(npep, random_state=seed)])
-                kf = KFold(n_splits=5, shuffle=True, random_state=seed)
+                kf = KFold(n_splits=5, shuffle=True,random_state=seed)
                 dataset['fold'] = 0
                 for i, (train_idx, test_idx) in enumerate(
                         kf.split(dataset['sequence'].values, dataset['agg_label'].values, groups=dataset['agg_label'])):
@@ -101,7 +103,9 @@ def main():
                 df_fi['NpepViral'] = npep
                 df_fi['Weight'] = ic_name
                 df_fi['seed'] = seed
-
+                df_fi['Proportion Viral'] = df_fi.apply(lambda x: f"{x['ProportionViral']/100:.1%}", axis=1)
+                df_fi['Tryptophan (W) Feat. Importance'] = df_fi.apply(lambda x: 100*x['W'], axis=1)
+                # Crossval AUC
                 _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence','HLA','agg_label']),
                                                                            trained_models, ics_dict,
                                                                            dataset,
@@ -109,8 +113,20 @@ def main():
                                                                            only_concat=False)
                 pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
                 auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
-                df_fi['auc']=auc
+                df_fi['kcv_auc']=auc
+                # Only CEDAR AUC
+                _, preds = evaluate_trained_models_sklearn(cedar_dataset.drop_duplicates(subset=['sequence','HLA','agg_label']),
+                                                                trained_models, ics_dict,
+                                                            dataset,
+                                                            encoding_kwargs, concatenated=False,
+                                                            only_concat=False)
+                pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
+                auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
+                df_fi['neoepi_auc']=auc
+
+                
                 feat_imps_df.append(df_fi)
+
     pd.concat(feat_imps_df).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
 
 
