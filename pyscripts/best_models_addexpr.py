@@ -142,7 +142,7 @@ def main():
             trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                         ics_dict=ics_dict,
                                                                         encoding_kwargs=encoding_kwargs,
-                                                                        n_jobs=args["ncores"])
+                                                                        n_jobs=10)
             fi = get_nested_feature_importance(trained_models)
             fn = AA_KEYS + ['rank'] + mut_cols if mut_cols is not None else AA_KEYS+['rank']
             # Saving Feature importances as dataframe
@@ -161,7 +161,7 @@ def main():
                                                            trained_models, ics_dict,
                                                            train_dataset,
                                                            encoding_kwargs, concatenated=False,
-                                                           only_concat=True, n_jobs=args["ncores"])
+                                                           only_concat=True, n_jobs=10)
 
                 # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                 preds.drop(columns=aa_cols).to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
