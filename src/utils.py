@@ -12,7 +12,8 @@ import seaborn as sns
 
 def get_palette(palette, n_colors):
     """ 'stretches' stupid fucking palette to have more contrast"""
-    pal = sns.color_palette(palette, n_colors=int(n_colors*2))
+    nc = 6 if n_colors<=2 else int(n_colors*2)
+    pal = sns.color_palette(palette, n_colors=nc)
     palette = [pal[i] for i in range(1, 1+int(n_colors*2), 2)]
     return palette
 
