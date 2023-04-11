@@ -91,8 +91,7 @@ def main():
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset}
-    expandmap = {True: (nested_kcv_train_sklearn_expand, evaluate_trained_models_sklearn),
-                 False: (nested_kcv_train_sklearn, evaluate_trained_models_sklearn)}
+                
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
