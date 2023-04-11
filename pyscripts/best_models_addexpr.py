@@ -40,7 +40,7 @@ def final_bootstrap_wrapper(preds_df, args, filename, add_expression, condition,
                                                 y_true=targets,
                                                 n_rounds=n_rounds, n_jobs=n_jobs)
     bootstrapped_df['condition'] = condition
-    bootstrapped_df['add_expression'] = expand
+    bootstrapped_df['add_expression'] = add_expression
     bootstrapped_df['key'] = key
     bootstrapped_df['evalset'] = evalset.upper()
 
@@ -91,7 +91,7 @@ def main():
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset}
-                
+
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
