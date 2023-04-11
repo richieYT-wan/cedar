@@ -104,7 +104,8 @@ def main():
     # Defining cdt = (kwargs, ics_dict, name)
     cdt_base = (dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, 
                        add_rank=True, seq_col='Peptide', rank_col='trueHLA_EL_rank', hla_col='HLA',
-                       target_col = 'agg_label', add_aaprop=False, remove_pep=False, standardize=True),
+                       target_col = 'agg_label', add_aaprop=False, remove_pep=False, standardize=True,
+                       mut_col = None),
                 None, 'Base')
     cdt_cedar = (dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True, seq_col='icore_mut', rank_col='EL_rank_mut', target_col ='agg_label', hla_col='HLA',
                         add_aaprop=False, remove_pep=False, standardize=True,
@@ -130,7 +131,7 @@ def main():
     for encoding_kwargs, ics_dict, condition in [cdt_general,cdt_base, cdt_cedar, cdt_prime]:
         for add_expression in [False, True]:
             if add_expression:
-                encoding_kwargs['mut_col'] = encoding_kwargs['mut_col'] + ['Total_Gene_TPM']
+                encoding_kwargs['mut_col'] = encoding_kwargs['mut_col'] + ['Total_Gene_TPM'] if encoding_kwargs['mut_col'] is not None else ['Total_Gene_TPM']
             filename = f'addExpression{add_expression}_Condition{condition}'
             mut_cols = encoding_kwargs['mut_col'] if (condition!='Base' or add_expression) else None
             # Using the same model and hyperparameters
@@ -150,7 +151,7 @@ def main():
                 f'{args["outdir"]}raw/featimps_{filename}.csv',
                 index=False)
             encoding_kwargs['standardize']=True
-            key = '-'.join(encoding_kwargs['mut_col']).replace('-'.join(aa_cols), 'aa_props')
+            key = '-'.join(mut_cols).replace('-'.join(aa_cols), 'aa_props') if mut_cols is not None else "only_rank"
             for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
                                          ['CEDAR', 'PRIME', 'NEPDB']):
                 # FULLY FILTERED + Mean_pred
