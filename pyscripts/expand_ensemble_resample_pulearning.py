@@ -114,9 +114,10 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         model.set_params(random_state=(resample*seed)+resample+seed)
         if standardize:
             model = Pipeline([('scaler', StandardScaler()), ('model', model)])
+        # Keep the positives fixed, resample the negatives, with or without subsampling
         tmp = pd.concat([train.query('agg_label==1'), train.query('agg_label==0').sample(frac=subsample, random_state=resample, replace=True)])
         # Get datasets
-        x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+        x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
         x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
@@ -245,8 +246,9 @@ def main():
     print('Starting loops')
     for encoding_kwargs, ics_dict, condition in [cdt_general,cdt_base, cdt_cedar, cdt_prime]:
         mut_cols = encoding_kwargs['mut_col'] if condition!='Base' else None
-        for expand_ensemble in [1, 2, 5, 10]:
-            for subsample in [0.5, 0.75, 1.0]:
+        # 1 doesn't expand, 2= double the ensemble, etc
+        for expand_ensemble in reversed([1, 2, 5, 10]):
+            for subsample in reversed([0.5, 0.75, 1.0]):
                 filename = f'expandEnsemble{expand_ensemble}_subsample{str(subsample).replace('.','p')}_Condition{condition}'
                 # Using the same model and hyperparameters
                 model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,

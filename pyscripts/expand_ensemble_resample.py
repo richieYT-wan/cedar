@@ -113,6 +113,8 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         model.set_params(random_state=(resample*seed)+resample+seed)
         if standardize:
             model = Pipeline([('scaler', StandardScaler()), ('model', model)])
+            
+        # Here, resamples both positives and negatives and expand ensemble 10x
         tmp = train.sample(len(train), random_state=resample, replace=True)
         # Get datasets
         x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
