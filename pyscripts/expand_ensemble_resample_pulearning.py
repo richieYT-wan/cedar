@@ -117,7 +117,12 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         # Keep the positives fixed, resample the negatives, with or without subsampling
         tmp = pd.concat([train.query('agg_label==1'), train.query('agg_label==0').sample(frac=subsample, random_state=resample, replace=True)])
         # Get datasets
-        x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
+        try:
+            x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
+        except:
+            print('HERE\n\n\n', resample, subsample, fold_out, fold_in, '\n\n')
+            print('THERE\n\n\n', encoding_kwargs, '\n\n\n\n')
+            raise Exception
         x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
@@ -249,14 +254,14 @@ def main():
         # 1 doesn't expand, 2= double the ensemble, etc
         for expand_ensemble in reversed([1, 2, 5, 10]):
             for subsample in reversed([0.5, 0.75, 1.0]):
-                filename = f'expandEnsemble{expand_ensemble}_subsample{str(subsample).replace('.','p')}_Condition{condition}'
+                filename = f'expandEnsemble{expand_ensemble}_subsample{str(subsample).replace(".","p")}_Condition{condition}'
                 # Using the same model and hyperparameters
                 model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                                    max_depth=8, ccp_alpha=9.945e-6)
                 # Training model and getting feature importances
                 print('Training')
                 train_fct, eval_fct = expandmap[True]
-                trained_models, train_metrics, _ = train_fct(train_dataset, model, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs, n_jobs=args["ncores"], n_resample=expand_ensemble, subsample=subsample)
+                trained_models, train_metrics, _ = train_fct(train_dataset, model, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs, n_jobs=10, n_resample=expand_ensemble, subsample=subsample)
 
 
                 fi = get_nested_feature_importance(trained_models)
@@ -276,7 +281,7 @@ def main():
                                                                trained_models, ics_dict,
                                                                train_dataset,
                                                                encoding_kwargs, concatenated=False,
-                                                               only_concat=True, n_jobs=args["ncores"])
+                                                               only_concat=True, n_jobs=10)
 
                     # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                     preds.drop(columns=aa_cols).to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
