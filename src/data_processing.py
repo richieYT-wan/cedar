@@ -304,12 +304,11 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
     df = verify_df(df, seq_col, hla_col, target_col)
-    if 'len' not in df.columns:
-        df['len'] = df[seq_col].apply(len)
+    df['seq_len'] = df[seq_col].apply(len)
     if max_len is not None:
         df = df.query('len<=@max_len')
     else:
-        max_len = df['len'].max()
+        max_len = df['seq_len'].max()
 
     # Encoding the sequences
     encoded_sequences = encode_batch(df[seq_col].values, max_len, encoding=encoding, blosum_matrix=blosum_matrix)
@@ -320,11 +319,11 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         # In case we are not doing weighted sequence (either for onehot-input or frequency computation)
         weights = np.ones(encoded_sequences.shape)
     weighted_sequences = torch.from_numpy(weights) * encoded_sequences
-
+    true_lens = df['seq_len'].values
     if device is None:
-        return weighted_sequences.float()
+        return weighted_sequences.float(), true_lens
     else:
-        return weighted_sequences.to(device).float()
+        return weighted_sequences.to(device).float(), true_lens
 
 
 def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
@@ -436,9 +435,9 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
-
-    x = batch_compute_frequency(encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
-                                                      seq_col, hla_col, target_col, mask, invert).numpy())
+    encoded_weighted, true_lens = encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
+                                                      seq_col, hla_col, target_col, mask, invert)
+    x = batch_compute_frequency(encoded_weighted.numpy(), true_lens)
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
         x = np.concatenate([x, ranks], axis=1)
@@ -540,7 +539,7 @@ def compute_frequency(encoded_sequence):
     return frequencies
 
 
-def batch_compute_frequency(encoded_sequences):
+def batch_compute_frequency(encoded_sequences, true_lens=None):
     """
 
     Args:
@@ -560,10 +559,13 @@ def batch_compute_frequency(encoded_sequences):
     #     else torch.bincount(non_zeros[:, 0]).unsqueeze(1)
 
     # This is the new way with mask and .all(dim=2) which works with both BLOSUM and OH
-    mask = (encoded_sequences == 0).all(2)  # checking on second dim
-    true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
-        np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
-    frequencies = encoded_sequences.sum(axis=1) / true_lens
+    if true_lens is None:
+        mask = (encoded_sequences == 0).all(2)  # checking on second dim that every entry == 0
+        true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
+            np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
+        frequencies = encoded_sequences.sum(axis=1) / true_lens
+    else:
+        frequencies = encoded_sequences.sum(axis=1) / np.repeat(true_lens,axis=0, repeats=20).reshape(len(true_lens), 20)
 
     return frequencies
 
