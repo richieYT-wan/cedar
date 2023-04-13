@@ -26,7 +26,9 @@ def bootstrap_wrapper(y_score, y_true, seed, auc01=False):
         else (test_results.pop('roc_curve'), test_results['auc'])
     # Delete PR curve and not saving because we don't use it at the moment
     _ = (test_results.pop('pr_curve'), test_results['prauc'])
-    return pd.DataFrame(test_results, index=[0]), roc_curve
+    bootstrapped_df = pd.DataFrame(test_results, index=[0])
+    bootstrapped_df['seed'] = seed
+    return bootstrapped_df, roc_curve
 
 
 def bootstrap_downsample_wrapper(df, downsample_label, downsample_number, score_col, target_col, seed):

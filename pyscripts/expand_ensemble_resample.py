@@ -115,7 +115,7 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
             model = Pipeline([('scaler', StandardScaler()), ('model', model)])
         tmp = train.sample(len(train), random_state=resample, replace=True)
         # Get datasets
-        x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+        x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
         x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
@@ -173,7 +173,7 @@ def args_parser():
 
     parser.add_argument('-datadir', type=str, default='../data/pepx/',
                         help='Path to directory containing the pre-partitioned data')
-    parser.add_argument('-outdir', type=str, default='../output/230405_ExpandEnsembleResample/')
+    parser.add_argument('-outdir', type=str, default='../output/230405_ExpandEnsembleResample_PUlearning/')
     parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
