@@ -133,7 +133,7 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
 ######################################
 
 
-def get_aa_properties(df, seq_col='Peptide'):
+def get_aa_properties(df, seq_col='icore_mut', do_vhse=True, prefix=''):
     """
     Compute some AA properties that I have selected
     keep = ['aliphatic_index', 'boman', 'hydrophobicity',
@@ -148,18 +148,21 @@ def get_aa_properties(df, seq_col='Peptide'):
 
     """
     out = df.copy()
-    out['aliphatic_index'] = out[seq_col].apply(lambda x: peptides.Peptide(x).aliphatic_index())
-    out['boman'] = out[seq_col].apply(lambda x: peptides.Peptide(x).boman())
+
+    out[f'{prefix}aliphatic_index'] = out[seq_col].apply(lambda x: peptides.Peptide(x).aliphatic_index())
+    out[f'{prefix}boman'] = out[seq_col].apply(lambda x: peptides.Peptide(x).boman())
+    out[f'{prefix}hydrophobicity'] = out[seq_col].apply(lambda x: peptides.Peptide(x).hydrophobicity())
+    out[f'{prefix}isoelectric_point'] = out[seq_col].apply(lambda x: peptides.Peptide(x).isoelectric_point())
+    # out['PD2'] = out[seq_col].apply(lambda x: peptides.Peptide(x).physical_descriptors()[1])
     # out['charge_7_4'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=7.4))
     # out['charge_6_65'] = out[seq_col].apply(lambda x: peptides.Peptide(x).charge(pH=6.65))
-    out['hydrophobicity'] = out[seq_col].apply(lambda x: peptides.Peptide(x).hydrophobicity())
-    out['isoelectric_point'] = out[seq_col].apply(lambda x: peptides.Peptide(x).isoelectric_point())
-    # out['PD2'] = out[seq_col].apply(lambda x: peptides.Peptide(x).physical_descriptors()[1])
-    vhse = out[seq_col].apply(lambda x: peptides.Peptide(x).vhse_scales())
-    # for i in range(1, 9):
-    #     out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
-    for i in [1, 3, 7, 8]:
-        out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
+    if do_vhse:
+        vhse = out[seq_col].apply(lambda x: peptides.Peptide(x).vhse_scales())
+        # for i in range(1, 9):
+        #     out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
+        for i in [1, 3, 7, 8]:
+            out[f'VHSE{i}'] = [x[i - 1] for x in vhse]
+
     # Some hardcoded bs
     return out, ['aliphatic_index', 'boman', 'hydrophobicity',
                  'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
