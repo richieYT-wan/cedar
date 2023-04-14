@@ -84,7 +84,7 @@ def bootstrap_downsample(df, downsample_label, downsample_number, score_col, tar
     return result_df, mean_roc_curve
 
 
-def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False):
+def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False, add_roc=True):
     """
     Takes the score, true labels, returns bootstrapped DF + mean rocs
     Args:
@@ -106,9 +106,12 @@ def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False)
 
     print('Making results DF and curves')
     result_df = pd.concat([x[0] for x in output])
-    mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None], auc01=auc01)
-    # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
-    return result_df, mean_roc_curve
+    if add_roc:
+        mean_roc_curve = get_mean_roc_curve([x[1] for x in output if x[1][0] is not None], auc01=auc01)
+        # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
+        return result_df, mean_roc_curve
+    else:
+        return result_df
 
 
 def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_jobs=N_CORES, auc01=False):
