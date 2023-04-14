@@ -3,7 +3,8 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import multiprocessing
 import itertools
-
+from functools import partial
+from joblib import Parallel, delayed
 from tqdm.auto import tqdm
 from datetime import datetime as dt
 import os, sys
@@ -24,30 +25,72 @@ from copy import deepcopy
 
 N_CORES = 39
 
-def final_bootstrap_wrapper(preds_df, args, filename, blsm_name,
-                            ic_name, pep_col, rank_col, key, evalset,
+def final_bootstrap_wrapper(preds_df, args, filename,
+                            ic_name, key, evalset,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
 
-    bootstrapped_df, mean_rocs = bootstrap_eval(y_score=scores,
-                                                y_true=targets,
-                                                n_rounds=n_rounds, n_jobs=n_jobs)
-    bootstrapped_df['encoding'] = blsm_name
+    bootstrapped_df = bootstrap_eval(y_score=scores, y_true=targets, n_rounds=n_rounds, n_jobs=n_jobs, add_roc=False)
+    bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
-    bootstrapped_df['pep_col'] = pep_col
-    bootstrapped_df['rank_col'] = rank_col
+    bootstrapped_df['pep_col'] = 'icore_mut'
+    bootstrapped_df['rank_col'] = 'EL_rank_mut'
     bootstrapped_df['key'] = key
     bootstrapped_df['evalset'] = evalset.upper()
 
     bootstrapped_df.to_csv(
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',
         index=False)
-    pkl_dump(mean_rocs,
-             f'{args["outdir"]}bootstrapping/{evalset}_mean_rocs_{filename}.pkl')
 
+    return bootstrapped_df.drop(columns=['AP', 'f1'])
+
+def parallel_wrapper(train_dataset, cedar_dataset, prime_dataset, nepdb_dataset, 
+                     args, encoding_kwargs, key, invert, ic_name, ics_dict, mask):
+    encoding_kwargs = copy.deepcopy(encoding_kwargs)
+    encoding_kwargs['invert'] = invert
+    encoding_kwargs['mask'] = mask
+    if invert:
+        if ic_name == 'None':
+            continue
+        else:
+            ic_name = 'Inverted ' + ic_name
+
+
+    filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'
+    # Using the same model and hyperparameters
+    model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
+                                   max_depth=8, ccp_alpha=9.945e-6)
+    # Training model and getting feature importances
+    print('Training')
+    trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
+                                                                ics_dict=ics_dict,
+                                                                encoding_kwargs=encoding_kwargs,
+                                                                n_jobs=10)
+    fi = get_nested_feature_importance(trained_models)
+    fn = AA_KEYS + ['rank'] + mut_cols
+    # Saving Feature importances as dataframe
+    df_fi = pd.DataFrame(fi, index=fn).T
+    df_fi.to_csv(
+        f'{args["outdir"]}raw/featimps_{filename}.csv',
+        index=False)
+
+    for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
+                                 ['CEDAR', 'PRIME', 'NEPDB']):
+        # FULLY FILTERED + Mean_pred
+        if not evalset.equals(train_dataset):
+            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
+        _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
+                                                   trained_models, ics_dict,
+                                                   train_dataset,
+                                                   encoding_kwargs, concatenated=False,
+                                                   only_concat=True, n_jobs=10)
+        # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+        preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
+
+        bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                  key, evalname, n_rounds=10000, n_jobs = 12)
     return bootstrapped_df
-
 
 def args_parser():
     parser = argparse.ArgumentParser(
@@ -86,15 +129,12 @@ def main():
 
     # DEFINING COLS
     mcs = []
-    cols_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point', 'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned', 'Total_Gene_TPM'] 
+    cols_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point', 'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM'] 
+    
     
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
-            mcs.append(list(mc))
-        mcs.append(aa_cols)
-        mcs = list(np.unique(mcs))
-        mcs.extend([aa_cols + [x] for x in cols_])
-
+           mcs.append(list(mc))
     cedar_dataset, _ = get_aa_properties(cedar_dataset, seq_col='icore_mut', do_vhse=False, prefix='icore_')
     prime_dataset, _ = get_aa_properties(prime_dataset, seq_col='icore_mut', do_vhse=False, prefix='icore_')
     nepdb_dataset, _ = get_aa_properties(nepdb_dataset, seq_col='icore_mut', do_vhse=False, prefix='icore_')
@@ -119,7 +159,10 @@ def main():
                        'remove_pep': False,
                        'standardize': True}
 
-    mega_df = pd.DataFrame()
+    conditions_list = [(True, 'Shannon', ics_shannon, False),
+                       (False, 'None', None, False),
+                       (False, 'Mask', ics_shannon, True)]
+    mega_list = []
     print('Starting loops')
     for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
         key = '-'.join(mut_cols).replace(' ', '-')
@@ -132,54 +175,15 @@ def main():
         encoding_kwargs['encoding'] = 'onehot'
         encoding_kwargs['blosum_matrix'] = None
         # Doing only Inverted Shannon, Mask, None
-        for invert, ic_name, ics_dict, mask in [(True, 'Shannon', ics_shannon, False),
-                                          (False, 'None', None, False),
-                                          (False, 'Mask', ics_shannon, True)]:
-            encoding_kwargs['invert'] = invert
-            encoding_kwargs['mask'] = mask
-            if invert:
-                if ic_name == 'None':
-                    continue
-                else:
-                    ic_name = 'Inverted ' + ic_name
+        wrapper = partial(parallel_wrapper, train_dataset=train_dataset, cedar_dataset=cedar_dataset, prime_dataset=prime_dataset,
+            nepdb_dataset=nepdb_dataset, args=args, encoding_kwargs = encoding_kwargs, key=key)
 
+        output = Parallel(n_jobs=3)(delayed(wrapper)(invert=invert, ic_name=ic_name, ics_dict=ics_dict, mask=mask) \
+                                    for invert, ic_name, ics_dict, mask in conditions_list)
 
-            filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'
-            # Using the same model and hyperparameters
-            model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
-                                           max_depth=8, ccp_alpha=9.945e-6)
-            # Training model and getting feature importances
-            print('Training')
-            trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
-                                                                        ics_dict=ics_dict,
-                                                                        encoding_kwargs=encoding_kwargs,
-                                                                        n_jobs=10)
-            fi = get_nested_feature_importance(trained_models)
-            fn = AA_KEYS + ['rank'] + mut_cols
-            # Saving Feature importances as dataframe
-            df_fi = pd.DataFrame(fi, index=fn).T
-            df_fi.to_csv(
-                f'{args["outdir"]}raw/featimps_{filename}.csv',
-                index=False)
-
-            for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
-                                         ['CEDAR', 'PRIME', 'NEPDB']):
-                # FULLY FILTERED + Mean_pred
-                if not evalset.equals(train_dataset):
-                    evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
-                _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
-                                                           trained_models, ics_dict,
-                                                           train_dataset,
-                                                           encoding_kwargs, concatenated=False,
-                                                           only_concat=True, n_jobs=10)
-                # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-                preds.drop(columns=aa_cols).to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
-
-                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, blsm_name, ic_name, pep_col, rank_col,
-                                                          key, evalname, n_rounds=10000, n_jobs = args["ncores"])
-                mega_df = mega_df.append(bootstrapped_df)
-
-    mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
+        mega_list.append(pd.concat(output))
+        print(type(mega_list), type(mega_list[0]))
+    pd.concat(mega_list).to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 
 if __name__ == '__main__':
