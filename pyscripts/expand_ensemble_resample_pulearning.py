@@ -117,12 +117,7 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
         # Keep the positives fixed, resample the negatives, with or without subsampling
         tmp = pd.concat([train.query('agg_label==1'), train.query('agg_label==0').sample(frac=subsample, random_state=resample, replace=True)])
         # Get datasets
-        try:
-            x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
-        except:
-            print('HERE\n\n\n', resample, subsample, fold_out, fold_in, '\n\n')
-            print('THERE\n\n\n', encoding_kwargs, '\n\n\n\n')
-            raise Exception
+        x_train, y_train = get_dataset(tmp, ics_dict, **encoding_kwargs)
         x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
         # Fit the model and append it to the list
         model.fit(x_train, y_train)
