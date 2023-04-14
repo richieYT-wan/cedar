@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 from tqdm.auto import tqdm
 from datetime import datetime as dt
 import os, sys
-
+import copy
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
@@ -45,53 +45,6 @@ def final_bootstrap_wrapper(preds_df, args, filename,
 
     return bootstrapped_df.drop(columns=['AP', 'f1'])
 
-def parallel_wrapper(train_dataset, cedar_dataset, prime_dataset, nepdb_dataset, 
-                     args, encoding_kwargs, key, invert, ic_name, ics_dict, mask):
-    encoding_kwargs = copy.deepcopy(encoding_kwargs)
-    encoding_kwargs['invert'] = invert
-    encoding_kwargs['mask'] = mask
-    if invert:
-        if ic_name == 'None':
-            continue
-        else:
-            ic_name = 'Inverted ' + ic_name
-
-
-    filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'
-    # Using the same model and hyperparameters
-    model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
-                                   max_depth=8, ccp_alpha=9.945e-6)
-    # Training model and getting feature importances
-    print('Training')
-    trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
-                                                                ics_dict=ics_dict,
-                                                                encoding_kwargs=encoding_kwargs,
-                                                                n_jobs=10)
-    fi = get_nested_feature_importance(trained_models)
-    fn = AA_KEYS + ['rank'] + mut_cols
-    # Saving Feature importances as dataframe
-    df_fi = pd.DataFrame(fi, index=fn).T
-    df_fi.to_csv(
-        f'{args["outdir"]}raw/featimps_{filename}.csv',
-        index=False)
-
-    for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
-                                 ['CEDAR', 'PRIME', 'NEPDB']):
-        # FULLY FILTERED + Mean_pred
-        if not evalset.equals(train_dataset):
-            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
-        _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
-                                                   trained_models, ics_dict,
-                                                   train_dataset,
-                                                   encoding_kwargs, concatenated=False,
-                                                   only_concat=True, n_jobs=10)
-        # p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-        preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False)
-
-        bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                  key, evalname, n_rounds=10000, n_jobs = 12)
-    return bootstrapped_df
-
 def args_parser():
     parser = argparse.ArgumentParser(
         description='Script to crossvalidate and evaluate methods that use aa frequency as encoding')
@@ -104,6 +57,7 @@ def args_parser():
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+    parser.add_argument('-condition', type=str, default='None', help = 'Inverted-Shannon, Mask or None. Must be string, so "None"')
 
     return parser.parse_args()
 
@@ -159,31 +113,73 @@ def main():
                        'remove_pep': False,
                        'standardize': True}
 
-    conditions_list = [(True, 'Shannon', ics_shannon, False),
-                       (False, 'None', None, False),
-                       (False, 'Mask', ics_shannon, True)]
-    mega_list = []
+    conditions_list = {'Inverted-Shannon':(True, 'Shannon', ics_shannon, False),
+                       'None':(False, 'None', None, False),
+                       'Mask':(False, 'Mask', ics_shannon, True)}
+
+
+        # for invert, ic_name, ics_dict, mask in [(True, 'Shannon', ics_shannon, False),
+        #                                   (False, 'None', None, False),
+        #                                   (False, 'Mask', ics_shannon, True)]:
+    invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
+    # megaloops for encoding-weighting
+
+    encoding_kwargs['encoding'] = 'onehot'
+    encoding_kwargs['blosum_matrix'] = None
+    # Doing only Inverted Shannon, Mask, None
+
+    encoding_kwargs['invert'] = invert
+    encoding_kwargs['mask'] = mask
+    if invert:
+        if ic_name == 'None':
+            pass
+        else:
+            ic_name = 'Inverted ' + ic_name
+
+    mega_df = pd.DataFrame()
     print('Starting loops')
     for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
+        encoding_kwargs['mut_col'] = mut_cols
         key = '-'.join(mut_cols).replace(' ', '-')
         if key == '':
             key = 'only_rank'
+        filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'
+        # Using the same model and hyperparameters
+        model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
+                                       max_depth=8, ccp_alpha=9.945e-6)
+        # Training model and getting feature importances
+        print('Training')
+        trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
+                                                                    ics_dict=ics_dict,
+                                                                    encoding_kwargs=encoding_kwargs,
+                                                                    n_jobs=10)
+        fi = get_nested_feature_importance(trained_models)
+        fn = AA_KEYS + ['rank'] + mut_cols
+        # Saving Feature importances as dataframe
+        df_fi = pd.DataFrame(fi, index=fn).T
+        df_fi.to_csv(
+            f'{args["outdir"]}raw/featimps_{filename}.csv',
+            index=False)
 
-        encoding_kwargs['mut_col'] = mut_cols
-        # megaloops for encoding-weighting
+        for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
+                                     ['CEDAR', 'PRIME', 'NEPDB']):
+            # FULLY FILTERED + Mean_pred
+            if not evalset.equals(train_dataset):
+                evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
+            _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide','HLA','agg_label']),
+                                                       trained_models, ics_dict,
+                                                       train_dataset,
+                                                       encoding_kwargs, concatenated=False,
+                                                       only_concat=True, n_jobs=10)
+            p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+            preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                         columns = ['HLA','Peptide','agg_label', 'icore_mut', 'icore_wt_aligned']+mut_cols+[p_col])
 
-        encoding_kwargs['encoding'] = 'onehot'
-        encoding_kwargs['blosum_matrix'] = None
-        # Doing only Inverted Shannon, Mask, None
-        wrapper = partial(parallel_wrapper, train_dataset=train_dataset, cedar_dataset=cedar_dataset, prime_dataset=prime_dataset,
-            nepdb_dataset=nepdb_dataset, args=args, encoding_kwargs = encoding_kwargs, key=key)
+            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                      key, evalname, n_rounds=10000, n_jobs = 38)
+            mega_df = mega_df.append(bootstrapped_df)
 
-        output = Parallel(n_jobs=3)(delayed(wrapper)(invert=invert, ic_name=ic_name, ics_dict=ics_dict, mask=mask) \
-                                    for invert, ic_name, ics_dict, mask in conditions_list)
-
-        mega_list.append(pd.concat(output))
-        print(type(mega_list), type(mega_list[0]))
-    pd.concat(mega_list).to_csv(f'{args["outdir"]}/total_df.csv', index=False)
+    mega_df.to_csv(f'{args["outdir"]}/total_df_{args["condition"]}.csv', index=False)
 
 
 if __name__ == '__main__':
