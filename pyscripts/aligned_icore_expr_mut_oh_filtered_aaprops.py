@@ -143,7 +143,10 @@ def main():
         key = '-'.join(mut_cols).replace(' ', '-')
         if key == '':
             key = 'only_rank'
-        filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'
+        # Hotfix for filename length...
+        key = 'all_feats' if key == '-'.join(cols_) else key
+        filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'.replace('Inverted','Inv')
+        
         # Using the same model and hyperparameters
         model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                        max_depth=8, ccp_alpha=9.945e-6)
