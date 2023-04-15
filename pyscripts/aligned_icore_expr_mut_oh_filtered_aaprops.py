@@ -138,7 +138,7 @@ def main():
 
     mega_df = pd.DataFrame()
     print('Starting loops')
-    for mut_cols in tqdm(mcs, position=0, leave=True, desc='cols'):
+    for mut_cols in tqdm(reversed(mcs), position=0, leave=True, desc='cols'):
         encoding_kwargs['mut_col'] = mut_cols
         key = '-'.join(mut_cols).replace(' ', '-')
         if key == '':
