@@ -204,7 +204,7 @@ def str2bool(v):
 
 def mkdirs(path):
     if not os.path.exists(path):
-        os.makedirs(path)
+        os.makedirs(path,exist_ok=True)
 
 
 def pkl_dump(obj, filename, dirname=None):
