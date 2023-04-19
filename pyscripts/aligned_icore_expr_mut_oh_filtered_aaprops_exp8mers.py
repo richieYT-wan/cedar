@@ -113,9 +113,10 @@ def main():
                        'remove_pep': False,
                        'standardize': True}
 
-    conditions_list = {'Inverted-Shannon':(True, 'Shannon', ics_shannon, False),
+    conditions_list = {'Inverted-Shannon':(True, 'Inverted-Shannon', ics_shannon, False),
                        'None':(False, 'None', None, False),
-                       'Mask':(False, 'Mask', ics_shannon, True)}
+                       'Mask':(False, 'Mask', ics_shannon, True),
+                       'Shannon':{False', 'Shannon', ics_shannon, False}}
 
 
         # for invert, ic_name, ics_dict, mask in [(True, 'Shannon', ics_shannon, False),
@@ -130,12 +131,7 @@ def main():
 
     encoding_kwargs['invert'] = invert
     encoding_kwargs['mask'] = mask
-    if invert:
-        if ic_name == 'None':
-            pass
-        else:
-            ic_name = 'Inverted ' + ic_name
-
+    
     mega_df = pd.DataFrame()
     print('Starting loops')
     for mut_cols in tqdm(reversed(mcs), position=0, leave=True, desc='cols'):
@@ -146,7 +142,7 @@ def main():
         # Hotfix for filename length...
         key = 'all_feats' if key == '-'.join(cols_) else key
         key = key.replace('icore_','')
-        filename = f'{args["trainset"]}_onehot_{"-".join(ic_name.split(" "))}_icore_mut_EL_rank_mut_{key}'.replace('Inverted','Inv')
+        filename = f'{args["trainset"]}_onehot_{ic_name}_icore_mut_EL_rank_mut_{key}'.replace('Inverted','Inv')
         
         # Using the same model and hyperparameters
         model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
