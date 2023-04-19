@@ -184,7 +184,7 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
     train_metrics = {}
     folds = sorted(dataframe.fold.unique())
     std = encoding_kwargs.pop('standardize')
-    for fold_out in tqdm(folds, leave=False, desc='Outer fold', position=2):
+    for fold_out in tqdm(folds, leave=False, desc='Train:Outer fold', position=2):
         # Get test set & init models list to house all models trained in inner fold
         test = dataframe.query('fold == @fold_out').reset_index(drop=True)
         x_test, y_test = get_dataset(test, ics_dict, **encoding_kwargs)
