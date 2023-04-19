@@ -116,13 +116,9 @@ def main():
     conditions_list = {'Inverted-Shannon':(True, 'Inverted-Shannon', ics_shannon, False),
                        'None':(False, 'None', None, False),
                        'Mask':(False, 'Mask', ics_shannon, True),
-                       'Shannon':{False, 'Shannon', ics_shannon, False},
-                       'Inverted-Mask':{True,'Inverted-Mask',ics_shannon,True}}
+                       'Shannon':(False, 'Shannon', ics_shannon, False),
+                       'Inverted-Mask':(True,'Inverted-Mask',ics_shannon,True)}
 
-
-        # for invert, ic_name, ics_dict, mask in [(True, 'Shannon', ics_shannon, False),
-        #                                   (False, 'None', None, False),
-        #                                   (False, 'Mask', ics_shannon, True)]:
     invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
     # megaloops for encoding-weighting
 
