@@ -41,7 +41,6 @@ def add_median_labels(ax, fmt='.1%'):
         ])
 
 
-
 def set_mode(models_dict, mode='eval'):
     """
     QOL function to set all models to train or eval
