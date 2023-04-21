@@ -170,7 +170,7 @@ def main():
                                                        only_concat=True, n_jobs=10)
             p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
             preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
-                         columns = ['HLA','Peptide','agg_label', 'icore_mut', 'icore_wt_aligned']+mut_cols+[p_col])
+                         columns = ['HLA','Peptide','agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned']+mut_cols+[p_col])
 
             bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                       key, evalname, n_rounds=10000, n_jobs = 38)

@@ -357,7 +357,10 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
         weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
     df = verify_df(df, seq_col, hla_col, target_col)
-    df['seq_len'] = df[seq_col].apply(len)
+    if seq_col == 'expanded_input':
+        df['seq_len'] = df[seq_col].apply(lambda x: len(x) - x.count('-'))
+    else:
+        df['seq_len'] = df[seq_col].apply(len)
     if max_len is not None:
         df = df.query('len<=@max_len')
     else:
