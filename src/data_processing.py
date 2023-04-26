@@ -362,7 +362,7 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
     else:
         df['seq_len'] = df[seq_col].apply(len)
     if max_len is not None:
-        df = df.query('len<=@max_len')
+        df = df.query('seq_len<=@max_len')
     else:
         max_len = df['seq_len'].max()
 

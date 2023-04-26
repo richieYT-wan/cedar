@@ -111,7 +111,7 @@ def main():
 
     # LOADING DATA AND STUFF
     cedar_dataset = pd.read_csv(f'{args["datadir"]}cedar.csv')
-    human_dataset = pd.read_csv(f'{args["datadir"]}human.csv').rename(columns={'icore_mut':'sequence'}).assign(agg_label=0)
+    human_dataset = pd.read_csv(f'{args["datadir"]}human.csv').rename(columns={'icore_mut':'sequence'}).assign(agg_label=0)[['sequence','HLA','EL_rank_mut','agg_label']]
 
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
 
