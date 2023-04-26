@@ -191,9 +191,9 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
         # For a given fold, all the models that are trained should be appended to this list
         inner_folds = sorted([f for f in folds if f != fold_out])
         # N jobs must be lower than cpu_count
-        n_jobs = min(multiprocessing.cpu_count()-1, len(inner_folds)) if n_jobs is None\
+        n_jobs = min(multiprocessing.cpu_count() - 1, len(inner_folds)) if n_jobs is None \
             else n_jobs if (n_jobs is not None and n_jobs <= multiprocessing.cpu_count()) \
-            else multiprocessing.cpu_count()-1
+            else multiprocessing.cpu_count() - 1
         # Create the sub-dict and put the model into the models dict
         train_wrapper_ = partial(parallel_inner_train_wrapper, train_dataframe=dataframe, x_test=x_test,
                                  base_model=base_model, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
@@ -225,10 +225,17 @@ def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
     else:
         test_df = test_dataframe.copy().reset_index(drop=True)
 
-    if train_dataframe is not None and not train_dataframe.equals(test_dataframe):
-        tmp = train_dataframe.query('fold != @fold_out')
-        train_peps = tmp[encoding_kwargs['seq_col']].unique()
-        test_df = test_df.query(f'{encoding_kwargs["seq_col"]} not in @train_peps')
+    # this here was used to filter out the training peps. turns out, when using this, even when pre-filtering for
+    # Peptides (i.e. prime.query('Peptide not in train.Peptide.values'), This would further filter out some peps that
+    # ended up having the same ICORE, fucking up the numbers of peptides on a per-fold basis making it inconsistent.
+    #
+    # if train_dataframe is not None and not train_dataframe.equals(test_dataframe):
+    #     tmp = train_dataframe.query('fold != @fold_out')
+    #     train_peps = tmp[encoding_kwargs['seq_col']].unique()
+    #     test_df = test_df.query(f'{encoding_kwargs["seq_col"]} not in @train_peps')
+    #
+
+    # So this is taken out !
     predictions_df = get_predictions(test_df, models_list, ics_dict, encoding_kwargs)
     test_metrics = get_metrics(predictions_df[encoding_kwargs['target_col']].values,
                                predictions_df['pred'].values)
@@ -258,7 +265,8 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     # Wrapper and parallel evaluation
     eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
                             train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
-    n_jobs = len(models_dict.keys()) if (n_jobs is None and len(models_dict.keys())<=multiprocessing.cpu_count()) else n_jobs
+    n_jobs = len(models_dict.keys()) if (
+                n_jobs is None and len(models_dict.keys()) <= multiprocessing.cpu_count()) else n_jobs
     output = Parallel(n_jobs=n_jobs)(delayed(eval_wrapper_)(fold_out=fold_out, models_list=models_list) \
                                      for (fold_out, models_list) in tqdm(models_dict.items(),
                                                                          desc='Eval Folds',
@@ -269,6 +277,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     test_metrics = [x[1] for x in output]
 
     test_results = {k: v for k, v in zip(models_dict.keys(), test_metrics)}
+    lens = [len(x[0]) for x in output]
 
     # Here simply concatenates it to get all the predictions from the folds
     predictions_df = pd.concat(predictions_df)
@@ -280,14 +289,17 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     # Either concatenated, or mean predictions
     else:
         # obj_cols = [x for x,y in zip(predictions_df.dtypes.index, predictions_df.dtypes.values) if y=='object']
-        cols = [encoding_kwargs['seq_col'], encoding_kwargs['hla_col'], encoding_kwargs['target_col']]
-        mean_preds = predictions_df.groupby(cols).agg(mean_pred=('pred', 'mean'))
-        predictions_df = test_dataframe.merge(mean_preds, left_on=cols, right_on=cols, suffixes=[None, None])
+        # cols = [encoding_kwargs['seq_col'], encoding_kwargs['hla_col'], encoding_kwargs['target_col']]
+        predictions_df = predictions_df.groupby([x for x in predictions_df.columns if x !='pred']).agg(mean_pred=('pred', 'mean')).reset_index()
+        #
+        # mean_preds = predictions_df.groupby(test_dataframe.columns).agg(mean_pred=('pred', 'mean'))
+        # predictions_df = test_dataframe.merge(mean_preds, left_on=test_dataframe.columns,
+        #                                       right_on=test_dataframe.columns,
+        #                                       suffixes=[None, None])
     # print('there', len(predictions_df))
 
     if only_concat and concatenated:
         keys_del = [k for k in test_results if k != 'concatenated']
         for k in keys_del:
             del test_results[k]
-
     return test_results, predictions_df

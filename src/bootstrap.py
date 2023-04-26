@@ -5,7 +5,7 @@ from joblib import Parallel, delayed
 from functools import partial
 from tqdm.auto import tqdm
 from src.metrics import get_metrics, get_mean_roc_curve
-
+import math
 N_CORES = multiprocessing.cpu_count() - 2
 
 
@@ -28,6 +28,11 @@ def bootstrap_wrapper(y_score, y_true, seed, auc01=False):
     _ = (test_results.pop('pr_curve'), test_results['prauc'])
     bootstrapped_df = pd.DataFrame(test_results, index=[0])
     bootstrapped_df['seed'] = seed
+    unique_id = [seed]+ [str(sample_idx[0]), str(sample_idx[-1])] + \
+                [str(sample_idx[math.floor(-1+len(sample_idx)/x)])[-1] for x in range(1,7)]
+
+
+    bootstrapped_df['id'] = str(unique_id[0])+'_'+''.join([x for x in unique_id[1:]])
     return bootstrapped_df, roc_curve
 
 
@@ -140,6 +145,11 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
     # mean_pr_curve = get_mean_pr_curve([x[2] for x in output])
     return result_df, mean_roc_curve
 
+def get_pval_wrapper(df_a, df_b, column='auc'):
+    df_a.sort_values('id', inplace=True)
+    df_b.sort_values('id', inplace=True)
+    assert all(df_a.id==df_b.id), 'wrong IDs!'
+    return get_pval(df_a[column].values, df_b[column].values)
 
 def get_pval(sample_a, sample_b):
     """
