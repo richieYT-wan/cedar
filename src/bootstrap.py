@@ -147,8 +147,10 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
     return result_df, mean_roc_curve
 
 def get_pval_wrapper(df_a, df_b, column='auc'):
-    df_a.sort_values('id', inplace=True).reset_index(drop=True)
-    df_b.sort_values('id', inplace=True).reset_index(drop=True)
+    df_a.sort_values('id', inplace=True)
+    df_a.reset_index(drop=True, inplace=True)
+    df_b.sort_values('id', inplace=True)
+    df_b.reset_index(drop=True, inplace=True)
     assert all(df_a.id==df_b.id), 'wrong IDs!'
     return get_pval(df_a[column].values, df_b[column].values)
 
