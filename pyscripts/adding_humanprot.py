@@ -65,8 +65,8 @@ def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics
                                                                 n_jobs=9)
     except:
         print(npep, seed)
-        raise ValueError
-        sys.exit(1)
+        errmsg = '#'*100 + '\n\n\n' + f'This here fucked up {npep} peps, {seed}' + '\n\n\n' +'#'*100
+        raise ValueError(errmsg)
 
     fi = get_nested_feature_importance(trained_models)
     fn = AA_KEYS + ['rank']
