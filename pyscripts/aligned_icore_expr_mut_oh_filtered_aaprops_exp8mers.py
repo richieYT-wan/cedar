@@ -34,8 +34,9 @@ def final_bootstrap_wrapper(preds_df, args, filename,
     bootstrapped_df = bootstrap_eval(y_score=scores, y_true=targets, n_rounds=n_rounds, n_jobs=n_jobs, add_roc=False)
     bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
-    bootstrapped_df['pep_col'] = 'icore_mut'
-    bootstrapped_df['rank_col'] = 'EL_rank_mut'
+    # bootstrapped_df['pep_col'] = 'icore_mut'
+    # bootstrapped_df['rank_col'] = 'EL_rank_mut'
+    bootstrapped_df['input_type'] = 'expand8mers'
     bootstrapped_df['key'] = key
     bootstrapped_df['evalset'] = evalset.upper()
 

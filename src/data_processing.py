@@ -235,7 +235,7 @@ def onehot_batch_decode(onehot_sequences):
 
 
 def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col='HLA', mask=False,
-                   invert=False):
+                   invert=False, threshold=0.3):
     """
 
     Args:
@@ -269,10 +269,10 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
                             for l, hla, pad in zip(lens, hlas, pads)])
         # IC > 0.3 goes to 0 because anchor position
         # IC <= 0.3 goes to 1 because "MIA" position
-        idx_min = (weights > 0.3)
-        idx_max = (weights <= 0.3)
+        idx_min = (weights > threshold)
+        idx_max = (weights <= threshold)
         if invert:
-            weights[idx_min] = 1.3
+            weights[idx_min] = 1 + threshold
             weights[idx_max] = 1
         else:
             weights[idx_min] = 0
