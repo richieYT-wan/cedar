@@ -9,29 +9,30 @@ import math
 N_CORES = multiprocessing.cpu_count() - 2
 
 
-def bootstrap_wrapper(y_score, y_true, seed, auc01=False):
+def bootstrap_wrapper(y_score, y_true, seed, auc01=False, add_roc=False, reduced=True):
     np.random.seed(seed)
     sample_idx = np.random.randint(0, len(y_score), len(y_score))
     sample_score = y_score[sample_idx]
     sample_true = y_true[sample_idx]
 
     try:
-        test_results = get_metrics(sample_true, sample_score)
+        test_results = get_metrics(sample_true, sample_score, reduced=reduced)
     except:
         return pd.DataFrame(), (None, None, None, None)
 
     # Save to get mean curves after
-
-    roc_curve = (test_results.pop('roc_curve'), test_results['auc'], test_results['auc_01']) if auc01 \
-        else (test_results.pop('roc_curve'), test_results['auc'])
-    # Delete PR curve and not saving because we don't use it at the moment
-    _ = (test_results.pop('pr_curve'), test_results['prauc'])
+    if add_roc:
+        roc_curve = (test_results.pop('roc_curve'), test_results['auc'], test_results['auc_01']) if auc01 \
+            else (test_results.pop('roc_curve'), test_results['auc'])
+        # Delete PR curve and not saving because we don't use it at the moment
+        _ = (test_results.pop('pr_curve'), test_results['prauc'])
+    else:
+        roc_curve = None
     bootstrapped_df = pd.DataFrame(test_results, index=[0])
-    bootstrapped_df['seed'] = seed
+    # bootstrapped_df['seed'] = seed
+
     unique_id = [seed]+ [str(sample_idx[0]), str(sample_idx[-1])] + \
                 [str(sample_idx[math.floor(-1+len(sample_idx)/x)])[-1] for x in range(1,7)]
-
-
     bootstrapped_df['id'] = str(unique_id[0])+'_'+''.join([x for x in unique_id[1:]])
     return bootstrapped_df, roc_curve
 
@@ -89,7 +90,7 @@ def bootstrap_downsample(df, downsample_label, downsample_number, score_col, tar
     return result_df, mean_roc_curve
 
 
-def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False, add_roc=True):
+def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False, add_roc=False, reduced=True):
     """
     Takes the score, true labels, returns bootstrapped DF + mean rocs
     Args:
@@ -103,7 +104,7 @@ def bootstrap_eval(y_score, y_true, n_rounds=10000, n_jobs=N_CORES, auc01=False,
         bootstrapped_df
         mean_roc
     """
-    wrapper = partial(bootstrap_wrapper,
+    wrapper = partial(bootstrap_wrapper, reduced=reduced, add_roc=add_roc,
                       y_score=y_score, y_true=y_true, auc01=auc01)
     print('Sampling')
     output = Parallel(n_jobs=n_jobs)(delayed(wrapper)(seed=seed) for seed in

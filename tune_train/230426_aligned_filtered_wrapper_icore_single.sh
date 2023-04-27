@@ -4,7 +4,7 @@
 CONDITION="$1"
 INDEX=$2
 INPUTTYPE=$3
-WALLTIME="00:30:00"
+WALLTIME="00:20 :00"
 # Create the script
 echo "#! /usr/bin/bash
 

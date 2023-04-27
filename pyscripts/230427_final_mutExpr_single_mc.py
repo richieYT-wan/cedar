@@ -20,7 +20,7 @@ import argparse
 from src.data_processing import BL62_VALUES, BL62FREQ_VALUES, AA_KEYS, get_aa_properties
 from src.utils import mkdirs, convert_path, str2bool
 from src.metrics import get_nested_feature_importance
-from src.bootstrap import bootstrap_eval
+from src.bootstrap import bootstrap_eval, get_pval_wrapper
 from src.sklearn_train_eval import nested_kcv_train_sklearn, evaluate_trained_models_sklearn
 from copy import deepcopy
 
@@ -29,16 +29,16 @@ N_CORES = 39
 
 def final_bootstrap_wrapper(preds_df, args, filename,
                             ic_name, key, evalset,
+                            baseline,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
 
-    bootstrapped_df = bootstrap_eval(y_score=scores, y_true=targets, n_rounds=n_rounds, n_jobs=n_jobs, add_roc=False)
+    bootstrapped_df = bootstrap_eval(y_score=scores, y_true=targets, n_rounds=n_rounds,
+                                     n_jobs=n_jobs, add_roc=False, reduced=True)
     bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
     bootstrapped_df['input_type'] = args['input_type']
-    # bootstrapped_df['rank_col'] = 'EL_rank_mut'
-    # bootstrapped_df['rank_col'] = 'EL_rank_mut'
     bootstrapped_df['key'] = key
     bootstrapped_df['evalset'] = evalset.upper()
 
@@ -46,7 +46,7 @@ def final_bootstrap_wrapper(preds_df, args, filename,
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',
         index=False)
 
-    return bootstrapped_df.drop(columns=['AP', 'f1'])
+    return bootstrapped_df
 
 
 def args_parser():
@@ -87,8 +87,8 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}230418_cedar_aligned_pepx.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
-
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
+    baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
 
     # DEFINING COLS
     mcs = []
@@ -174,6 +174,9 @@ def main():
         f'{args["outdir"]}raw/featimps_{filename}.csv',
         index=False)
 
+    pval_df = pd.DataFrame([[ic_name, args['input_type'], key]],
+                           columns=['weight', 'input_type', 'key'])
+
     for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
                                  ['CEDAR', 'PRIME', 'NEPDB']):
         # FULLY FILTERED + Mean_pred
@@ -187,9 +190,14 @@ def main():
         p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
         preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                      columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [p_col])
-
         bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                   key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+
+        for xx in baseline.keys():
+            df_base = baseline[xx][evalset.upper()]
+            pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
+            pval_df[f'pval_{xx}_{evalset}'] = pval
+    pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
     print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds.')
