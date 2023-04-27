@@ -199,7 +199,7 @@ def main():
             for xx in baseline.keys():
                 df_base = baseline[xx][evalname]
                 pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
-                pval_df[f'pval_{xx}_{evalset}'] = pval
+                pval_df[f'pval_{xx}_{evalname}'] = pval
         
         del bootstrapped_df
 

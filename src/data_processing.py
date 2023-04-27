@@ -269,7 +269,6 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
                             for l, hla, pad in zip(lens, hlas, pads)])
         # IC > 0.3 goes to 0 because anchor position
         # IC <= 0.3 goes to 1 because "MIA" position
-        print(threshold)
         idx_min = (weights > threshold)
         idx_max = (weights <= threshold)
         if invert:
