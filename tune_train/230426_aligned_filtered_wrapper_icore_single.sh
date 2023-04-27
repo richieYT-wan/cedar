@@ -18,6 +18,7 @@ ICSDIR=\${HOMEDIR}/data/ic_dicts/
 TRAINSET=\"cedar\"
 CONDITION=\"$CONDITION\"
 INDEX=\"$INDEX\"
+INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
@@ -25,4 +26,4 @@ python3 ./230427_final_mutExpr_single_mc.py -icsdir \${ICSDIR} -trainset \${TRAI
 " > "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
 
 chmod +x "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
-qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=4.5gb,walltime=$WALLTIME "./230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
+qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=4500mb,walltime=$WALLTIME "./230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
