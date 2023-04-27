@@ -235,7 +235,7 @@ def onehot_batch_decode(onehot_sequences):
 
 
 def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col='HLA', mask=False,
-                   invert=False, threshold=0.3):
+                   invert=False, threshold=0.234):
     """
 
     Args:
@@ -269,6 +269,7 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
                             for l, hla, pad in zip(lens, hlas, pads)])
         # IC > 0.3 goes to 0 because anchor position
         # IC <= 0.3 goes to 1 because "MIA" position
+        print(threshold)
         idx_min = (weights > threshold)
         idx_max = (weights <= threshold)
         if invert:
@@ -336,7 +337,7 @@ def batch_find_extra_aa(core_seqs, icore_seqs):
 
 def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES,
                           seq_col='Peptide', hla_col='HLA', target_col='agg_label', mask=False,
-                          invert=False, return_weights=False):
+                          invert=False, threshold=.234, return_weights=False):
     """
     Takes as input a df containing sequence, len, HLA;
     Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
@@ -369,7 +370,7 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
     # Encoding the sequences
     encoded_sequences = encode_batch(df[seq_col].values, max_len, encoding=encoding, blosum_matrix=blosum_matrix)
     if ics_dict is not None:
-        weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, mask, invert)
+        weights = get_ic_weights(df, ics_dict, max_len, seq_col, hla_col, mask, invert, threshold)
     else:
         # Here, if no ics_dict is provided, the normal weight will just be ones everywhere
         # In case we are not doing weighted sequence (either for onehot-input or frequency computation)
@@ -465,7 +466,7 @@ def to_tensors(x, y, device='cpu'):
 
 def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='Peptide',
                       hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False,
-                      add_rank=True, add_aaprop=False, remove_pep=False, icore_bulge=False,
+                      add_rank=True, add_aaprop=False, remove_pep=False, threshold=0.234, icore_bulge=False,
                       core_col='core_mut', icore_col = 'icore_mut'):
     """
         Computes the frequencies as the main features
@@ -493,7 +494,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
     encoded_weighted, true_lens = encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
-                                                      seq_col, hla_col, target_col, mask, invert)
+                                                      seq_col, hla_col, target_col, mask, invert, threshold)
     x = batch_compute_frequency(encoded_weighted.numpy(), true_lens)
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
@@ -521,7 +522,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
 
 def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='icore_mut',
                 hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mut_col=None, adaptive=False, mask=False,
-                invert=False, add_rank=False, add_aaprop=False, remove_pep=False, mask_aa=None,
+                invert=False, add_rank=False, add_aaprop=False, remove_pep=False, mask_aa=None, threshold=.234,
                 icore_bulge=False, core_col='core_mut', icore_col='icore_mut'):
     """
     """
@@ -554,7 +555,8 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
 
     else:
         x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
-                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep, icore_bulge=icore_bulge,
+                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep, threshold=threshold,
+                                 icore_bulge=icore_bulge,
                                  core_col=core_col, icore_col=icore_col)
         if mut_col is not None and type(mut_col) == list:
             if len(mut_col) > 0:
