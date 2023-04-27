@@ -29,7 +29,6 @@ N_CORES = 39
 
 def final_bootstrap_wrapper(preds_df, args, filename,
                             ic_name, key, evalset,
-                            baseline,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
