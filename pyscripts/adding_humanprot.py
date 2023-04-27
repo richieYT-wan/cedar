@@ -39,14 +39,14 @@ def args_parser():
 
 
 
-
 def flatten_list(list_of_lists):
     return [x for list_ in list_of_lists for x in list_]
 
 def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics_dict, encoding_kwargs, args):
     p_human = 100*npep / (npep+len(cedar_dataset))
     filename = f"NeoepiHuman_Seed{seed}_{ic_name}_ProportionHuman{p_human:.2f}".replace(".","_")
-    dataset = pd.concat([cedar_dataset, human_dataset.sample(npep, random_state=seed)])
+    dataset = pd.concat([cedar_dataset.assign(dataset='cedar'),
+                         human_dataset.sample(npep, random_state=seed).assign(dataset='human')])
     kf = KFold(n_splits=5, shuffle=True,random_state=seed)
     dataset['fold'] = 0
     for i, (train_idx, test_idx) in enumerate(
@@ -54,7 +54,7 @@ def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics
         dataset.iloc[test_idx, dataset.columns.get_loc('fold')] = i
     dataset.fold = dataset.fold.astype(int)
     model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=100,
-                                                   max_depth=6, ccp_alpha=9.945e-6)
+                                   max_depth=6, ccp_alpha=9.945e-6)
     # Training model and getting feature importances
     print('Training')
 
@@ -67,6 +67,7 @@ def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics
         print(npep, seed)
         raise ValueError
         sys.exit(1)
+
     fi = get_nested_feature_importance(trained_models)
     fn = AA_KEYS + ['rank']
     # Saving Feature importances as dataframe
@@ -84,17 +85,19 @@ def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics
     # Crossval roc_auc_score
     _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence','HLA','agg_label']),
                                                                trained_models, ics_dict,
-                                                               dataset,
-                                                               encoding_kwargs, concatenated=False,
+                                                               dataset, kcv_eval=False,
+                                                               encoding_kwargs=encoding_kwargs,
+                                               concatenated=False,
                                                                only_concat=False, n_jobs=9)
     pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
     auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
     df_fi['kcv_auc']=auc
     # Only CEDAR AUC
-    _, preds = evaluate_trained_models_sklearn(cedar_dataset.drop_duplicates(subset=['sequence','HLA','agg_label']),
-                                                    trained_models, ics_dict,
-                                                dataset,
-                                                encoding_kwargs, concatenated=False,
+    _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence','HLA','agg_label']).query('dataset=="cedar"'),
+                                                trained_models, ics_dict,
+                                                dataset, kcv_eval=True,
+                                                encoding_kwargs=encoding_kwargs,
+                                               concatenated=False,
                                                 only_concat=False, n_jobs=9)
     pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
     auc = roc_auc_score(preds['agg_label'].values, preds[pcol])

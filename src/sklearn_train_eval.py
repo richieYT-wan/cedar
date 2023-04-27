@@ -217,10 +217,10 @@ def nested_kcv_train_sklearn(dataframe, base_model, ics_dict, encoding_kwargs: d
 
 # EVAL WITH PARALLEL WRAPPER
 def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
-                          train_dataframe, encoding_kwargs, fold_out):
+                          train_dataframe, encoding_kwargs, fold_out, kcv_eval=False):
     # If no train dataframe provided and test_dataframe is partitioned,
     # It will eval on each of the folds
-    if 'fold' in test_dataframe.columns and test_dataframe.equals(train_dataframe):
+    if kcv_eval or ('fold' in test_dataframe.columns and test_dataframe.equals(train_dataframe)):
         test_df = test_dataframe.query('fold==@fold_out')
     else:
         test_df = test_dataframe.copy().reset_index(drop=True)
@@ -243,7 +243,7 @@ def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
 
 
 def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
-                                    train_dataframe=None,
+                                    train_dataframe=None, kcv_eval=False,
                                     encoding_kwargs: dict = None,
                                     concatenated=False, only_concat=False, n_jobs=None):
     """
@@ -263,7 +263,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
     """
     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=True)
     # Wrapper and parallel evaluation
-    eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict,
+    eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict, kcv_eval=kcv_eval,
                             train_dataframe=train_dataframe, encoding_kwargs=encoding_kwargs)
     n_jobs = len(models_dict.keys()) if (
                 n_jobs is None and len(models_dict.keys()) <= multiprocessing.cpu_count()) else n_jobs
