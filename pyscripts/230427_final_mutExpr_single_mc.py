@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 from datetime import datetime as dt
 import os, sys
 import copy
-
+import tracemalloc
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
@@ -69,6 +69,7 @@ def args_parser():
 
 
 def main():
+    tracemalloc.start()
     start = dt.now()
     args = vars(args_parser())
     args['outdir'], args['datadir'], args['icsdir'] = convert_path(args['outdir']), convert_path(
@@ -193,14 +194,14 @@ def main():
                                                   key, evalname, n_rounds=10000, n_jobs=args['ncores'])
 
         for xx in baseline.keys():
-            df_base = baseline[xx][evalset.upper()]
+            df_base = baseline[xx][evalname]
             pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
             pval_df[f'pval_{xx}_{evalset}'] = pval
     pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
-    print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds.')
-
+    print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds. ; Memory used: {tracemalloc.get_traced_memory()}')
+    tracemalloc.stop()
 
 if __name__ == '__main__':
     main()
