@@ -4,7 +4,7 @@
 CONDITION="$1"
 INDEX=$2
 INPUTTYPE=$3
-WALLTIME="00:20 :00"
+WALLTIME="00:25:00"
 # Create the script
 echo "#! /usr/bin/bash
 
@@ -26,4 +26,4 @@ python3 ./230427_final_mutExpr_single_mc.py -icsdir \${ICSDIR} -trainset \${TRAI
 " > "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
 
 chmod +x "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
-qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=4500mb,walltime=$WALLTIME "./230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
+qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,walltime=$WALLTIME "./230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"

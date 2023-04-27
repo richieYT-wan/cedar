@@ -162,7 +162,7 @@ def main():
                                    max_depth=8, ccp_alpha=9.945e-6)
     # Training model and getting feature importances
     print('Training')
-    trained_models, train_metrics, _ = nested_kcv_train_sklearn(train_dataset, model,
+    trained_models, _, _ = nested_kcv_train_sklearn(train_dataset, model,
                                                                 ics_dict=ics_dict,
                                                                 encoding_kwargs=encoding_kwargs,
                                                                 n_jobs=min(10, args['ncores']))
@@ -181,7 +181,7 @@ def main():
                                  ['CEDAR', 'PRIME', 'NEPDB']):
         # FULLY FILTERED + Mean_pred
         if not evalset.equals(train_dataset):
-            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values')
+            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values').copy()
         _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
                                                    trained_models, ics_dict,
                                                    train_dataset,
@@ -193,10 +193,17 @@ def main():
         bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                   key, evalname, n_rounds=10000, n_jobs=args['ncores'])
 
-        for xx in baseline.keys():
-            df_base = baseline[xx][evalname]
-            pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
-            pval_df[f'pval_{xx}_{evalset}'] = pval
+        if evalname=="NEPDB":
+            continue
+        else:
+            for xx in baseline.keys():
+                df_base = baseline[xx][evalname]
+                pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
+                pval_df[f'pval_{xx}_{evalset}'] = pval
+        
+        del bootstrapped_df
+
+    del trained_models
     pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
