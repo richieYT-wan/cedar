@@ -57,10 +57,16 @@ def parallel_npep_wrapper(npep, cedar_dataset, human_dataset, seed, ic_name, ics
                                                    max_depth=6, ccp_alpha=9.945e-6)
     # Training model and getting feature importances
     print('Training')
-    trained_models, train_metrics, _ = nested_kcv_train_sklearn(dataset, model,
+
+    try:
+        trained_models, train_metrics, _ = nested_kcv_train_sklearn(dataset, model,
                                                                 ics_dict=ics_dict,
                                                                 encoding_kwargs=encoding_kwargs,
                                                                 n_jobs=9)
+    except:
+        print(npep, seed)
+        raise ValueError
+        sys.exit(1)
     fi = get_nested_feature_importance(trained_models)
     fn = AA_KEYS + ['rank']
     # Saving Feature importances as dataframe
@@ -124,7 +130,7 @@ def main():
     n_human = [int(x*len(cedar_dataset)) for x in np.arange(0, 10, 0.1) if x*len(cedar_dataset) <= len(human_dataset)]
     p_human = [round(100 * x / (x+len(cedar_dataset)),2) for x in n_human]
     feat_imps_df = []
-    for seed in tqdm([0,1,2,3,4,5,6,7,8,10], desc='seed', leave=True):
+    for seed in tqdm([1,2,3,4,5,6,7,8,9,10], desc='seed', leave=True):
         for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', ics_shannon, True, False),
                                                      (['Mask', ics_shannon, False, True]),
                                                      (['None', None, False, False])],

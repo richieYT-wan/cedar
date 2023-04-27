@@ -95,7 +95,7 @@ def verify_df(df, seq_col, hla_col, target_col):
         df = df.query(f'{hla_col} in @HLAS')
     except:
         print(type(df), type(HLAS), HLAS, hla_col)
-        raise ValueError(f'{type(df)}, {type(HLAS)}, {HLAS}, {hla_col}')
+        raise ValueError(f'{type(df)}, {type(HLAS)}, {HLAS}, {hla_col}, {df[hla_col].unique()}')
 
     return df
 
