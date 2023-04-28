@@ -99,6 +99,16 @@ def main():
     for L in range(0, len(cols_) + 1):
         for mc in itertools.combinations(cols_, L):
             mcs.append(list(mc))
+
+    cols2_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point',
+              'icore_dissimilarity_score', 'icore_mut_score',
+              'icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
+    mcs2 = []
+    for L in range(0, len(cols2_) + 1):
+        for mc in itertools.combinations(cols2_, L):
+            mcs2.append(list(mc))
+    mcs = [x for x in mcs2 if x not in mcs]
+    # len(mcs)
     # Define various stuff depending on the input columns
     scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'
     prefix = 'fullpep_' if scol == 'Peptide' else 'icore_'
