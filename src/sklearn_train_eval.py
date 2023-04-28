@@ -243,9 +243,9 @@ def parallel_eval_wrapper(test_dataframe, models_list, ics_dict,
 
 
 def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
-                                    train_dataframe=None, kcv_eval=False,
+                                    train_dataframe=None, 
                                     encoding_kwargs: dict = None,
-                                    concatenated=False, only_concat=False, n_jobs=None):
+                                    concatenated=False, only_concat=False, n_jobs=None,kcv_eval=False):
     """
 
     Args:

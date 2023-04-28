@@ -111,6 +111,11 @@ def main():
     cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity', f'{prefix}isoelectric_point',
              'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
              'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
+
+    print(cols_)
+    print('CEDAR', cedar_dataset.columns)
+    print('PRIME', prime_dataset.columns)
+    print('NEPDB', nepdb_dataset.columns)
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset}
@@ -182,6 +187,9 @@ def main():
         # FULLY FILTERED + Mean_pred
         if not evalset.equals(train_dataset):
             evalset = evalset.query('Peptide not in @train_dataset.Peptide.values').copy()
+
+        print(len(evalset), evalset.columns)
+        print('#\n'*3, encoding_kwargs, '#\n'*3)
         _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
                                                    trained_models, ics_dict,
                                                    train_dataset,
