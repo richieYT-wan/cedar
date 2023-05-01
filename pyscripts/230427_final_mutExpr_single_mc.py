@@ -88,6 +88,7 @@ def main():
     prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
+    ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
 
     # DEFINING COLS
@@ -147,7 +148,11 @@ def main():
                        'None': (False, 'None', None, False),
                        'Mask': (False, 'Mask', ics_shannon, True),
                        'Shannon': (False, 'Shannon', ics_shannon, False),
-                       'Inverted-Mask': (True, 'Inverted-Mask', ics_shannon, True)}
+                       'Inverted-Mask': (True, 'Inverted-Mask', ics_shannon, True),
+                       'KL': (False, 'KL', ics_kl, False),
+                       'Inverted-KL': (True, 'KL', ics_kl, False),
+                       'KL-Mask':(False, 'KL-Mask', ics_kl, True),
+                       'Inverted-KL-Mask':(True, 'Inverted-KL-Mask', ics_kl, True)}
 
     invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
     # megaloops for encoding-weighting
