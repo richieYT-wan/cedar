@@ -33,8 +33,8 @@ def _init(DATADIR):
     CHAR_TO_INT = dict((c, i) for i, c in enumerate(AA_KEYS))
     INT_TO_CHAR = dict((i, c) for i, c in enumerate(AA_KEYS))
 
-    CHAR_TO_INT['-']=-1
-    INT_TO_CHAR[-1]='-'
+    CHAR_TO_INT['-'] = -1
+    INT_TO_CHAR[-1] = '-'
 
     BG = np.loadtxt(f'{MATRIXDIR}bg.freq.fmt', dtype=float)
     BG = dict((k, v) for k, v in zip(AA_KEYS, BG))
@@ -82,7 +82,7 @@ def verify_df(df, seq_col, hla_col, target_col):
     assert ([int(x) for x in sorted(unique_labels)]) in [[0, 1], [0], [1]], f'Labels are not 0, 1! {unique_labels}'
     # Checks if any seq not in alphabet
     try:
-        df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS and not z=='-' for z in x]))].index)
+        df = df.drop(df.loc[df[seq_col].apply(lambda x: any([z not in AA_KEYS and not z == '-' for z in x]))].index)
     except:
         print(len(df), df.columns, seq_col, AA_KEYS)
         raise ValueError
@@ -280,7 +280,7 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
 
     else:
         if invert:  # If invert, then uses the actual IC as weight
-            weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(0,1)) \
+            weights = np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(0, 1)) \
                                 for l, hla, pad in zip(lens, hlas, pads)])
         else:  # Else we get the weight with the 1-IC depending on the IC dict provided
             weights = 1 - np.stack([np.pad(ics_dict[l][hla][0.25], pad_width=(0, pad), constant_values=(1, 1)) \
@@ -288,6 +288,7 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
 
     weights = np.expand_dims(weights, axis=2).repeat(len(AA_KEYS), axis=2)
     return weights
+
 
 # Here stuff for extra AA bulging out:
 
@@ -317,7 +318,8 @@ def find_extra_aa(core, icore):
         # return (encode(''.join(results)).sum(axis=0).numpy() / (len(icore)-len(core))).astype(np.float32)
 
         # Here, changed to return the extra + the length so that we can do the weighted division
-        return encode(''.join(results)).sum(axis=0).numpy(), np.array(len(icore)-len(core))
+        return encode(''.join(results)).sum(axis=0).numpy(), np.array(len(icore) - len(core))
+
 
 def batch_find_extra_aa(core_seqs, icore_seqs):
     """
@@ -386,6 +388,7 @@ def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
     train_data = dataframe.query('fold != @fold_inner and fold != @fold_outer')
     valid_data = dataframe.query('fold == @fold_inner')
     return train_data, valid_data
+
 
 # TODO: fix this whatever it is
 # def get_tensor_dataset(df, ics_dict, device, dataset='aafreq', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
@@ -463,7 +466,8 @@ def to_tensors(x, y, device='cpu'):
     return x, y
 
 
-def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None, seq_col='icore_mut', hla_col='HLA',
+def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None, seq_col='icore_mut',
+                      hla_col='HLA',
                       target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False, add_rank=True,
                       add_aaprop=False, remove_pep=False, threshold=0.234, icore_bulge=False, core_col='core_mut',
                       icore_col='icore_mut'):
@@ -619,11 +623,13 @@ def batch_compute_frequency(encoded_sequences, true_lens=None):
     # This is the new way with mask and .all(dim=2) which works with both BLOSUM and OH
     if true_lens is None:
         mask = (encoded_sequences == 0).all(2)  # checking on second dim that every entry == 0
-        true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(mask) == torch.Tensor else \
+        true_lens = (mask.shape[1] - torch.bincount(torch.where(mask)[0])).unsqueeze(1) if type(
+            mask) == torch.Tensor else \
             np.expand_dims(mask.shape[1] - np.bincount(np.where(mask)[0]), 1)
         frequencies = encoded_sequences.sum(axis=1) / true_lens
     else:
-        frequencies = encoded_sequences.sum(axis=1) / np.repeat(true_lens,axis=0, repeats=20).reshape(len(true_lens), 20)
+        frequencies = encoded_sequences.sum(axis=1) / np.repeat(true_lens, axis=0, repeats=20).reshape(len(true_lens),
+                                                                                                       20)
 
     return frequencies
 
