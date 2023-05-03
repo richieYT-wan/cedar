@@ -174,7 +174,7 @@ def get_aa_properties(df, seq_col='icore_mut', do_vhse=True, prefix=''):
                  'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
 
 
-def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES):
+def encode(sequence, max_len=None, encoding='onehot', blosum_matrix=None):
     """
     encodes a single peptide into a matrix, using 'onehot' or 'blosum'
     if 'blosum', then need to provide the blosum dictionary as argument
@@ -272,8 +272,8 @@ def get_ic_weights(df, ics_dict: dict, max_len=None, seq_col='Peptide', hla_col=
         idx_min = (weights > threshold)
         idx_max = (weights <= threshold)
         if invert:
-            weights[idx_min] = 1 + threshold
-            weights[idx_max] = 1
+            weights[idx_min] = 1
+            weights[idx_max] = 0
         else:
             weights[idx_min] = 0
             weights[idx_max] = 1
@@ -334,9 +334,9 @@ def batch_find_extra_aa(core_seqs, icore_seqs):
     return encoded, lens
 
 
-def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding='onehot', blosum_matrix=BL62_VALUES,
-                          seq_col='Peptide', hla_col='HLA', target_col='agg_label', mask=False,
-                          invert=False, threshold=.234, return_weights=False):
+def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding='onehot', blosum_matrix=None,
+                          seq_col='Peptide', hla_col='HLA', target_col='agg_label', mask=False, invert=False,
+                          threshold=.234, return_weights=False):
     """
     Takes as input a df containing sequence, len, HLA;
     Batch onehot-encode all sequences & weights them with (1-IC) depending on the ICs dict given
@@ -435,13 +435,13 @@ def get_train_valid_dfs(dataframe, fold_inner, fold_outer):
 #     return x, y
 
 
-def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES,
+def get_mutation_tensors(df, ics_dict, device='cuda', max_len=12, encoding='onehot', blosum_matrix=None,
                          mutant_col='Peptide', wt_col='wild_type', feat_cols=['trueHLA_EL_rank'],
                          target_col='agg_label', hla_col='HLA', mask=False, invert=False):
-    x_mut = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                                  mutant_col, hla_col, target_col, mask, invert)
-    x_wt = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix,
-                                 wt_col, hla_col, target_col, mask, invert)
+    x_mut = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix, mutant_col, hla_col,
+                                  target_col, mask, invert)
+    x_wt = encode_batch_weighted(df, ics_dict, device, max_len, encoding, blosum_matrix, wt_col, hla_col, target_col,
+                                 mask, invert)
     x_props = torch.from_numpy(df[feat_cols].values).float().to(device)
     y = torch.from_numpy(df[target_col].values).float().unsqueeze(1).to(device)
     x = torch.cat([x_mut.view(-1, max_len * 20), x_wt.view(-1, max_len * 20), x_props], dim=1)
@@ -463,10 +463,10 @@ def to_tensors(x, y, device='cpu'):
     return x, y
 
 
-def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='Peptide',
-                      hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False,
-                      add_rank=True, add_aaprop=False, remove_pep=False, threshold=0.234, icore_bulge=False,
-                      core_col='core_mut', icore_col = 'icore_mut'):
+def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None, seq_col='icore_mut', hla_col='HLA',
+                      target_col='agg_label', rank_col='EL_rank_mut', mask=False, invert=False, add_rank=True,
+                      add_aaprop=False, remove_pep=False, threshold=0.234, icore_bulge=False, core_col='core_mut',
+                      icore_col='icore_mut'):
     """
         Computes the frequencies as the main features
         Takes as input a df containing sequence, len, HLA;
@@ -492,8 +492,8 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
         tensor_dataset (torch.utils.data.TensorDataset): Dataset containing the tensors X and y
     """
     # df = verify_df(df, seq_col, hla_col, target_col)
-    encoded_weighted, true_lens = encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix,
-                                                      seq_col, hla_col, target_col, mask, invert, threshold)
+    encoded_weighted, true_lens = encode_batch_weighted(df, ics_dict, 'cpu', max_len, encoding, blosum_matrix, seq_col,
+                                                        hla_col, target_col, mask, invert, threshold)
     x = batch_compute_frequency(encoded_weighted.numpy(), true_lens)
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
@@ -519,7 +519,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     return x, y
 
 
-def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_VALUES, seq_col='icore_mut',
+def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None, seq_col='icore_mut',
                 hla_col='HLA', target_col='agg_label', rank_col='EL_rank_mut', mut_col=None, adaptive=False, mask=False,
                 invert=False, add_rank=False, add_aaprop=False, remove_pep=False, mask_aa=None, threshold=.234,
                 icore_bulge=False, core_col='core_mut', icore_col='icore_mut'):
@@ -554,9 +554,8 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=BL62_
 
     else:
         x, y = get_array_dataset(df, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col, target_col, rank_col,
-                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep, threshold=threshold,
-                                 icore_bulge=icore_bulge,
-                                 core_col=core_col, icore_col=icore_col)
+                                 mask, invert, add_rank=add_rank, add_aaprop=add_aaprop, remove_pep=remove_pep,
+                                 threshold=threshold, icore_bulge=icore_bulge, core_col=core_col, icore_col=icore_col)
         if mut_col is not None and type(mut_col) == list:
             if len(mut_col) > 0:
                 mut_scores = df[mut_col].values
