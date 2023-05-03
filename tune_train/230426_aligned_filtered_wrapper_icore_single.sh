@@ -13,7 +13,7 @@ source activate phd
 
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=\${HOMEDIR}pyscripts/
-OUTDIR=\${HOMEDIR}output/230427_MutExpr_Final_input-type/
+OUTDIR=\${HOMEDIR}output/230427_MutExpr_Final_input_type/
 ICSDIR=\${HOMEDIR}/data/ic_dicts/
 TRAINSET=\"cedar\"
 CONDITION=\"$CONDITION\"

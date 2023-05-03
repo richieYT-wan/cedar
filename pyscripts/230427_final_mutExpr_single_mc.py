@@ -55,7 +55,7 @@ def args_parser():
     parser.add_argument('-datadir', type=str, default='../data/pepx/',
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str,
-                        default='../output/230414_aligned_icore_exprscore_mutscore_filtered_aaprops_exp8mers/')
+                        default='../output/230427_MutExpr_Final_input_type/')
     parser.add_argument('-trainset', type=str, default='cedar')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
