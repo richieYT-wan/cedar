@@ -111,7 +111,7 @@ def main():
     #         mcs2.append(list(mc))
     # mcs = [x for x in mcs2 if x not in mcs]
     # len(mcs)
-    
+
     # Define various stuff depending on the input columns
     scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'
     prefix = 'fullpep_' if scol == 'Peptide' else 'icore_'
@@ -158,7 +158,8 @@ def main():
 
     invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
     # megaloops for encoding-weighting
-
+    if 'KL' in args["condition"]:
+        encoding_kwargs['threshold']=0.201
     encoding_kwargs['encoding'] = 'onehot'
     encoding_kwargs['blosum_matrix'] = None
     # Doing only Inverted Shannon, Mask, None
