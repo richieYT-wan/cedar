@@ -90,7 +90,7 @@ def main():
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
-
+    # print('fit check xd')
     # DEFINING COLS
     mcs = []
     cols_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point',
@@ -152,7 +152,7 @@ def main():
                        'Shannon': (False, 'Shannon', ics_shannon, False),
                        'Inverted-Mask': (True, 'Inverted-Mask', ics_shannon, True),
                        'KL': (False, 'KL', ics_kl, False),
-                       'Inverted-KL': (True, 'KL', ics_kl, False),
+                       'Inverted-KL': (True, 'Inverted-KL', ics_kl, False),
                        'KL-Mask':(False, 'KL-Mask', ics_kl, True),
                        'Inverted-KL-Mask':(True, 'Inverted-KL-Mask', ics_kl, True)}
 
@@ -175,7 +175,9 @@ def main():
     # Hotfix for filename length...
     key = 'all_feats' if key == '-'.join(cols_) else key
     key = key.replace('icore_', '')
+    # You fucking moron ; ICname should've just been args["condition"] from the start instead of this hardcoded nonsense bullshit FUCK I hate you so much
     filename = f'{args["trainset"]}_onehot_{ic_name}_{args["input_type"]}_{key}'.replace('Inverted', 'Inv')
+    # print('#'*100,'\n\n\n', args["condition"], ic_name, filename, '\n', '#'*100,'\n\n\n')
 
     # Using the same model and hyperparameters
     model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
@@ -196,7 +198,6 @@ def main():
 
     pval_df = pd.DataFrame([[ic_name, args['input_type'], key]],
                            columns=['weight', 'input_type', 'key'])
-
     for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
                                  ['CEDAR', 'PRIME', 'NEPDB']):
         # FULLY FILTERED + Mean_pred
@@ -215,6 +216,7 @@ def main():
                      columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [p_col])
         bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                   key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+        # print('#'*100,'\n\n\n', evalname, bootstrapped_df['auc'].mean(), '#'*100, '\n\n\n\n')
 
         if evalname=="NEPDB":
             continue
