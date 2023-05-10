@@ -65,6 +65,7 @@ def args_parser():
                         help='Inverted-Shannon, Mask or None. Must be string, so "None"')
     parser.add_argument('-mc_index', type=int, default=0, help='sample a single condition')
     parser.add_argument('-input_type', type=str, default='icore_mut', help='icore_mut, expanded_input, or Peptide')
+    parser.add_argument('-debug', type=str2bool, default=False)
     return parser.parse_args()
 
 
@@ -227,7 +228,10 @@ def main():
                 pval_df[f'pval_{xx}_{evalname}'] = pval
         
         del bootstrapped_df
-
+    if args['debug']:
+        pkl_dump(trained_models, args['outdir']+f'model_{filename}.pkl')
+        pkl_dump(prime_dataset.query('Peptide not in @train_dataset.Peptide.values'), f'{args["outdir"]}prime_df_{filename}.pkl')
+        pkl_dump(encoding_kwargs, args['outdir']+f'encoding_kwargs_{filename}.pkl')
     del trained_models
     pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
