@@ -21,13 +21,14 @@ def bootstrap_wrapper(y_score, y_true, seed, auc01=False, add_roc=False, reduced
         return pd.DataFrame(), (None, None, None, None)
 
     # Save to get mean curves after
-    if add_roc:
+    if add_roc or not reduced:
         roc_curve = (test_results.pop('roc_curve'), test_results['auc'], test_results['auc_01']) if auc01 \
             else (test_results.pop('roc_curve'), test_results['auc'])
         # Delete PR curve and not saving because we don't use it at the moment
         _ = (test_results.pop('pr_curve'), test_results['prauc'])
     else:
         roc_curve = None
+
     bootstrapped_df = pd.DataFrame(test_results, index=[0])
     # bootstrapped_df['seed'] = seed
 

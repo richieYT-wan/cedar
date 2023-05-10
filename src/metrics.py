@@ -330,8 +330,8 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
                     ax=ax, palette=get_palette(palette, n_colors=len(feature_names)))
         # Add chart labels
         plt.xticks(ax.get_xticks(), (ax.get_xticks() * 100).round(1))
-        plt.xlabel('Percentage importance [%]', fontsize=12)
-        plt.ylabel('Feature name', fontsize=12)
+        plt.xlabel('Percentage importance [%]', fontsize=14, fontweight='semibold')
+        plt.ylabel('Feature name', fontweight='semibold', fontsize=14)
         if title != '':
             ax.set_title(title, fontweight='semibold', fontsize=14)
     else:
@@ -340,14 +340,14 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
         # Add chart labels
         # ax.set_xticks((ax.get_xticks() * 100).round(1))
         ax.set_xticklabels((ax.get_xticks() * 100).round(1))
-        ax.set_xlabel('Percentage importance [%]', fontsize=12)
-        ax.set_ylabel('Feature name', fontsize=12)
+        ax.set_xlabel('Percentage importance [%]', fontweight='semibold', fontsize=13)
+        ax.set_ylabel('Feature name', fontweight='semibold', fontsize=13)
         if title != '':
             ax.set_title(title, fontweight='semibold', fontsize=14)
         f = None
     if label_number:
         values = [f'{(100 * x).round(1)}%' for x in ax.containers[0].datavalues]
-        ax.bar_label(ax.containers[0], labels=values)
+        ax.bar_label(ax.containers[0], labels=values, fontweight='semibold')
     return f, ax
 
 
