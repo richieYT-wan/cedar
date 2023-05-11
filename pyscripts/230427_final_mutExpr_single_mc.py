@@ -64,6 +64,7 @@ def args_parser():
     parser.add_argument('-condition', type=str, default='None',
                         help='Inverted-Shannon, Mask or None. Must be string, so "None"')
     parser.add_argument('-mc_index', type=int, default=0, help='sample a single condition')
+    parser.add_argument('-key', type=str, default = None, help = 'a - separated string (i.e. the key) to make the mutcols from. Can\'t be used together with mc_index!!')
     parser.add_argument('-input_type', type=str, default='icore_mut', help='icore_mut, expanded_input, or Peptide')
     parser.add_argument('-debug', type=str2bool, default=False)
     return parser.parse_args()
@@ -168,7 +169,11 @@ def main():
     encoding_kwargs['invert'] = invert
     encoding_kwargs['mask'] = mask
 
-    mut_cols = mcs[args['mc_index']]
+    if args['key'] is None:
+        mut_cols = mcs[args['mc_index']]
+    else:
+        mut_cols = args['key'].split('-')
+        
     encoding_kwargs['mut_col'] = mut_cols
     key = '-'.join(mut_cols).replace(' ', '-')
     if key == '':
