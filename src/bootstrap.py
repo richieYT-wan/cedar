@@ -148,6 +148,30 @@ def bootstrap_df_score(df, score_col, target_col='agg_label', n_rounds=10000, n_
     return result_df, mean_roc_curve
 
 def get_pval_wrapper(df_a, df_b, column='auc'):
+    """
+    Null hypothesis : Sample A !>= Sample B
+    Alt. hypothesis : Sample A >> Sample B
+
+    Returns the bootstrapped pval that sample_a > sample_b
+
+    Ex: sample_a is the AUCs for a given cdt
+        sample_b is the AUCs for another condition
+        --> Check that condition A works better than B
+    Args:
+        sample_a: an array-like of values of size N
+        sample_b: an array-like of values of size N
+
+    Returns:
+        pval : P value
+        sig : significance symbol
+    Args:
+        df_a:
+        df_b:
+        column:
+
+    Returns:
+    """
+
     df_a.sort_values('id', inplace=True)
     df_a.reset_index(drop=True, inplace=True)
     df_b.sort_values('id', inplace=True)
@@ -184,7 +208,7 @@ def get_pval(sample_a, sample_b):
     return pval, sig
 
 
-def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
+def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k', fontsize=12, fontweight='normal'):
     # Rounds the label to the relevant decimal
     pvstr = str(pval)
     if sig == '****':
@@ -197,4 +221,4 @@ def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k'):
     # x1, x2 = 0, 1
     # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
     axis.plot([x0, x0, x1, x1], [y, y + h / 1.25, y + h / 1.25, y], lw=1.5, c=color)
-    axis.text((x0 + x1) * .5, y + h, label, ha='center', va='bottom', color=color)
+    axis.text((x0 + x1) * .5, y + h, label, ha='center', va='bottom', fontweight=fontweight, fontsize=fontsize, color=color)

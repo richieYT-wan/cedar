@@ -372,12 +372,12 @@ def pipeline_mutation_scores(df, mut_col, wt_col, ics_dict, threshold=.1615, pre
     df[f'{prefix}len_mut'] = df[mut_col].apply(len)
     df[f'{prefix}len_wt'] = df[wt_col].apply(len)
     assert (df[f'{prefix}len_wt']==df[f'{prefix}len_mut']).all(), 'input lengths for wt vs mut don\'t match!'
-    # df[f'{prefix}anchor'] = df.apply(lambda x: get_anchor(x['HLA'].replace(':','').replace('*',''),
-    #                                                       ics_dict, l=x[f'{prefix}len_mut'], threshold=threshold), axis=1)
+    df[f'{prefix}anchor'] = df.apply(lambda x: get_anchor(x['HLA'].replace(':','').replace('*',''),
+                                                          ics_dict, l=x[f'{prefix}len_mut'], threshold=threshold), axis=1)
 
     df[f'{prefix}mutation_position'] = df.apply(lambda x: get_mutation_pos(x[mut_col], x[wt_col], 'substitution'), axis=1)
-    # df[f'{prefix}anchor_mutation'] = df.apply(lambda x: get_anchor_mutation_mutwt(x[mut_col], x[wt_col],
-    #                                                                               x[f'{prefix}anchor']), axis=1)
+    df[f'{prefix}anchor_mutation'] = df.apply(lambda x: get_anchor_mutation_mutwt(x[mut_col], x[wt_col],
+                                                                                  x[f'{prefix}anchor']), axis=1)
     df[f'{prefix}mut_score'] = df.apply(lambda x: get_mutation_score(x[f'{prefix}mutation_position'],
                                                                      x[mut_col], x[wt_col]), axis=1)
     df[f'{prefix}blsm_mut_score'] = df.apply(lambda x: get_blsm_mutation_score(x[f'{prefix}mutation_position'],

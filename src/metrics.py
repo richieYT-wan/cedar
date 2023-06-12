@@ -310,7 +310,8 @@ def get_nested_feature_importance(models):
     return np.mean(np.stack(feat_importances), axis=0)
 
 
-def plot_feature_importance(importance, names, title='', ax=None, label_number=False, palette='viridis_r'):
+def plot_feature_importance(importance, names, title='', ax=None, label_number=False, palette='viridis_r',
+    ):
     # Create arrays from feature importance and feature names
     feature_importance = np.array(importance)
     feature_names = np.array(names)
@@ -347,7 +348,7 @@ def plot_feature_importance(importance, names, title='', ax=None, label_number=F
         f = None
     if label_number:
         values = [f'{(100 * x).round(1)}%' for x in ax.containers[0].datavalues]
-        ax.bar_label(ax.containers[0], labels=values, fontweight='semibold')
+        ax.bar_label(ax.containers[0], labels=values, fontweight='semibold', fontsize=14)
     return f, ax
 
 
