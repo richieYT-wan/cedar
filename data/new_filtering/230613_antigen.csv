@@ -1,0 +1,8 @@
+Antigen,Antigen,Antigen,Antigen,Antigen,Antigen,Antigen
+Antigen Name,Antigen ID,Organism Name,Organism ID,# Epitopes,# Assays,# References
+"Cytochrome b-c1 complex subunit 7","http://www.uniprot.org/uniprot/P14927","Homo sapiens (human)","http://purl.obolibrary.org/obo/NCBITaxon_9606","1","1","1"
+"Bcl-2-like protein 13 (UniProt:Q9BXK5)","http://www.uniprot.org/uniprot/Q9BXK5","Homo sapiens (human)","http://purl.obolibrary.org/obo/NCBITaxon_9606","1","1","1"
+"E3 ubiquitin protein ligase","http://www.uniprot.org/uniprot/H3BP71","Homo sapiens (human)","http://purl.obolibrary.org/obo/NCBITaxon_9606","1","2","1"
+"Unidentified protein","https://ontology.iedb.org/taxon-protein/32644","Unidentified","http://purl.obolibrary.org/obo/NCBITaxon_32644","11","18","1"
+"Receptor protein-tyrosine kinase (UniProt:Q504U8)","http://www.uniprot.org/uniprot/Q504U8","Homo sapiens (human)","http://purl.obolibrary.org/obo/NCBITaxon_9606","4","8","1"
+"Receptor protein-tyrosine kinase (UniProt:E9PFD7)","http://www.uniprot.org/uniprot/E9PFD7","Homo sapiens (human)","http://purl.obolibrary.org/obo/NCBITaxon_9606","2","2","1"

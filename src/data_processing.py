@@ -358,6 +358,7 @@ def encode_batch_weighted(df, ics_dict=None, device=None, max_len=None, encoding
     Returns:
         weighted_sequence (torch.Tensor): Tensor containing the weighted onehot-encoded peptide sequences.
     """
+
     df = verify_df(df, seq_col, hla_col, target_col)
     if seq_col == 'expanded_input':
         df['seq_len'] = df[seq_col].apply(lambda x: len(x) - x.count('-'))
@@ -501,8 +502,13 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
     x = batch_compute_frequency(encoded_weighted.numpy(), true_lens)
     if add_rank:
         ranks = np.expand_dims(df[rank_col].values, 1)
-        x = np.concatenate([x, ranks], axis=1)
-
+        try:
+            x = np.concatenate([x, ranks], axis=1)
+        except:
+            print(rank_col, ranks.shape, x.shape)
+            print('\n\n\n', x[:5])
+            print('\n\n\n', ranks[:5])
+            raise ValueError
     if add_aaprop:
         # New way of doing it already  saves the aa props to the df to
         # not re-compute them everytime, here for now because I

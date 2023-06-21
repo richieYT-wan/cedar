@@ -237,3 +237,4 @@ notebook/train_loader.pkl
 notebook/x_train.pkl
 notebook/y_train.pkl
 output/rebootstrap_copy/rebootstrapped_hla_spec_df.csv
+output/harmonic_model.pkl
