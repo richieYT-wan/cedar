@@ -303,7 +303,7 @@ def main():
             bdf = final_bootstrap_wrapper(preds, args, filename, percentile_thr, pruned, evalname,
                                           n_rounds=10000, n_jobs=args['ncores'])
             mega_df = mega_df.append(bdf)
-        mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
+    mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 if __name__ == '__main__':
     main()
