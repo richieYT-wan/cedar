@@ -71,7 +71,7 @@ def final_bootstrap_wrapper(preds_df, args, filename, percentile, pruned, evalse
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
 
-    bootstrapped_df, mean_rocs = bootstrap_eval(y_score=scores,
+    bootstrapped_df = bootstrap_eval(y_score=scores,
                                                 y_true=targets,
                                                 n_rounds=n_rounds, n_jobs=n_jobs)
     bootstrapped_df['condition'] = percentile
@@ -81,9 +81,6 @@ def final_bootstrap_wrapper(preds_df, args, filename, percentile, pruned, evalse
     bootstrapped_df.to_csv(
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',
         index=False)
-    pkl_dump(mean_rocs,
-             f'{args["outdir"]}bootstrapping/{evalset}_mean_rocs_{filename}.pkl')
-
     return bootstrapped_df
 
 
