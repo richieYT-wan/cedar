@@ -9,5 +9,5 @@ OUTDIR=${HOMEDIR}output/230721_TrainDataPruning/
 ICSDIR=../data/ic_dicts/
 TRAINSET="cedar"
 cd ${PYDIR}
-python3 ./expand_ensemble_resample_pulearning.py -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39 -outdir ${OUTDIR}
+python3 ./traindata_pruning.py -icsdir ${ICSDIR} -trainset ${TRAINSET} -ncores 39 -outdir ${OUTDIR}
 
