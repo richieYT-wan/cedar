@@ -305,6 +305,5 @@ def main():
             mega_df = mega_df.append(bdf)
             mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
-
 if __name__ == '__main__':
     main()
