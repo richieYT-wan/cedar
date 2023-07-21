@@ -226,9 +226,9 @@ def main():
             args['ncores'] is None) else args['ncores']
 
     # LOADING DATA AND STUFF
-    cedar_dataset = pd.read_csv(f'{args["datadir"]}230308_cedar_aligned_pepx_fold.csv')
-    prime_dataset = pd.read_csv(f'{args["datadir"]}230308_prime_aligned_pepx.csv')
-    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230308_nepdb_aligned_pepx.csv')
+    cedar_dataset = pd.read_csv(f'{args["datadir"]}230418_cedar_aligned_pepx.csv')
+    prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
+    nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
 
     preds_100k = pd.read_csv('../data/human_proteome/preds_100k.txt', header=None)
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
