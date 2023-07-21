@@ -299,6 +299,7 @@ def main():
                                         (prime_preds_prune, 'PRIME', True),
                                         (nepdb_preds_prune, 'NEPDB', True)]:
             filename = f'Pruning{pruned}_Percentile_{percentile_thr:02}'
+            preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{filename}.csv', index=False)
             bdf = final_bootstrap_wrapper(preds, args, filename, percentile_thr, pruned, evalname,
                                           n_rounds=10000, n_jobs=args['ncores'])
             mega_df = mega_df.append(bdf)
