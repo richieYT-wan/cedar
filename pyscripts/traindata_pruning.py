@@ -66,7 +66,7 @@ def assert_encoding_kwargs(encoding_kwargs, mode_eval=False):
     return encoding_kwargs
 
 
-def final_bootstrap_wrapper(preds_df, args, filename, percentile, pruned, evalset,
+def final_bootstrap_wrapper(preds_df, args, filename, percentile, pruned, evalset, name,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
@@ -77,7 +77,7 @@ def final_bootstrap_wrapper(preds_df, args, filename, percentile, pruned, evalse
     bootstrapped_df['condition'] = percentile
     bootstrapped_df['pruned'] = pruned
     bootstrapped_df['evalset'] = evalset.upper()
-
+    bootstrapped_df['model_name'] = name
     bootstrapped_df.to_csv(
         f'{args["outdir"]}bootstrapping/{evalset}_bootstrapped_df_{filename}.csv',
         index=False)
@@ -235,31 +235,40 @@ def main():
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
-    train_dataset = trainmap[args['trainset']]
-
     # DEFINING COLS
-    aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity', 'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
-
-    kwargs, ics = dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True,
-                       seq_col='icore_mut', rank_col='EL_rank_mut', target_col='agg_label', hla_col='HLA',
-                       add_aaprop=False, remove_pep=False, standardize=True,
-                       mask=True, invert=False, threshold=0.2,
-                       mut_col=['icore_dissimilarity_score', 'icore_blsm_mut_score', 'Total_Gene_TPM']), ics_kl
+    base = dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True,
+                seq_col='icore_mut', rank_col='EL_rank_mut', target_col='agg_label', hla_col='HLA',
+                add_aaprop=False, remove_pep=False, standardize=True,
+                mask=True, invert=False, threshold=0.2,
+                mut_col=None), None, 'base'
+    consensus = dict(max_len=12, encoding='onehot', blosum_matrix='None', add_rank=True,
+                     seq_col='icore_mut', rank_col='EL_rank_mut', target_col='agg_label', hla_col='HLA',
+                     add_aaprop=False, remove_pep=False, standardize=True,
+                     mask=True, invert=False, threshold=0.2,
+                     mut_col=['icore_dissimilarity_score', 'icore_blsm_mut_score',
+                              'Total_Gene_TPM']), ics_kl, 'consensus'
     mega_df = pd.DataFrame()
 
-    # Top and bottom X percentiles
-    for percentile_thr in range(1, 16):
-        bot, top = [percentile_thr / 100, (100 - percentile_thr) / 100]
-        bot, top = preds_100k.describe(percentiles=[bot, top]).loc[[f'{bot:.0%}', f'{top:.0%}']].values
-
+    for kwargs, ics, name in [consensus, base]:
+        # For each model, runs the training + evaluation on all sets a SINGLE TIME (for no pruning)
         model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                        max_depth=8, ccp_alpha=9.945e-6)
 
         # First training, with KCV preds + test preds (PRIME) and no pruning
         trained_models, _, _ = nested_kcv_train_sklearn(cedar_dataset, model, ics, kwargs, n_jobs=10)
+
+        fi = get_nested_feature_importance(trained_models)
+        fn = AA_KEYS + ['rank'] + kwargs['mut_col']
+        # Saving Feature importances as dataframe
+        df_fi = pd.DataFrame(fi, index=fn).T
+        df_fi.to_csv(
+            f'{args["outdir"]}raw/featimps_{name}_PrunedFalse_Percentile_{1:02}.csv',
+            index=False)
+
         _, kcv_preds = evaluate_trained_models_sklearn(cedar_dataset, trained_models, ics, None,
                                                        kwargs, concatenated=False, only_concat=False, n_jobs=10,
                                                        kcv_eval=True)
+
         _, prime_preds = evaluate_trained_models_sklearn(
             prime_dataset.query('Peptide not in @cedar_dataset.Peptide.values'),
             trained_models, ics, None,
@@ -270,34 +279,24 @@ def main():
             trained_models, ics, None,
             kwargs, concatenated=False, only_concat=False, n_jobs=10,
             kcv_eval=False)
-        for preds, evalname, pruned in [(kcv_preds, 'KCV', False),
-                                        (prime_preds, 'PRIME', False),
-                                        (nepdb_preds, 'NEPDB', False)]:
-            filename = f'Pruning{pruned}_Percentile_{percentile_thr:02}'
-            preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{filename}.csv', index=False)
-            bdf = final_bootstrap_wrapper(preds, args, filename, percentile_thr, pruned, evalname,
-                                          n_rounds=10000, n_jobs=args['ncores'])
-            mega_df = mega_df.append(bdf)
-        fi = get_nested_feature_importance(trained_models)
-        fn = AA_KEYS + ['rank'] + kwargs['mut_col']
-        # Saving Feature importances as dataframe
-        df_fi = pd.DataFrame(fi, index=fn).T
-        df_fi.to_csv(
-            f'{args["outdir"]}raw/featimps_PrunedFalse_Percentile_{percentile_thr:02}.csv',
-            index=False)
-        # Second training, with pruned datapoints
-        kcv_preds['class'] = kcv_preds.apply(lambda x: get_misclassified(x['mean_pred'], x['agg_label'], bot, top),
-                                             axis=1)
-        kcv_preds['misclassified'] = kcv_preds['class'] != 'Normal'
+        # Then, at different percentiles %Rank (wrt human proteome predictions),
+        # Run the pruning and retraining process
+        for percentile_thr in range(1, 16):
+            # Top and bottom X percentiles
+            bot, top = [percentile_thr / 100, (100 - percentile_thr) / 100]
+            bot, top = preds_100k.describe(percentiles=[bot, top]).loc[[f'{bot:.0%}', f'{top:.0%}']].values
+            # Second training, with pruned datapoints
+            kcv_preds['class'] = kcv_preds.apply(lambda x: get_misclassified(x['mean_pred'], x['agg_label'], bot, top),
+                                                 axis=1)
+            kcv_preds['misclassified'] = kcv_preds['class'] != 'Normal'
 
-        if percentile_thr == 1:
             trained_models_prune, _, _ = nested_kcv_train_sklearn_prune(kcv_preds, model, ics, kwargs, n_jobs=10)
             fi = get_nested_feature_importance(trained_models_prune)
             fn = AA_KEYS + ['rank'] + kwargs['mut_col']
             # Saving Feature importances as dataframe
             df_fi = pd.DataFrame(fi, index=fn).T
             df_fi.to_csv(
-                f'{args["outdir"]}raw/featimps_PrunedTrue_Percentile_{percentile_thr:02}.csv',
+                f'{args["outdir"]}raw/featimps_{name}_PrunedTrue_Percentile_{percentile_thr:02}.csv',
                 index=False)
             _, kcv_preds_prune = evaluate_trained_models_sklearn(cedar_dataset, trained_models_prune, ics, None,
                                                                  kwargs, concatenated=False, only_concat=False,
@@ -316,17 +315,25 @@ def main():
                 kwargs, concatenated=False, only_concat=False, n_jobs=10,
                 kcv_eval=False)
 
-            for preds, evalname, pruned in [(kcv_preds_prune, 'KCV', True),
+            for preds, evalname, pruned in [(kcv_preds, 'KCV', False),
+                                            (prime_preds, 'PRIME', False),
+                                            (nepdb_preds, 'NEPDB', False),
+                                            (kcv_preds_prune, 'KCV', True),
                                             (prime_preds_prune, 'PRIME', True),
                                             (nepdb_preds_prune, 'NEPDB', True)]:
-                filename = f'Pruning{pruned}_Percentile_{percentile_thr:02}'
-                preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{filename}.csv', index=False)
-                bdf = final_bootstrap_wrapper(preds, args, filename, percentile_thr, pruned, evalname,
-                                              n_rounds=10000, n_jobs=args['ncores'])
+                # Here use a single loop to do the bootstrapping etc
+                # Only do it once for the non pruned evalsets, then skips
+                if percentile_thr > 1 and not pruned:
+                    continue
 
-        mega_df = mega_df.append(bdf)
+                filename = f'{name}_Pruning{pruned}_Percentile_{percentile_thr:02}'
+                preds.to_csv(f'{args["outdir"]}/raw/{evalname}_preds_{filename}.csv', index=False)
+                bdf = final_bootstrap_wrapper(preds, args, filename, percentile_thr, pruned, evalname, name,
+                                              n_rounds=10000, n_jobs=args['ncores'])
+                mega_df = mega_df.append(bdf)
+
+            mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
         mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
-    mega_df.to_csv(f'{args["outdir"]}/total_df.csv', index=False)
 
 
 if __name__ == '__main__':

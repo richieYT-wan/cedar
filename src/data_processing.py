@@ -546,7 +546,7 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None,
         x_anchors, y_anchors = get_array_dataset(anchors, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
                                                  target_col, invert=True, add_rank=True, add_aaprop=False,
                                                  remove_pep=False)
-        # Adding the mut columns and concatenating on columns axis (ax=1)
+        # Adding the mut columns and concatenating on columns' axis (ax=1)
         if len(mut_col) > 0:
             mut_anchors = anchors[mut_col].values
             x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
