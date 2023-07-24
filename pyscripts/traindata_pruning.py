@@ -249,7 +249,7 @@ def main():
                               'Total_Gene_TPM']), ics_kl, 'consensus'
     mega_df = pd.DataFrame()
 
-    for kwargs, ics, name in [consensus, base]:
+    for kwargs, ics, name in [base, consensus]:
         # For each model, runs the training + evaluation on all sets a SINGLE TIME (for no pruning)
         model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                        max_depth=8, ccp_alpha=9.945e-6)
