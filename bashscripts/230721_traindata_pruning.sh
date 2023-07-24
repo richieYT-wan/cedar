@@ -5,7 +5,7 @@ source activate phd
 
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=${HOMEDIR}pyscripts/
-OUTDIR=${HOMEDIR}output/230721_TrainDataPruning/
+OUTDIR=${HOMEDIR}output/230724_TrainDataPruning_CompareModels/
 ICSDIR=../data/ic_dicts/
 TRAINSET="cedar"
 cd ${PYDIR}
