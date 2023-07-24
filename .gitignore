@@ -229,7 +229,7 @@ notebook/results_related_mutation_switch.pkl
 output/lr1e-4/train_metrics.pkl
 output/test/params/train_metrics.pkl
 pyscripts/stupid_save_reshape.py
-tune_train/stupid_save_reshape.sh
+bashscripts/stupid_save_reshape.sh
 notebook/criterion.pkl
 notebook/model.pkl
 notebook/optim.pkl
