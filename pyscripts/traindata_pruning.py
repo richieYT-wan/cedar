@@ -294,7 +294,9 @@ def main():
 
             trained_models_prune, _, _ = nested_kcv_train_sklearn_prune(kcv_preds, model, ics, kwargs, n_jobs=10)
             fi = get_nested_feature_importance(trained_models_prune)
-            fn = AA_KEYS + ['rank'] + kwargs['mut_col']
+            fn = AA_KEYS + ['rank']
+            if kwargs['mut_col'] is not None:
+                fn = fn + kwargs['mut_col']
             # Saving Feature importances as dataframe
             df_fi = pd.DataFrame(fi, index=fn).T
             df_fi.to_csv(
