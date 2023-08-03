@@ -185,17 +185,14 @@ def save_checkpoint_single(model, dir_path: str = './', name: str = 'checkpoint.
     print(f'Model saved at {savepath}')
 
 
-def display_side(*args, titles=cycle([''])):
-    """
-    small util to display pd frames side by side
-    """
-    html_str = ''
-    for df, title in zip(args, chain(titles, cycle(['</br>']))):
-        html_str += '<th style="text-align:center"><td style="vertical-align:top">'
-        html_str += f'<h2>{title}</h2>'
-        html_str += df.to_html().replace('table', 'table style="display:inline"')
-        html_str += '</td></th>'
-    display_html(html_str, raw=True)
+def display_side_by_side(*args,titles=cycle([''])):
+    html_str=''
+    for df,title in zip(args, chain(titles,cycle(['</br>'])) ):
+        html_str+='<th style="text-align:center"><td style="vertical-align:top">'
+        html_str+=f'<h2 style="text-align: center;">{title}</h2>'
+        html_str+=df.to_html().replace('table','table style="display:inline"')
+        html_str+='</td></th>'
+    display_html(html_str,raw=True)
 
 
 def str2bool(v):
