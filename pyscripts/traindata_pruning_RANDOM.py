@@ -135,6 +135,7 @@ def parallel_inner_train_wrapper_prune(train_dataframe, x_test, base_model, ics_
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
     # Get datasets
     x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+    print('Here len train', len(train))
     x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
 
     # Fit the model and append it to the list
@@ -282,11 +283,13 @@ def main():
         # Run the pruning and retraining process
         for percentile_thr in range(1, 16):
             # Top and bottom X percentiles
+            print('Training randomly pruned model')
             trained_models_prune, _, _ = nested_kcv_train_sklearn_prune(cedar_dataset, model, ics, kwargs, n_jobs=10,
                                                                         percentile=percentile_thr,
                                                                         preds_100k=preds_100k, model_name=name)
             fi = get_nested_feature_importance(trained_models_prune)
             fn = AA_KEYS + ['rank']
+            print('Model trained')
             if kwargs['mut_col'] is not None:
                 fn = fn + kwargs['mut_col']
             # Saving Feature importances as dataframe
