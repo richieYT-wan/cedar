@@ -136,7 +136,6 @@ def parallel_inner_train_wrapper_prune(train_dataframe, x_test, base_model, ics_
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
     # Get datasets
     x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
-    print('Here len train', len(train))
     x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
 
     # Fit the model and append it to the list
@@ -286,7 +285,7 @@ def main():
             # Top and bottom X percentiles
             if os.path.exists(f'{args["outdir"]}raw/featimps_{name}_PrunedTrue_Percentile_{percentile_thr:02}.csv'):
                 continue
-            print('Training randomly pruned model')
+            print(f'Training randomly pruned {name} model')
             trained_models_prune, _, _ = nested_kcv_train_sklearn_prune(cedar_dataset, model, ics, kwargs, n_jobs=10,
                                                                         percentile=percentile_thr,
                                                                         preds_100k=preds_100k, model_name=name)
