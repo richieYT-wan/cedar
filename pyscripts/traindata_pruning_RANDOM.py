@@ -124,9 +124,10 @@ def parallel_inner_train_wrapper_prune(train_dataframe, x_test, base_model, ics_
 
     df['class'] = df.apply(lambda x: get_misclassified(x['mean_pred'], x['agg_label'], bot, top), axis=1)
     df['misclassified'] = df['class'] != 'Normal'
-    n_pos, n_neg = [x.item() for x in
-                    df.query('misclassified').groupby(['class']).agg(count=('Peptide', 'count')).rename(
-                        index={'FN': 'pos', 'FP': 'neg'}).values]
+    df = df.query('misclassified').groupby(['class']).agg(count=('Peptide', 'count')).rename(index={'FN': 'pos', 'FP': 'neg'})
+    n_pos = df.loc['pos'].item() if 'pos' in df.index else 1
+    n_neg = df.loc['neg'].item() if 'neg' in df.index else 100
+
     pos_index = train.query('agg_label==1').sample(n_pos).index
     neg_index = train.query('agg_label==0').sample(n_neg).index
     # dropping index
