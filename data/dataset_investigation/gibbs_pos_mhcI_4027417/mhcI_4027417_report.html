@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head><title>Gibbs Cluster Report</title>
+<style type="text/css">
+body { 
+font-family: Arial, Helvetica, sans-serif;
+color: #000000;background-color: #FFFFFF;
+font-size: 15px; border: 0;
+margin: 0;
+padding: 0;
+}
+div.header {
+color: #FFFFFF;
+background-color: #FF3399;
+font-size: 200%;
+font-weight: bold;
+border:0;
+margin:0;
+padding: 0.5em;
+}
+div.footer {
+color: #FFFFFF;
+background-color: #FF3399;
+font-size: 130%;
+font-weight: bold;
+border:0;
+margin:0;
+padding: 0.5em;
+}
+div.main {
+margin-left: 2em;
+margin-right: 2em;
+}
+a:link {
+color: #FF3399
+}
+a:visited {
+color: #FF3399
+}
+a:hover {
+color: #642EFE
+}
+a:active {
+color: #642EFE
+}
+</style>
+</head>
+<body><div class="header"> GibbsCluster report</div>
+<div class="main">
+<br><b>Version:</b> 2.0
+<br><b>Run ID:</b> 4027417
+<br><b>Run name:</b> mhcI_4027417
+<br><b>Platform:</b> Linux x86_64
+<br><br><br>Read <b>661 unique sequences</b> from file<br><br>
+<b>Settings:</b><br><small>
+<b>No shift moves, cluster moves at every iteration</b><br>
+Number of clusters: 1 - 3<br>
+Motif length: 9<br>
+Initial MC temperture: 1.5<br>
+Number of temperature steps: 20<br>
+Number of iterations x Sequence x Tstep: 10<br>
+Max insertion length: 1<br>
+Max deletion length: 4<br>
+Interval between Indel moves: 10<br>
+Number of initial seeds: 5<br>
+Penalty lambda: 0.8<br>
+Weight on small clusters: 5<br>
+Sequence weighting type: 0<br>
+Background model: Uniprot pre-calculated<br>
+Use trash cluster to remove outliers: 1<br>
+Threshold for trash cluster: 2<br>
+</small>
+<hr><table width="100%" border="0">
+<tr valign="top"><td width:50%;text-align:center>
+<div style="padding-left: 2em">
+<b>KLD vs. Number of clusters with &#955; = 0.8</b></div>
+</td> <td width:50%;text-align:center>
+<div style="padding-left: 2em"><b>Identified 2 sequence motifs</b>
+</div>
+</td></tr><tr valign="middle"><td width:50%;text-align:center>
+<img src="./images/mhcI_4027417.gibbs.KLDvsCluster.barplot.png" alt="" title="Barplot of combined Kullbach Leibler Distance versus the Number of Partitions applied to the dataset. " width="400" />
+<br><span style="padding-left:5em"><font size="2">View the <a href="./images/mhcI_4027417.gibbs.KLDvsCluster.barplot.png" TARGET='_blank'>barplot</a> in full size</font></span>
+<br></td> <td width:50%;text-align:left;vertical-align:middle>
+<img src="./logos/gibbs_logos_1of2-001.png" alt='' title="LOGO 1 of 2 - KLD=5.725" width="250" /><img src="./logos/gibbs_logos_2of2-001.png" alt='' title="LOGO 2 of 2 - KLD=7.300" width="250" /></td></tr></table>
+<br>
+<hr>
+<table width="100%" border='0'>
+<tr valign="top"><td colspan='2'>
+<h3>RESULTS for 1 CLUSTERS</h3>
+</td></tr><tr valign='top'> <td> <font face="COURIER">
+ Final Average KLD: <b>6.734341
+</b></font><br><br>
+<table align='left'>
+<font face="COURIER"><tr valign='top'> <th>&nbsp;Group&nbsp;</th> <th>&nbsp;Size&nbsp;</th> <th>&nbsp;KLD&nbsp;</th> <th>&nbsp;Seq2Logo&nbsp;</th> <th>&nbsp;Matrix&nbsp;</th> </tr>
+<tr valign='top'> <td>&nbsp;1&nbsp;</td> <td>&nbsp;485&nbsp;</td> <td>&nbsp;6.734&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_1of1-001.png" TARGET='_blank'>Group_1of1</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.1of1.mat" TARGET='_blank'>Mat_1.1</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;Outliers&nbsp;</td> <td>&nbsp;176&nbsp;</td> <td>&nbsp; &nbsp;</td>
+ <td>&nbsp; &nbsp;</td></tr></font><tr valign='top'> <td colspan='4'><br>Raw <a href="./res/gibbs.1g.out" TARGET='_blank'>Clustering Report</a>
+<br>Formatted <a href="./res/gibbs.1g.ds.out" TARGET='_blank'>Clustering Solution</a>
+<br>Clustered <a href="./cores/gibbs.1g.cores" TARGET='_blank'>Alignment Cores</a><br><br></td></tr>
+</table>
+</td> <td width:50%;text-align:left;vertical_align:middle>
+<img src="./logos/gibbs_logos_1of1-001.png" alt='' title="LOGO 1 of 1 - KLD=6.734" width="150" /></td></tr>
+<tr><td colspan="2"></td></tr>
+<tr valign="top"><td colspan='2'>
+<h3>RESULTS for 2 CLUSTERS</h3>
+</td></tr><tr valign='top'> <td> <font face="COURIER">
+ Final Average KLD: <b>6.767517
+</b></font><br><br>
+<table align='left'>
+<font face="COURIER"><tr valign='top'> <th>&nbsp;Group&nbsp;</th> <th>&nbsp;Size&nbsp;</th> <th>&nbsp;KLD&nbsp;</th> <th>&nbsp;Seq2Logo&nbsp;</th> <th>&nbsp;Matrix&nbsp;</th> </tr>
+<tr valign='top'> <td>&nbsp;1&nbsp;</td> <td>&nbsp;191&nbsp;</td> <td>&nbsp;5.725&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_1of2-001.png" TARGET='_blank'>Group_1of2</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.1of2.mat" TARGET='_blank'>Mat_1.2</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;2&nbsp;</td> <td>&nbsp;374&nbsp;</td> <td>&nbsp;7.300&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_2of2-001.png" TARGET='_blank'>Group_2of2</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.2of2.mat" TARGET='_blank'>Mat_2.2</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;Outliers&nbsp;</td> <td>&nbsp;96&nbsp;</td> <td>&nbsp; &nbsp;</td>
+ <td>&nbsp; &nbsp;</td></tr></font><tr valign='top'> <td colspan='4'><br>Raw <a href="./res/gibbs.2g.out" TARGET='_blank'>Clustering Report</a>
+<br>Formatted <a href="./res/gibbs.2g.ds.out" TARGET='_blank'>Clustering Solution</a>
+<br>Clustered <a href="./cores/gibbs.2g.cores" TARGET='_blank'>Alignment Cores</a><br><br></td></tr>
+</table>
+</td> <td width:50%;text-align:left;vertical_align:middle>
+<img src="./logos/gibbs_logos_1of2-001.png" alt='' title="LOGO 1 of 2 - KLD=5.725" width="150" /><img src="./logos/gibbs_logos_2of2-001.png" alt='' title="LOGO 2 of 2 - KLD=7.300" width="150" /></td></tr>
+<tr><td colspan="2"></td></tr>
+<tr valign="top"><td colspan='2'>
+<h3>RESULTS for 3 CLUSTERS</h3>
+</td></tr><tr valign='top'> <td> <font face="COURIER">
+ Final Average KLD: <b>6.615725
+</b></font><br><br>
+<table align='left'>
+<font face="COURIER"><tr valign='top'> <th>&nbsp;Group&nbsp;</th> <th>&nbsp;Size&nbsp;</th> <th>&nbsp;KLD&nbsp;</th> <th>&nbsp;Seq2Logo&nbsp;</th> <th>&nbsp;Matrix&nbsp;</th> </tr>
+<tr valign='top'> <td>&nbsp;1&nbsp;</td> <td>&nbsp;259&nbsp;</td> <td>&nbsp;6.816&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_1of3-001.png" TARGET='_blank'>Group_1of3</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.1of3.mat" TARGET='_blank'>Mat_1.3</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;2&nbsp;</td> <td>&nbsp;189&nbsp;</td> <td>&nbsp;6.558&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_2of3-001.png" TARGET='_blank'>Group_2of3</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.2of3.mat" TARGET='_blank'>Mat_2.3</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;3&nbsp;</td> <td>&nbsp;150&nbsp;</td> <td>&nbsp;6.343&nbsp;</td>
+<td>&nbsp; <a href="./logos/gibbs_logos_3of3-001.png" TARGET='_blank'>Group_3of3</a> &nbsp;</td>
+<td>&nbsp; <a href="./matrices/gibbs.3of3.mat" TARGET='_blank'>Mat_3.3</a> &nbsp;</td>
+ </td>
+</tr><tr valign='top'> <td>&nbsp;Outliers&nbsp;</td> <td>&nbsp;63&nbsp;</td> <td>&nbsp; &nbsp;</td>
+ <td>&nbsp; &nbsp;</td></tr></font><tr valign='top'> <td colspan='4'><br>Raw <a href="./res/gibbs.3g.out" TARGET='_blank'>Clustering Report</a>
+<br>Formatted <a href="./res/gibbs.3g.ds.out" TARGET='_blank'>Clustering Solution</a>
+<br>Clustered <a href="./cores/gibbs.3g.cores" TARGET='_blank'>Alignment Cores</a><br><br></td></tr>
+</table>
+</td> <td width:50%;text-align:left;vertical_align:middle>
+<img src="./logos/gibbs_logos_1of3-001.png" alt='' title="LOGO 1 of 3 - KLD=6.816" width="150" /><img src="./logos/gibbs_logos_2of3-001.png" alt='' title="LOGO 2 of 3 - KLD=6.558" width="150" /><img src="./logos/gibbs_logos_3of3-001.png" alt='' title="LOGO 3 of 3 - KLD=6.343" width="150" /></td></tr>
+<tr><td colspan="2"></td></tr>
+</table>
+<br><hr>See the <a href="./log.txt" TARGET='_blank'>Activity log</a> for this job
+<br>
+<br><br><a href="/services/GibbsCluster-2.0/tmp/mhcI_4027417/mhcI_4027417.tar.gz">DOWNLOAD</a> archive with all results files<br><br>
+
+<br><div class="footer"> Made with GibbsCluster version 2.0</div>
+</body></html>
