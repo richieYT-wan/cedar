@@ -1,4 +1,4 @@
-icore_start_pos,Peptide,Core,Of,Gp,Gl,Ip,Il,icore_mut,EL_rank_mut,icore_wt_aligned,EL_rank_wt_aligned,icore_similarity_score,wild_type,HLA,target,Gene TPM,icore_len_mut,icore_len_wt,icore_anchor,icore_mutation_position,icore_anchor_mutation,icore_mut_score,icore_blsm_mut_score
+icore_start_pos,Peptide,Core,Of,Gp,Gl,Ip,Il,icore_mut,EL_rank_mut,icore_wt_aligned,EL_rank_wt_aligned,icore_dissimilarity_score,wild_type,HLA,target,Total_Gene_TPM,icore_len_mut,icore_len_wt,icore_anchor,icore_mutation_position,icore_anchor_mutation,icore_mut_score,icore_blsm_mut_score
 1,QLEQLMQLY,QLEQLMQLY,0,0,0,0,0,QLEQLMQLY,0.072,YLEQLHQLY,0.019,0.891333,YLEQLHQLY,HLA-A0101,1,60.0711,9,9,"1,8","0,5",True,0,-3
 1,QLEQLMQLY,QLEQLMQLY,0,0,0,0,0,QLEQLMQLY,0.663,YLEQLHQLY,0.555,0.891333,YLEQLHQLY,HLA-A2601,0,60.0711,9,9,"0,1,8","0,5",True,0,-3
 1,CIDFQPDIY,CIDFQPDIY,0,0,0,0,0,CIDFQPDIY,0.071,CIDFQPEIY,0.059,0.949230,CIDFQPEIY,HLA-A0101,1,7.18108,9,9,"1,8",6,False,4,2

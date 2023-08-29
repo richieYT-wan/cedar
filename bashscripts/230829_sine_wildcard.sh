@@ -22,7 +22,7 @@ INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./2305XX_final_mutExpr_single_mc_newratio.py -icsdir \${ICSDIR} -trainset sine -ncores 1 -outdir \${OUTDIR} -condition None -key EL_rank_mut -input_type icore
+python3 ./2305XX_final_mutExpr_single_mc_newratio.py -icsdir \${ICSDIR} -trainset sine -ncores 1 -outdir \${OUTDIR} -condition None -key None -input_type icore -wc True
 " > "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
 
 chmod +x "230427_MCFinal_${1}_exp8mers_index_${2}_input_type_${3}.sh"
