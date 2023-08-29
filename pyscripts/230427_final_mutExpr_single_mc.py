@@ -127,10 +127,11 @@ def main():
              'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
              'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
 
-
+    sine_dataset = pd.read_csv('../data/sine_ibel/230829_sine_processed_pepx_mutations.csv')
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
-                'prime': prime_dataset}
+                'prime': prime_dataset,
+                'sine': sine_dataset}
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
 
     train_dataset = trainmap[args['trainset']]
@@ -204,6 +205,19 @@ def main():
 
     pval_df = pd.DataFrame([[ic_name, args['input_type'], key]],
                            columns=['weight', 'input_type', 'key'])
+
+    if args['trainset']=='sine':
+        _, preds = evaluate_trained_models_sklearn(sine_dataset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
+                                                   trained_models, ics_dict,
+                                                   train_dataset,
+                                                   encoding_kwargs, concatenated=False,
+                                                   only_concat=True, n_jobs=min(10, args['ncores']), kcv_eval=True)
+
+        p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+        preds.to_csv(f'{args["outdir"]}raw/sineKCV_preds_{filename}.csv', index=False,
+                     columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [p_col])
+        bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                  key, 'SineKCV', n_rounds=10000, n_jobs=args['ncores'])
     for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
                                  ['CEDAR', 'PRIME', 'NEPDB']):
         # FULLY FILTERED + Mean_pred
