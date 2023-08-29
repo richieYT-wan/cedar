@@ -258,20 +258,12 @@ def main():
         if evalname == "NEPDB":
             continue
         else:
-<<<<<<< HEAD
-            for xx in baseline.keys():
-                df_base = baseline[xx][evalname]
-                pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
-                pval_df[f'pval_{xx}_{evalname}'] = pval
-
-=======
             if not args['wc']:
                 for xx in baseline.keys():
                     df_base = baseline[xx][evalname]
                     pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
                     pval_df[f'pval_{xx}_{evalname}'] = pval
         
->>>>>>> a7e1f22762dcfca023f397fc771c47a7c313f4b5
         del bootstrapped_df
     if args['debug']:
         pkl_dump(trained_models, args['outdir'] + f'model_{filename}.pkl')
