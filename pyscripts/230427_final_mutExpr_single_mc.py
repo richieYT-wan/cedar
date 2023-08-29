@@ -91,7 +91,9 @@ def main():
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
-    baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
+
+    if not args['wc']:
+        baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
     # print('fit check xd')
     # DEFINING COLS
     mcs = []
@@ -241,10 +243,11 @@ def main():
         if evalname=="NEPDB":
             continue
         else:
-            for xx in baseline.keys():
-                df_base = baseline[xx][evalname]
-                pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
-                pval_df[f'pval_{xx}_{evalname}'] = pval
+            if not args['wc']:
+                for xx in baseline.keys():
+                    df_base = baseline[xx][evalname]
+                    pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
+                    pval_df[f'pval_{xx}_{evalname}'] = pval
         
         del bootstrapped_df
     if args['debug']:
@@ -252,7 +255,8 @@ def main():
         pkl_dump(prime_dataset.query('Peptide not in @train_dataset.Peptide.values'), f'{args["outdir"]}prime_df_{filename}.pkl')
         pkl_dump(encoding_kwargs, args['outdir']+f'encoding_kwargs_{filename}.pkl')
     del trained_models
-    pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
+    if not args['wc']:
+        pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
     print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds. ; Memory used: {tracemalloc.get_traced_memory()}')
