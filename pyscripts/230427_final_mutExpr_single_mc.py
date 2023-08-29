@@ -10,6 +10,7 @@ from datetime import datetime as dt
 import os, sys
 import copy
 import tracemalloc
+
 module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
@@ -64,7 +65,10 @@ def args_parser():
     parser.add_argument('-condition', type=str, default='None',
                         help='Inverted-Shannon, Mask or None. Must be string, so "None"')
     parser.add_argument('-mc_index', type=int, default=0, help='sample a single condition')
-    parser.add_argument('-key', type=str, default = None, help = 'a - separated string (i.e. the key) to make the mutcols from. Can\'t be used together with mc_index!!')
+    parser.add_argument('-key', type=str, default=None,
+                        help='a - separated string (i.e. the key) to make the mutcols from. Can\'t be used together with mc_index!!')
+    parser.add_argument('-wc', type=str2bool, default=None,
+                        help='Wildcard : Bypass everything and train harmonic model')
     parser.add_argument('-input_type', type=str, default='icore_mut', help='icore_mut, expanded_input, or Peptide')
     parser.add_argument('-debug', type=str2bool, default=False)
     return parser.parse_args()
@@ -156,34 +160,46 @@ def main():
                        'Inverted-Mask': (True, 'Inverted-Mask', ics_shannon, True),
                        'KL': (False, 'KL', ics_kl, False),
                        'Inverted-KL': (True, 'Inverted-KL', ics_kl, False),
-                       'KL-Mask':(False, 'KL-Mask', ics_kl, True),
-                       'Inverted-KL-Mask':(True, 'Inverted-KL-Mask', ics_kl, True)}
+                       'KL-Mask': (False, 'KL-Mask', ics_kl, True),
+                       'Inverted-KL-Mask': (True, 'Inverted-KL-Mask', ics_kl, True)}
 
-    invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
-    # megaloops for encoding-weighting
-    if 'KL' in args["condition"]:
-        encoding_kwargs['threshold']=0.201
+    if args['wc']:
+        key = 'wildcard_consensus_model'
+        mut_cols =  ['icore_dissimilarity_score', 'icore_blsm_mut_score', 'Total_Gene_TPM']
+        encoding_kwargs['mut_col'] = mut_cols
+        invert, ic_name, ics_dict, mask = conditions_list['KL-Mask']
+
+        encoding_kwargs['threshold']=0.2
+
+    else:
+        invert, ic_name, ics_dict, mask = conditions_list[args["condition"]]
+        # megaloops for encoding-weighting
+
+        if args['key'] is None:
+            mut_cols = mcs[args['mc_index']]
+        else:
+            mut_cols = args['key'].split('-')
+
+        encoding_kwargs['mut_col'] = mut_cols
+        key = '-'.join(mut_cols).replace(' ', '-')
+        if key == '':
+            key = 'only_rank'
+        # Hotfix for filename length...
+        key = 'all_feats' if key == '-'.join(cols_) else key
+        key = key.replace('icore_', '')
+        # You fucking moron ; ICname should've just been args["condition"] from the start instead of this hardcoded nonsense bullshit FUCK I hate you so much
+
+        if 'KL' in args["condition"]:
+            encoding_kwargs['threshold'] = 0.201
+
     encoding_kwargs['encoding'] = 'onehot'
     encoding_kwargs['blosum_matrix'] = None
     # Doing only Inverted Shannon, Mask, None
 
     encoding_kwargs['invert'] = invert
     encoding_kwargs['mask'] = mask
-
-    if args['key'] is None:
-        mut_cols = mcs[args['mc_index']]
-    else:
-        mut_cols = args['key'].split('-')
-        
-    encoding_kwargs['mut_col'] = mut_cols
-    key = '-'.join(mut_cols).replace(' ', '-')
-    if key == '':
-        key = 'only_rank'
-    # Hotfix for filename length...
-    key = 'all_feats' if key == '-'.join(cols_) else key
-    key = key.replace('icore_', '')
-    # You fucking moron ; ICname should've just been args["condition"] from the start instead of this hardcoded nonsense bullshit FUCK I hate you so much
     filename = f'{args["trainset"]}_onehot_{ic_name}_{args["input_type"]}_{key}'.replace('Inverted', 'Inv')
+
     # print('#'*100,'\n\n\n', args["condition"], ic_name, filename, '\n', '#'*100,'\n\n\n')
 
     # Using the same model and hyperparameters
@@ -192,9 +208,9 @@ def main():
     # Training model and getting feature importances
     print('Training')
     trained_models, _, _ = nested_kcv_train_sklearn(train_dataset, model,
-                                                                ics_dict=ics_dict,
-                                                                encoding_kwargs=encoding_kwargs,
-                                                                n_jobs=min(10, args['ncores']))
+                                                    ics_dict=ics_dict,
+                                                    encoding_kwargs=encoding_kwargs,
+                                                    n_jobs=min(10, args['ncores']))
     fi = get_nested_feature_importance(trained_models)
     fn = AA_KEYS + ['rank'] + mut_cols
     # Saving Feature importances as dataframe
@@ -206,7 +222,7 @@ def main():
     pval_df = pd.DataFrame([[ic_name, args['input_type'], key]],
                            columns=['weight', 'input_type', 'key'])
 
-    if args['trainset']=='sine':
+    if args['trainset'] == 'sine':
         _, preds = evaluate_trained_models_sklearn(sine_dataset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
                                                    trained_models, ics_dict,
                                                    train_dataset,
@@ -224,7 +240,6 @@ def main():
         if not evalset.equals(train_dataset):
             evalset = evalset.query('Peptide not in @train_dataset.Peptide.values').copy()
 
-
         # print(evalname, len(evalset), evalset.columns)
         _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
                                                    trained_models, ics_dict,
@@ -238,25 +253,27 @@ def main():
                                                   key, evalname, n_rounds=10000, n_jobs=args['ncores'])
         # print('#'*100,'\n\n\n', evalname, bootstrapped_df['auc'].mean(), '#'*100, '\n\n\n\n')
 
-        if evalname=="NEPDB":
+        if evalname == "NEPDB":
             continue
         else:
             for xx in baseline.keys():
                 df_base = baseline[xx][evalname]
                 pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
                 pval_df[f'pval_{xx}_{evalname}'] = pval
-        
+
         del bootstrapped_df
     if args['debug']:
-        pkl_dump(trained_models, args['outdir']+f'model_{filename}.pkl')
-        pkl_dump(prime_dataset.query('Peptide not in @train_dataset.Peptide.values'), f'{args["outdir"]}prime_df_{filename}.pkl')
-        pkl_dump(encoding_kwargs, args['outdir']+f'encoding_kwargs_{filename}.pkl')
+        pkl_dump(trained_models, args['outdir'] + f'model_{filename}.pkl')
+        pkl_dump(prime_dataset.query('Peptide not in @train_dataset.Peptide.values'),
+                 f'{args["outdir"]}prime_df_{filename}.pkl')
+        pkl_dump(encoding_kwargs, args['outdir'] + f'encoding_kwargs_{filename}.pkl')
     del trained_models
     pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
     print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds. ; Memory used: {tracemalloc.get_traced_memory()}')
     tracemalloc.stop()
+
 
 if __name__ == '__main__':
     main()
