@@ -66,11 +66,11 @@ for add_rank in [True, False]:
             for evalset, evalname in zip([cedar_merged, prime_merged, nepdb_merged],
                                          ['CEDAR', 'PRIME', 'NEPDB']):
                 # FULLY FILTERED + Mean_pred
-                if not evalset.equals(cedar_merged):
-                    kcv_eval = False
-                    evalset = evalset.query('Peptide not in @train_dataset.Peptide.values').copy()
-                else:
+                if evalname =='CEDAR':
                     kcv_eval = True
+                else:
+                    kcv_eval = False
+                    evalset = evalset.query('Peptide not in @cedar_merged.Peptide.values').copy()
 
                 # print(evalname, len(evalset), evalset.columns)
                 _, preds = evaluate_trained_models_sklearn(
