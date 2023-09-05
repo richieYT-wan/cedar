@@ -41,6 +41,7 @@ pca_cols = [f'ESM_PCA_{i:02}' for i in range(1, 26)]
 outdir = '../output/230905_ESM_embeddings/'
 os.makedirs(outdir, exist_ok=True)
 
+mega_df = []
 for add_rank in [True, False]:
     for remove_pep in [True, False]:
         for mut_cols, name in zip([pca_cols, esm_cols], ['ESM_PCA', 'ESM_mean']):
@@ -88,3 +89,6 @@ for add_rank in [True, False]:
                 bootstrapped_df['add_rank'] = add_rank
 
                 bootstrapped_df.to_csv(f'{outdir}/bootstrapped_df_{evalname}_{filename}.csv', index=False)
+                mega_df.append(bootstrapped_df)
+
+pd.concat(mega_df).to_csv(f'{outdir}total_df.csv')
