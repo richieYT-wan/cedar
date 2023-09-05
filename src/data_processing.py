@@ -524,7 +524,7 @@ def get_array_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix
 
     y = df[target_col].values
     # Queries whatever is above 20, and only keeps that as feature
-    if remove_pep and (add_rank or add_aaprop):
+    if remove_pep:
         x = x[:, 20:]
     return x, y
 
@@ -545,14 +545,14 @@ def get_dataset(df, ics_dict, max_len=12, encoding='onehot', blosum_matrix=None,
         # Here Invert is true (so the anchors get IC instead of 1-IC)
         x_anchors, y_anchors = get_array_dataset(anchors, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
                                                  target_col, invert=True, add_rank=True, add_aaprop=False,
-                                                 remove_pep=False)
+                                                 remove_pep=remove_pep)
         # Adding the mut columns and concatenating on columns' axis (ax=1)
         if len(mut_col) > 0:
             mut_anchors = anchors[mut_col].values
             x_anchors = np.concatenate([x_anchors, mut_anchors], axis=1)
         # Here, invert is False (so using 1-IC, to up-weigh non-anchor positions for non anc mutations
         x_non, y_non = get_array_dataset(non_ancs, ics_dict, max_len, encoding, blosum_matrix, seq_col, hla_col,
-                                         target_col, invert=False, add_rank=True, add_aaprop=False, remove_pep=False)
+                                         target_col, invert=False, add_rank=True, add_aaprop=False, remove_pep=remove_pep)
         # Same
         if mut_col is not None and type(mut_col) == list:
             if len(mut_col) > 0:

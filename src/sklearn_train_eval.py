@@ -140,6 +140,7 @@ def parallel_inner_train_wrapper(train_dataframe, x_test, base_model, ics_dict,
     valid = train_dataframe.query('fold == @fold_in').reset_index(drop=True)
     # Get datasets
     x_train, y_train = get_dataset(train, ics_dict, **encoding_kwargs)
+    print(x_train.shape)
     x_valid, y_valid = get_dataset(valid, ics_dict, **encoding_kwargs)
 
     # Fit the model and append it to the list

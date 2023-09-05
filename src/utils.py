@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 import matplotlib.patheffects as path_effects
 import seaborn as sns
 
+def display_side(**kwargs):
+    pass
 
 def get_palette(palette, n_colors):
     """ 'stretches' stupid fucking palette to have more contrast"""
