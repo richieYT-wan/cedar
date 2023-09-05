@@ -52,7 +52,7 @@ for add_rank in [True, False]:
 
             model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300, max_depth=9,
                                            ccp_alpha=9.945e-6)
-            trained_models, _, _ = nested_kcv_train_sklearn(cedar_merged, model, None, encoding_kwargs, n_jobs=8)
+            trained_models, _, _ = nested_kcv_train_sklearn(cedar_merged, model, None, encoding_kwargs, n_jobs=10)
             fi = get_nested_feature_importance(trained_models)
             fn = []
             if not remove_pep:
@@ -83,7 +83,7 @@ for add_rank in [True, False]:
                 preds.to_csv(f'{outdir}/{evalname}_preds_{filename}.csv', index=False,
                              columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [
                                  p_col])
-                bootstrapped_df = bootstrap_eval(preds[p_col], preds['agg_label'], n_rounds=10000, n_jobs=8,
+                bootstrapped_df = bootstrap_eval(preds[p_col], preds['agg_label'], n_rounds=10000, n_jobs=40,
                                                  reduced=True)
                 bootstrapped_df['remove_pep'] = remove_pep
                 bootstrapped_df['add_rank'] = add_rank
