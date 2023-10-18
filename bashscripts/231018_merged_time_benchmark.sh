@@ -23,7 +23,7 @@ INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -key None -input_type \${INPUTTYPE} -mc_index \${INDEX}
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -input_type \${INPUTTYPE} -mc_index \${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime.sh"
@@ -53,7 +53,7 @@ INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -key None -input_type \${INPUTTYPE} -mc_index \${INDEX}
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -input_type \${INPUTTYPE} -mc_index \${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
