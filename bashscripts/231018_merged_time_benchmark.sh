@@ -4,7 +4,7 @@
 CONDITION="KL-Mask"
 INDEX=1023
 INPUTTYPE="icore_mut"
-trainset="cp_merged"
+TRAINSET="cp_merged"
 WALLTIME="01:00:00"
 # Create the script
 echo "#! /usr/bin/bash
@@ -16,14 +16,14 @@ HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=\${HOMEDIR}pyscripts/
 OUTDIR=\${HOMEDIR}output/231018_redo_merged/
 ICSDIR=\${HOMEDIR}/data/ic_dicts/
-TRAINSET=\"$trainset\"
+TRAINSET=\"$TRAINSET\"
 CONDITION=\"$CONDITION\"
 INDEX=\"$INDEX\"
 INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${trainset} -ncores 1 -outdir \${OUTDIR} -condition None -key None -input_type icore -wc True
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -key None -input_type \${INPUTTYPE} -mc_index \${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime.sh"
@@ -34,7 +34,7 @@ qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,wa
 CONDITION="KL-Mask"
 INDEX=1023
 INPUTTYPE="icore_mut"
-trainset="cpn_merged"
+TRAINSET="cpn_merged"
 WALLTIME="01:00:00"
 # Create the script
 echo "#! /usr/bin/bash
@@ -46,14 +46,14 @@ HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
 PYDIR=\${HOMEDIR}pyscripts/
 OUTDIR=\${HOMEDIR}output/231018_redo_merged/
 ICSDIR=\${HOMEDIR}/data/ic_dicts/
-TRAINSET=\"$trainset\"
+TRAINSET=\"$TRAINSET\"
 CONDITION=\"$CONDITION\"
 INDEX=\"$INDEX\"
 INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${trainset} -ncores 1 -outdir \${OUTDIR} -condition None -key None -input_type icore -wc True
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -key None -input_type \${INPUTTYPE} -mc_index \${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
