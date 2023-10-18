@@ -18,7 +18,7 @@ CONDITION=\"$CONDITION\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./aligned_icore_expr_mut_oh_filtered_aaprops_expr8mers.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 39 -outdir \${OUTDIR} -condition \${CONDITION}
+python3 ./aligned_icore_expr_mut_oh_filtered_aaprops_expr8mers.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 10 -outdir \${OUTDIR} -condition \${CONDITION}
 " > "230414_aligned_expr_mut_oh_filt_${1}.sh"
 
 chmod +x "230414_aligned_expr_mut_oh_filt_${1}.sh"

@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 
 # Set the variable CONDITION to the first positional argument
 CONDITION="$1"

@@ -57,17 +57,17 @@ def args_parser():
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str,
                         default='../output/230427_MutExpr_Final_input_type/')
-    parser.add_argument('-trainset', type=str, default='cedar')
+    parser.add_argument('-trainset', type=str, default='cp_merged')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
     parser.add_argument('-ncores', type=int, default=36,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     parser.add_argument('-condition', type=str, default='None',
                         help='Inverted-Shannon, Mask or None. Must be string, so "None"')
-    parser.add_argument('-mc_index', type=int, default=0, help='sample a single condition')
+    parser.add_argument('-mc_index', type=int, default=None, help='sample a single condition')
     parser.add_argument('-key', type=str, default=None,
                         help='a - separated string (i.e. the key) to make the mutcols from. Can\'t be used together with mc_index!!')
-    parser.add_argument('-wc', type=str2bool, default=None,
+    parser.add_argument('-wc', type=str2bool, default=False,
                         help='Wildcard : Bypass everything and train harmonic model')
     parser.add_argument('-input_type', type=str, default='icore_mut', help='icore_mut, expanded_input, or Peptide')
     parser.add_argument('-debug', type=str2bool, default=False)
@@ -93,32 +93,14 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}230418_cedar_aligned_pepx.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
+    cp_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_merged_fold.csv')
+    cpn_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_nepdb_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
 
+
     if not args['wc']:
         baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
-    # print('fit check xd')
-    # DEFINING COLS
-    mcs = []
-    cols_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point',
-             'icore_dissimilarity_score',
-             'icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
-
-    for L in range(0, len(cols_) + 1):
-        for mc in itertools.combinations(cols_, L):
-            mcs.append(list(mc))
-
-    # # This thing here just filters out columns to keep only those that didnt have icore_mut_score
-    # cols2_ = ['icore_aliphatic_index', 'icore_boman', 'icore_hydrophobicity', 'icore_isoelectric_point',
-    #           'icore_dissimilarity_score', 'icore_mut_score',
-    #           'icore_blsm_mut_score', 'ratio_rank', 'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
-    # mcs2 = []
-    # for L in range(0, len(cols2_) + 1):
-    #     for mc in itertools.combinations(cols2_, L):
-    #         mcs2.append(list(mc))
-    # mcs = [x for x in mcs2 if x not in mcs]
-    # len(mcs)
 
     # Define various stuff depending on the input columns
     scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'
@@ -128,21 +110,28 @@ def main():
     cedar_dataset, _ = get_aa_properties(cedar_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     prime_dataset, _ = get_aa_properties(prime_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     nepdb_dataset, _ = get_aa_properties(nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    cp_dataset, _ = get_aa_properties(cp_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
 
-    cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity', f'{prefix}isoelectric_point',
-             'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
+    # Defining mut cols
+    mcs = []
+    cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity',
+             f'{prefix}isoelectric_point','icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
              'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
 
-    sine_dataset = pd.read_csv('../data/sine_ibel/230829_sine_processed_pepx_mutations.csv')
+    for L in range(0, len(cols_) + 1):
+        for mc in itertools.combinations(cols_, L):
+            mcs.append(list(mc))
+
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset,
-                'sine': sine_dataset,
-                }
+                'cp_merged': cp_dataset,
+                'cpn_merged': cpn_dataset}
+
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
-
     train_dataset = trainmap[args['trainset']]
-
+    assert not (args['key'] is None and args['mc_index'] is None), 'Both mutcol index and mutcol key are None! one of the two should be used'
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
                        'encoding': 'onehot',
@@ -193,7 +182,7 @@ def main():
         # You fucking moron ; ICname should've just been args["condition"] from the start instead of this hardcoded nonsense bullshit FUCK I hate you so much
 
         if 'KL' in args["condition"]:
-            encoding_kwargs['threshold'] = 0.201
+            encoding_kwargs['threshold'] = 0.200
 
     encoding_kwargs['encoding'] = 'onehot'
     encoding_kwargs['blosum_matrix'] = None
@@ -222,58 +211,28 @@ def main():
         f'{args["outdir"]}raw/featimps_{filename}.csv',
         index=False)
 
-    pval_df = pd.DataFrame([[ic_name, args['input_type'], key]],
-                           columns=['weight', 'input_type', 'key'])
+    _, kcv_preds = evaluate_trained_models_sklearn(train_dataset, trained_models, ics_dict, train_dataset,
+                                                   encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=True)
 
-    if args['trainset'] == 'sine':
-        _, preds = evaluate_trained_models_sklearn(sine_dataset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
-                                                   trained_models, ics_dict,
-                                                   train_dataset,
-                                                   encoding_kwargs, concatenated=False,
-                                                   only_concat=True, n_jobs=min(10, args['ncores']), kcv_eval=True)
-
-        p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-        preds.to_csv(f'{args["outdir"]}raw/sineKCV_preds_{filename}.csv', index=False,
-                     columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [p_col])
-        bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                  key, 'SineKCV', n_rounds=10000, n_jobs=args['ncores'])
-    for evalset, evalname in zip([cedar_dataset, prime_dataset, nepdb_dataset],
-                                 ['CEDAR', 'PRIME', 'NEPDB']):
-        # FULLY FILTERED + Mean_pred
-        if not evalset.equals(train_dataset):
-            evalset = evalset.query('Peptide not in @train_dataset.Peptide.values').copy()
-
-        # print(evalname, len(evalset), evalset.columns)
-        _, preds = evaluate_trained_models_sklearn(evalset.drop_duplicates(subset=['Peptide', 'HLA', 'agg_label']),
-                                                   trained_models, ics_dict,
-                                                   train_dataset,
-                                                   encoding_kwargs, concatenated=False,
-                                                   only_concat=True, n_jobs=min(10, args['ncores']))
-        p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-        preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
-                     columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned'] + mut_cols + [p_col])
-        bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                  key, evalname, n_rounds=10000, n_jobs=args['ncores'])
-        # print('#'*100,'\n\n\n', evalname, bootstrapped_df['auc'].mean(), '#'*100, '\n\n\n\n')
-
-        if evalname == "NEPDB":
-            continue
+    for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb'],['KCV', 'CEDAR', 'PRIME', 'NEPDB']):
+        if c in kcv_preds.columns:
+            preds = kcv_preds.query(f'{c}')
+            p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+            preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                         columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
+            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                      key, evalname, n_rounds=10000, n_jobs=args['ncores'])
         else:
-            if not args['wc']:
-                for xx in baseline.keys():
-                    df_base = baseline[xx][evalname]
-                    pval, _ = get_pval_wrapper(bootstrapped_df[['id', 'auc']], df_base[['id', 'auc']], column='auc')
-                    pval_df[f'pval_{xx}_{evalname}'] = pval
-        
-        del bootstrapped_df
-    if args['debug']:
-        pkl_dump(trained_models, args['outdir'] + f'model_{filename}.pkl')
-        pkl_dump(prime_dataset.query('Peptide not in @train_dataset.Peptide.values'),
-                 f'{args["outdir"]}prime_df_{filename}.pkl')
-        pkl_dump(encoding_kwargs, args['outdir'] + f'encoding_kwargs_{filename}.pkl')
-    del trained_models
-    if not args['wc']:
-        pval_df.to_csv(f'{args["outdir"]}raw/pvals_{filename}.csv')
+            if evalname == "NEPDB":
+                _, preds = evaluate_trained_models_sklearn(nepdb_dataset, trained_models, ics_dict, train_dataset,
+                                                           encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=False)
+                p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+                preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                             columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                      'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                          key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
     print(f'Elapsed: {elapsed[0]} minutes, {elapsed[1]} seconds. ; Memory used: {tracemalloc.get_traced_memory()}')
