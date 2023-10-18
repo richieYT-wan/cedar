@@ -93,7 +93,7 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}230418_cedar_aligned_pepx.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
-    nepdb_dataset = pd.read_csv(f'{args["datadir"]}231018_nepdb_new_filtered.csv')
+    new_nepdb_dataset = pd.read_csv(f'{args["datadir"]}231018_nepdb_new_filtered.csv')
     cp_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_merged_fold.csv')
     cpn_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_nepdb_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
@@ -111,6 +111,7 @@ def main():
     cedar_dataset, _ = get_aa_properties(cedar_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     prime_dataset, _ = get_aa_properties(prime_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     nepdb_dataset, _ = get_aa_properties(nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    new_nepdb_dataset, _ = get_aa_properties(new_nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     cp_dataset, _ = get_aa_properties(cp_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
 
@@ -233,6 +234,16 @@ def main():
                                       'EL_rank_wt_aligned'] + mut_cols + [p_col])
                 bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                           key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+
+                _, preds = evaluate_trained_models_sklearn(new_nepdb_dataset, trained_models, ics_dict, train_dataset,
+                                                           encoding_kwargs, False, True, min(10, args['ncores']),
+                                                           kcv_eval=False)
+                p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+                preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                             columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                      'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                          key, f'new_{evalname}', n_rounds=10000, n_jobs=args['ncores'])
 
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
