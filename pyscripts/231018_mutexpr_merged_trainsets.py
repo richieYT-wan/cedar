@@ -93,6 +93,7 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}230418_cedar_aligned_pepx.csv')
     prime_dataset = pd.read_csv(f'{args["datadir"]}230418_prime_aligned_pepx.csv')
     nepdb_dataset = pd.read_csv(f'{args["datadir"]}230418_nepdb_aligned_pepx.csv')
+    nepdb_dataset = pd.read_csv(f'{args["datadir"]}231018_nepdb_new_filtered.csv')
     cp_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_merged_fold.csv')
     cpn_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_nepdb_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
