@@ -99,8 +99,8 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
 
 
-    if not args['wc']:
-        baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
+    # if not args['wc']:
+    #     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
 
     # Define various stuff depending on the input columns
     scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'

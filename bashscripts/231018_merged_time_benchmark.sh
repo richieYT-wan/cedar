@@ -23,11 +23,11 @@ INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -input_type \${INPUTTYPE} -mc_index \${INDEX}
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -ncores 1 -outdir \${OUTDIR} -trainset ${TRAINSET} -condition ${CONDITION} -input_type ${INPUTTYPE} -mc_index ${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime.sh"
-qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,walltime=$WALLTIME "./231018_timebenchmark_1core_cedar-prime.sh"
+#qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,walltime=$WALLTIME "./231018_timebenchmark_1core_cedar-prime.sh"
 
 
 # Set the variable CONDITION to the first positional argument
@@ -53,8 +53,8 @@ INPUTTYPE=\"$INPUTTYPE\"
 cd \${PYDIR}
 pwd
 echo \"Starting PyScript\"
-python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir \${OUTDIR} -condition \${CONDITION} -input_type \${INPUTTYPE} -mc_index \${INDEX}
+python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -trainset \${TRAINSET} -ncores 1 -outdir ${OUTDIR} -condition ${CONDITION} -input_type ${INPUTTYPE} -mc_index ${INDEX}
 " > "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
 
 chmod +x "231018_timebenchmark_1core_cedar-prime-nepdb.sh"
-qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,walltime=$WALLTIME "./231018_timebenchmark_1core_cedar-prime-nepdb.sh"
+#qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=1:thinnode,mem=10gb,walltime=$WALLTIME "./231018_timebenchmark_1core_cedar-prime-nepdb.sh"
