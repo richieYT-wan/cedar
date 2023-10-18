@@ -5,7 +5,14 @@ CONDITION="$1"
 INDEX=$2
 INPUTTYPE=$3
 TRAINSET=$4
-WALLTIME="00:12:30"
+if [ "$TRAINSET" == "cp_merged" ]; then
+    WALLTIME="00:10:00"
+elif [ "$TRAINSET" == "cpn_merged" ]; then
+    WALLTIME="00:08:00"
+else
+    # Default value if TRAINSET doesn't match either option
+    WALLTIME="00:12:00"
+fi
 # Create the script
 echo "#! /usr/bin/bash
 
