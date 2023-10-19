@@ -67,11 +67,11 @@ def main():
     # This will be a list of lists initially, then concat along axis = 1 for each evalset
     res_list = []
     baseline_wrapper = partial(compare_baseline, baseline=baseline_df)
-    for evalset in evalset_reorder:
+    for evalset in tqdm(evalset_reorder, desc='evalset', position=0, leave=True):
         filtered_files = list(filter(lambda x: evalset in x and x.startswith(evalset), files))
         if len(list(filtered_files)) == 0: continue
         output = Parallel(n_jobs=args['ncores'])(
-            delayed(baseline_wrapper)(df=pd.read_csv(f'{args["datadir"]}{x}')) for x in filtered_files)
+            delayed(baseline_wrapper)(df=pd.read_csv(f'{args["datadir"]}{x}')) for x in tqdm(filtered_files, desc='files', position=1, leave=False))
         res_list.append(pd.concat(output, axis=0))
 
     pd.concat(res_list, axis=1).to_csv(f'{args["outdir"]}{args["savename"]}_gb_results.csv')
