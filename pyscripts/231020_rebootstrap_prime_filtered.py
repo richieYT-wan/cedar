@@ -24,8 +24,7 @@ N_CORES = 39
 def get_in_ref(peptide, hla, ref):
     return len(ref.query('Peptide==@peptide and HLA == @hla'))==1
 
-def pipeline(filename, baseline, ref):
-    df = pd.read_csv(filename)
+def pipeline(df, baseline, ref):
     df['in_nepdb'] = df.apply(lambda x: get_in_ref(x['Peptide'], x['HLA'], ref=ref), axis=1)
     df = df.query('not in_nepdb')
     pcol = 'pred' if 'pred' in df.columns else 'mean_pred'
@@ -52,7 +51,7 @@ def args_parser():
                         help='Path to directory containing the results')
     parser.add_argument('-savename', type=str, default='')
     parser.add_argument('-outdir', type=str,
-                        default='../output/231018_redo_merged/')
+                        default='../output/230427_MutExpr_Final_input_type/')
     parser.add_argument('-ncores', type=int, default=40,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
     return parser.parse_args()
