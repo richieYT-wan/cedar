@@ -40,7 +40,7 @@ def bootstrap_pipeline(filename, args, ref):
     df['in_nepdb'] = df.apply(lambda x: get_in_ref(x['Peptide'], x['HLA'], ref=ref), axis=1)
     df = df.query('not in_nepdb')
     pcol = 'pred' if 'pred' in df.columns else 'mean_pred'
-    bdf = bootstrap_eval(df[pcol].values, df['agg_label'].values, 10000, 40, True, False, True)\
+    bdf = bootstrap_eval(df[pcol].values, df['agg_label'].values, 10000, 10, True, False, True)\
                         .assign(evalset='PRIME', input_type='icore_mut', weight=weight, key=key)
     bdf.to_csv(f'{args["outdir"]}PRIME_bootstrapped_df_cedar_onehot_{weight}_icore_mut_{key}.csv')
     return None
@@ -92,12 +92,11 @@ def main():
     files = [f'{args["datadir"]}{x}' for x in os.listdir(args["datadir"]) if x.endswith('.csv') and 'PRIME' in x]
     # This will be a list of lists initially, then concat along axis = 1 for each evalset
     print('Doing BDFs')
-    # bs_wrapper = partial(bootstrap_pipeline, args=args, ref=nepdb)
-    # output = Parallel(n_jobs=4)(
-    #     delayed(bs_wrapper)(filename=x) for x in
-    #     tqdm(files, desc='files', position=1, leave=False))
-    for f in files:
-        bootstrap_pipeline(f, args, nepdb)
+    bs_wrapper = partial(bootstrap_pipeline, args=args, ref=nepdb)
+    output = Parallel(n_jobs=4)(
+        delayed(bs_wrapper)(filename=x) for x in
+        tqdm(files, desc='files', position=1, leave=False))
+
     print('Doing baseline comparisons')
     baseline_wrapper = partial(compare_baseline, baseline=baseline_df)
     bdf_files = [x for x in os.listdir(args["outdir"]) if x.endswith('.csv')]
