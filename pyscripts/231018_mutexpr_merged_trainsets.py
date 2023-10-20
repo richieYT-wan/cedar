@@ -216,34 +216,49 @@ def main():
     _, kcv_preds = evaluate_trained_models_sklearn(train_dataset, trained_models, ics_dict, train_dataset,
                                                    encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=True)
 
-    for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb'],['KCV', 'CEDAR', 'PRIME', 'NEPDB']):
-        if c in kcv_preds.columns:
-            preds = kcv_preds.query(f'{c}')
-            p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-            preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
-                         columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
-            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                      key, evalname, n_rounds=10000, n_jobs=args['ncores'])
-        else:
-            if evalname == "NEPDB":
-                _, preds = evaluate_trained_models_sklearn(nepdb_dataset, trained_models, ics_dict, train_dataset,
-                                                           encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=False)
+    if 'merged' in args['trainset']:
+        for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb'],['KCV', 'CEDAR', 'PRIME', 'NEPDB']):
+            if c in kcv_preds.columns:
+                preds = kcv_preds.query(f'{c}')
                 p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                 preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
-                             columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
-                                      'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                             columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
                 bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                           key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+            else:
+                if evalname == "NEPDB":
+                    _, preds = evaluate_trained_models_sklearn(nepdb_dataset, trained_models, ics_dict, train_dataset,
+                                                               encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=False)
+                    p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+                    preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                                 columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                          'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                    bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                              key, evalname, n_rounds=10000, n_jobs=args['ncores'])
 
-                _, preds = evaluate_trained_models_sklearn(new_nepdb_dataset, trained_models, ics_dict, train_dataset,
-                                                           encoding_kwargs, False, True, min(10, args['ncores']),
-                                                           kcv_eval=False)
-                p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-                preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
-                             columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
-                                      'EL_rank_wt_aligned'] + mut_cols + [p_col])
-                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
-                                                          key, f'new_{evalname}', n_rounds=10000, n_jobs=args['ncores'])
+                    _, preds = evaluate_trained_models_sklearn(new_nepdb_dataset, trained_models, ics_dict, train_dataset,
+                                                               encoding_kwargs, False, True, min(10, args['ncores']),
+                                                               kcv_eval=False)
+                    p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+                    preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                                 columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                          'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                    bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                              key, f'new_{evalname}', n_rounds=10000, n_jobs=args['ncores'])
+    # bad behaviour but whatever I just want to retrain a prime model here
+    elif args['trainset']=="prime":
+        for evalset, evalname in zip([prime_dataset, cedar_dataset, nepdb_dataset,
+                                      nepdb_dataset.query('Peptide not in @prime_dataset.Peptide.values')],
+                                     ['KCV', 'CEDAR', 'NEPDB', 'new_NEPDB']):
+            _, preds = evaluate_trained_models_sklearn(evalset, trained_models, ics_dict, train_dataset,
+                                                        encoding_kwargs, False, True, min(10, args['ncores']),
+                                                        kcv_eval=evalname=="KCV")
+            p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+            preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                         columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                  'EL_rank_wt_aligned'] + mut_cols + [p_col])
+            bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                      key, evalname, n_rounds=10000, n_jobs=args['ncores'])
 
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
