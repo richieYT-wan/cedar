@@ -80,7 +80,7 @@ def parallel_npep_wrapper(npep, merged_dataset, viral_dataset, seed, ic_name, ic
                                                trained_models, ics_dict,
                                                dataset,
                                                encoding_kwargs, concatenated=False,
-                                               only_concat=False, n_jobs=9)
+                                               only_concat=False, n_jobs=9, kcv_eval=True)
     pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
     auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
     df_fi['kcv_auc'] = auc
@@ -89,7 +89,7 @@ def parallel_npep_wrapper(npep, merged_dataset, viral_dataset, seed, ic_name, ic
                                                trained_models, ics_dict,
                                                dataset,
                                                encoding_kwargs, concatenated=False,
-                                               only_concat=False, n_jobs=9)
+                                               only_concat=False, n_jobs=9, kcv_eval=False)
     pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
     auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
     df_fi['neoepi_auc'] = auc
@@ -134,7 +134,7 @@ def main():
             partial_wrapper = partial(parallel_npep_wrapper, merged_dataset=merged_dataset, viral_dataset=viral_dataset,
                                       seed=seed, ic_name=ic_name, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
                                       args=args)
-            output = Parallel(n_jobs=4)(
+            output = Parallel(n_jobs=1)(
                 delayed(partial_wrapper)(npep=npep) for npep in tqdm(n_viral, desc='nviral', leave=True))
             feat_imps_df.append(output)
     pd.concat(flatten_list(feat_imps_df)).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
