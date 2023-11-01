@@ -134,7 +134,7 @@ def main():
             partial_wrapper = partial(parallel_npep_wrapper, merged_dataset=merged_dataset, viral_dataset=viral_dataset,
                                       seed=seed, ic_name=ic_name, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
                                       args=args)
-            output = Parallel(n_jobs=1)(
+            output = Parallel(n_jobs=4)(
                 delayed(partial_wrapper)(npep=npep) for npep in tqdm(n_viral, desc='nviral', leave=True))
             feat_imps_df.append(output)
     pd.concat(flatten_list(feat_imps_df)).to_csv(f'{args["outdir"]}/feat_imps_df.csv', index=False)
