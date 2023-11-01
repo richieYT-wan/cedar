@@ -113,19 +113,21 @@ def main():
     cedar_dataset = pd.read_csv(f'{args["datadir"]}cedar.csv')
     viral_dataset = pd.read_csv(f'{args["datadir"]}viral.csv')
 
-    ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
+    ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
 
 
     # DEFINING KWARGS
     encoding_kwargs = dict(max_len=12, encoding='onehot', blosum_matrix=None, mask=False, add_rank=True,
                            seq_col='sequence', rank_col='EL_rank_mut', hla_col = 'HLA', target_col='agg_label',
-                           add_aaprop=False, remove_pep=False, standardize=True)
+                           add_aaprop=False, remove_pep=False, standardize=True, threshold=0.2)
 
     n_viral = [int(x*len(cedar_dataset)) for x in np.arange(0, 10, 0.1) if x*len(cedar_dataset) <= len(viral_dataset)]
     p_viral = [round(100 * x / (x+len(cedar_dataset)),2) for x in n_viral]
     feat_imps_df = []
     for seed in tqdm([0,1,2,3,4,5,6,7,8,10], desc='seed', leave=True):
-        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-Shannon', ics_shannon, True, False),(['Mask', ics_shannon, False, True]),(['None', None, False, False])],
+        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-KL', ics_kl, True, False),
+                                                     (['Mask', ics_kl, False, True]),
+                                                     (['None', None, False, False])],
                                                     desc = 'weighting', leave=True):
             encoding_kwargs['mask']=mask
             encoding_kwargs['invert']=invert

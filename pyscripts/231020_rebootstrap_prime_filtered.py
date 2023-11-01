@@ -40,15 +40,16 @@ def bootstrap_pipeline(filename, args, ref):
     df['in_nepdb'] = df.apply(lambda x: get_in_ref(x['Peptide'], x['HLA'], ref=ref), axis=1)
     df = df.query('not in_nepdb')
     pcol = 'pred' if 'pred' in df.columns else 'mean_pred'
-    bdf = bootstrap_eval(df[pcol].values, df['agg_label'].values, 10000, 40, True, False, True)\
-                        .assign(evalset='PRIME', input_type='icore_mut', weight=weight, key=key)
+    bdf = bootstrap_eval(df[pcol].values, df['agg_label'].values, 10000, 40, True, False, True) \
+        .assign(evalset='PRIME', input_type='icore_mut', weight=weight, key=key)
     bdf.to_csv(f'{args["outdir"]}PRIME_bootstrapped_df_cedar_onehot_{weight}_icore_mut_{key}.csv')
     return None
+
 
 def compare_baseline(df, baseline):
     evalset = df.evalset.unique()[0]
     b = baseline.query('evalset==@evalset')
-    if len(b)==0:
+    if len(b) == 0:
         pval_icore = 1
         pval_pep = 1
     else:
@@ -103,7 +104,7 @@ def main():
     baseline_wrapper = partial(compare_baseline, baseline=baseline_df)
     bdf_files = [x for x in os.listdir(args["outdir"]) if x.endswith('.csv')]
     res_list = []
-    for evalset in tqdm(['CEDAR','PRIME'], desc='evalset', position=0, leave=True):
+    for evalset in tqdm(['CEDAR', 'PRIME'], desc='evalset', position=0, leave=True):
         filtered_files = list(filter(lambda x: evalset in x and x.startswith(evalset), bdf_files))
         if len(list(filtered_files)) == 0: continue
         output = Parallel(n_jobs=args['ncores'])(
@@ -112,7 +113,6 @@ def main():
         res_list.append(pd.concat(output, axis=0))
 
     pd.concat(res_list, axis=1).to_csv(f'{args["outdir"]}{args["savename"]}_gb_results.csv')
-
 
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
