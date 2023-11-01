@@ -131,7 +131,7 @@ def main():
                                                     desc='weighting', leave=True):
             encoding_kwargs['mask'] = mask
             encoding_kwargs['invert'] = invert
-            partial_wrapper = partial(parallel_npep_wrapper, cedar_dataset=merged_dataset, viral_dataset=viral_dataset,
+            partial_wrapper = partial(parallel_npep_wrapper, merged_dataset=merged_dataset, viral_dataset=viral_dataset,
                                       seed=seed, ic_name=ic_name, ics_dict=ics_dict, encoding_kwargs=encoding_kwargs,
                                       args=args)
             output = Parallel(n_jobs=4)(
