@@ -4,7 +4,7 @@ source /home/projects/vaccine/people/yatwan/anaconda3/etc/profile.d/conda.sh
 source activate phd
 
 HOMEDIR=/home/projects/vaccine/people/yatwan/cedar/
-OUTDIR=${HOMEDIR}output/230401_viral_featimp_sampling_interative/
+OUTDIR=${HOMEDIR}output/231101_redo_viral_merged_dataset/
 PYDIR=${HOMEDIR}pyscripts/
 ICSDIR=../data/ic_dicts/
 cd ${PYDIR}

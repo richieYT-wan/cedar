@@ -46,54 +46,57 @@ def flatten_list(list_of_lists):
 def parallel_npep_wrapper(npep, merged_dataset, viral_dataset, seed, ic_name, ics_dict, encoding_kwargs, args):
     p_viral = 100 * npep / (npep + len(merged_dataset))
     filename = f"NeoepiViral_Seed{seed}_{ic_name}_ProportionViral{p_viral:.2f}".replace(".", "_")
-    dataset = pd.concat([merged_dataset, viral_dataset.sample(npep, random_state=seed)])
-    kf = KFold(n_splits=5, shuffle=True, random_state=seed)
-    dataset['fold'] = 0
-    for i, (train_idx, test_idx) in enumerate(
-            kf.split(dataset['sequence'].values, dataset['agg_label'].values, groups=dataset['agg_label'])):
-        dataset.iloc[test_idx, dataset.columns.get_loc('fold')] = i
-    dataset.fold = dataset.fold.astype(int)
-    model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=100,
-                                   max_depth=6, ccp_alpha=9.945e-6)
-    # Training model and getting feature importances
-    print('Training')
-    trained_models, train_metrics, _ = nested_kcv_train_sklearn(dataset, model,
-                                                                ics_dict=ics_dict,
-                                                                encoding_kwargs=encoding_kwargs,
-                                                                n_jobs=9)
-    fi = get_nested_feature_importance(trained_models)
-    fn = AA_KEYS + ['rank']
-    # Saving Feature importances as dataframe
-    df_fi = pd.DataFrame(fi, index=fn).T
-    df_fi.to_csv(
-        f'{args["outdir"]}raw/featimps_{filename}.csv',
-        index=False)
+    if os.path.exists(f'{args["outdir"]}/bootstrapping/df_fi_{filename}.csv') and os.path.isfile(f'{args["outdir"]}/bootstrapping/df_fi_{filename}.csv'):
+        df_fi = pd.read_csv(f'{args["outdir"]}/bootstrapping/df_fi_{filename}.csv')
+    else:
+        dataset = pd.concat([merged_dataset, viral_dataset.sample(npep, random_state=seed)])
+        kf = KFold(n_splits=5, shuffle=True, random_state=seed)
+        dataset['fold'] = 0
+        for i, (train_idx, test_idx) in enumerate(
+                kf.split(dataset['sequence'].values, dataset['agg_label'].values, groups=dataset['agg_label'])):
+            dataset.iloc[test_idx, dataset.columns.get_loc('fold')] = i
+        dataset.fold = dataset.fold.astype(int)
+        model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=100,
+                                       max_depth=6, ccp_alpha=9.945e-6)
+        # Training model and getting feature importances
+        print('Training')
+        trained_models, train_metrics, _ = nested_kcv_train_sklearn(dataset, model,
+                                                                    ics_dict=ics_dict,
+                                                                    encoding_kwargs=encoding_kwargs,
+                                                                    n_jobs=9)
+        fi = get_nested_feature_importance(trained_models)
+        fn = AA_KEYS + ['rank']
+        # Saving Feature importances as dataframe
+        df_fi = pd.DataFrame(fi, index=fn).T
+        df_fi.to_csv(
+            f'{args["outdir"]}raw/featimps_{filename}.csv',
+            index=False)
 
-    df_fi['ProportionViral'] = p_viral
-    df_fi['NpepViral'] = npep
-    df_fi['Weight'] = ic_name
-    df_fi['seed'] = seed
-    df_fi['Proportion Viral'] = df_fi.apply(lambda x: f"{x['ProportionViral'] / 100:.1%}", axis=1)
-    df_fi['Tryptophan (W) Feat. Importance'] = df_fi.apply(lambda x: 100 * x['W'], axis=1)
-    # Crossval roc_auc_score
-    _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence', 'HLA', 'agg_label']),
-                                               trained_models, ics_dict,
-                                               dataset,
-                                               encoding_kwargs, concatenated=False,
-                                               only_concat=False, n_jobs=9, kcv_eval=True)
-    pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
-    auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
-    df_fi['kcv_auc'] = auc
-    # Only CEDAR AUC
-    _, preds = evaluate_trained_models_sklearn(merged_dataset.drop_duplicates(subset=['sequence', 'HLA', 'agg_label']),
-                                               trained_models, ics_dict,
-                                               dataset,
-                                               encoding_kwargs, concatenated=False,
-                                               only_concat=False, n_jobs=9, kcv_eval=False)
-    pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
-    auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
-    df_fi['neoepi_auc'] = auc
-    df_fi.to_csv(f'{args["outdir"]}/bootstrapping/df_fi_{filename}.csv', index=False)
+        df_fi['ProportionViral'] = p_viral
+        df_fi['NpepViral'] = npep
+        df_fi['Weight'] = ic_name
+        df_fi['seed'] = seed
+        df_fi['Proportion Viral'] = df_fi.apply(lambda x: f"{x['ProportionViral'] / 100:.1%}", axis=1)
+        df_fi['Tryptophan (W) Feat. Importance'] = df_fi.apply(lambda x: 100 * x['W'], axis=1)
+        # Crossval roc_auc_score
+        _, preds = evaluate_trained_models_sklearn(dataset.drop_duplicates(subset=['sequence', 'HLA', 'agg_label']),
+                                                   trained_models, ics_dict,
+                                                   dataset,
+                                                   encoding_kwargs, concatenated=False,
+                                                   only_concat=False, n_jobs=9, kcv_eval=True)
+        pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
+        auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
+        df_fi['kcv_auc'] = auc
+        # Only CEDAR AUC
+        _, preds = evaluate_trained_models_sklearn(merged_dataset.drop_duplicates(subset=['sequence', 'HLA', 'agg_label']),
+                                                   trained_models, ics_dict,
+                                                   dataset,
+                                                   encoding_kwargs, concatenated=False,
+                                                   only_concat=False, n_jobs=9, kcv_eval=False)
+        pcol = 'mean_pred' if 'mean_pred' in preds.columns else 'pred'
+        auc = roc_auc_score(preds['agg_label'].values, preds[pcol])
+        df_fi['neoepi_auc'] = auc
+        df_fi.to_csv(f'{args["outdir"]}/bootstrapping/df_fi_{filename}.csv', index=False)
     return df_fi
 
 
@@ -125,7 +128,8 @@ def main():
     p_viral = [round(100 * x / (x + len(merged_dataset)), 2) for x in n_viral]
     feat_imps_df = []
     for seed in tqdm([0, 1, 2, 3, 4, 5, 6, 7, 8, 10], desc='seed', leave=True):
-        for ic_name, ics_dict, invert, mask in tqdm([('Inverted-KL', ics_kl, True, False),
+        for ic_name, ics_dict, invert, mask in tqdm([('KL', ics_kl, False, False),
+                                                     ('Inverted-KL', ics_kl, True, False),
                                                      (['Mask', ics_kl, False, True]),
                                                      (['None', None, False, False])],
                                                     desc='weighting', leave=True):
