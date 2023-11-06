@@ -240,7 +240,7 @@ def main():
                                                                encoding_kwargs, False, True, min(10, args['ncores']),
                                                                kcv_eval=False)
                     p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
-                    preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                    preds.to_csv(f'{args["outdir"]}raw/new_{evalname}_preds_{filename}.csv', index=False,
                                  columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
                                           'EL_rank_wt_aligned'] + mut_cols + [p_col])
                     bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
