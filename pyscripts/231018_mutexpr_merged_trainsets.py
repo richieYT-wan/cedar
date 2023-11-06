@@ -98,8 +98,8 @@ def main():
     cpn_dataset = pd.read_csv(f'{args["datadir"]}231018_cedar_prime_nepdb_merged_fold.csv')
     ics_shannon = pkl_load(f'{args["icsdir"]}ics_shannon.pkl')
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
-
-
+    merged_dataset = pd.read_csv(f'{args["datadir"]}231106_cedar_prime_no_overlap.csv')
+    overlap_dataset = pd.read_csv(f'{args["datadir"]}231106_overlap.csv')
     # if not args['wc']:
     #     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
 
@@ -114,6 +114,8 @@ def main():
     new_nepdb_dataset, _ = get_aa_properties(new_nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     cp_dataset, _ = get_aa_properties(cp_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    merged_dataset, _ = get_aa_properties(merged_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    overlap_dataset, _ = get_aa_properties(overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
 
     # Defining mut cols
     mcs = []
@@ -129,7 +131,8 @@ def main():
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset,
                 'cp_merged': cp_dataset,
-                'cpn_merged': cpn_dataset}
+                'cpn_merged': cpn_dataset,
+                'merged_no_overlap': merged_dataset}
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
     train_dataset = trainmap[args['trainset']]
@@ -156,6 +159,7 @@ def main():
                        'Inverted-KL': (True, 'Inverted-KL', ics_kl, False),
                        'KL-Mask': (False, 'KL-Mask', ics_kl, True),
                        'Inverted-KL-Mask': (True, 'Inverted-KL-Mask', ics_kl, True)}
+
 
     if args['wc']:
         key = 'wildcard_consensus_model'
@@ -217,7 +221,8 @@ def main():
                                                    encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=True)
 
     if 'merged' in args['trainset']:
-        for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb'],['KCV', 'CEDAR', 'PRIME', 'NEPDB']):
+        for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb','overlap'],
+                               ['KCV', 'CEDAR', 'PRIME', 'NEPDB','overlap']):
             if c in kcv_preds.columns:
                 preds = kcv_preds.query(f'{c}')
                 if c == 'in_prime':
@@ -228,6 +233,16 @@ def main():
                 bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                           key, evalname, n_rounds=10000, n_jobs=args['ncores'])
             else:
+                if evalname == "overlap" and args['trainset'] == "merged_no_overlap":
+                    _, preds = evaluate_trained_models_sklearn(overlap_dataset, trained_models, ics_dict, train_dataset,
+                                                               encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=False)
+                    p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
+                    preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
+                                 columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
+                                          'EL_rank_wt_aligned'] + mut_cols + [p_col])
+                    bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                                                              key, evalname, n_rounds=10000, n_jobs=args['ncores'])
+
                 if evalname == "NEPDB":
                     _, preds = evaluate_trained_models_sklearn(nepdb_dataset, trained_models, ics_dict, train_dataset,
                                                                encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=False)
