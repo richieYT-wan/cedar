@@ -220,6 +220,8 @@ def main():
         for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb'],['KCV', 'CEDAR', 'PRIME', 'NEPDB']):
             if c in kcv_preds.columns:
                 preds = kcv_preds.query(f'{c}')
+                if c == 'in_prime':
+                    preds = preds.query('not in_cedar')
                 p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                 preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                              columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
