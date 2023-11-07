@@ -24,8 +24,11 @@ N_CORES = 39
 
 
 def compare_baseline(df, baseline):
-    evalset = df.evalset.unique()[0]
-    b = baseline.query('evalset==@evalset')
+    try:
+        evalset = df.evalset.unique()[0]
+        b = baseline.query('evalset==@evalset')
+    except:
+        raise ValueError(df, type(df), df.evalset())
     try:
         baseline_icore = b.query('input_type=="icore_mut"')
         pval_icore, sig_icore = get_pval_wrapper(df, baseline_icore, 'auc')
