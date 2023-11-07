@@ -26,10 +26,16 @@ N_CORES = 39
 def compare_baseline(df, baseline):
     evalset = df.evalset.unique()[0]
     b = baseline.query('evalset==@evalset')
-    baseline_icore = b.query('input_type=="icore_mut"')
-    baseline_pep = b.query('input_type=="Peptide"')
-    pval_icore, sig_icore = get_pval_wrapper(df, baseline_icore, 'auc')
-    pval_pep, sig_pep = get_pval_wrapper(df, baseline_pep, 'auc')
+    try:
+        baseline_icore = b.query('input_type=="icore_mut"')
+        pval_icore, sig_icore = get_pval_wrapper(df, baseline_icore, 'auc')
+    except:
+        pval_icore = 10000
+    try:
+        baseline_pep = b.query('input_type=="Peptide"')
+        pval_pep, sig_pep = get_pval_wrapper(df, baseline_pep, 'auc')
+    except:
+        pval_pep = 10000
     gb = df.groupby(['weight', 'key']).agg(mean_auc=('auc', 'mean'), mean_auc01=('auc_01', 'mean'))
     gb['pval_icore'] = pval_icore
     gb['pval_pep'] = pval_pep
