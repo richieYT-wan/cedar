@@ -33,10 +33,11 @@ def get_in_ref(peptide, hla, ref):
 
 
 def bootstrap_pipeline(filename, args, ref):
-    df = pd.read_csv(filename)
     basename = os.path.basename(filename)
     weight, key = get_cdt(basename)
-
+    if os.path.exists(f'{args["outdir"]}PRIME_bootstrapped_df_cedar_onehot_{weight}_icore_mut_{key}.csv'):
+        return None
+    df = pd.read_csv(filename)
     df['in_nepdb'] = df.apply(lambda x: get_in_ref(x['Peptide'], x['HLA'], ref=ref), axis=1)
     df = df.query('not in_nepdb')
     pcol = 'pred' if 'pred' in df.columns else 'mean_pred'
@@ -112,7 +113,7 @@ def main():
             tqdm(filtered_files, desc='files', position=1, leave=False))
         res_list.append(pd.concat(output, axis=0))
 
-    pd.concat(res_list, axis=1).to_csv(f'{args["outdir"]}{args["savename"]}_gb_results.csv')
+    pd.concat(res_list, axis=1).to_csv(f'{args["outdir"]}../{args["savename"]}_gb_results.csv')
 
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
