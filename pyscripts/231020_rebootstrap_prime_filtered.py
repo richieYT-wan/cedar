@@ -112,8 +112,10 @@ def main():
             delayed(baseline_wrapper)(df=pd.read_csv(f'{args["outdir"]}{x}')) for x in
             tqdm(filtered_files, desc='files', position=1, leave=False))
         res_list.append(pd.concat(output, axis=0))
-
+    print(len(res_list[0]))
+    print(len(res_list[1]))
     pd.concat(res_list, axis=1).to_csv(f'{args["outdir"]}../{args["savename"]}_gb_results.csv')
+    print(len(pd.concat(res_list)))
 
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)

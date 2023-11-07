@@ -100,6 +100,9 @@ def main():
     ics_kl = pkl_load(f'{args["icsdir"]}ics_kl_new.pkl')
     merged_dataset = pd.read_csv(f'{args["datadir"]}231106_cedar_prime_no_overlap.csv')
     overlap_dataset = pd.read_csv(f'{args["datadir"]}231106_overlap.csv')
+    upsampled_overlap_dataset = pd.read_csv(f'{args["datadir"]}231107_merged_prime_upsampled_with_cedar_overlap.csv')
+    upsampled_no_overlap_dataset = pd.read_csv(f'{args["datadir"]}231107_merged_prime_upsampled_without_cedar_overlap.csv')
+
     # if not args['wc']:
     #     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
 
@@ -116,7 +119,8 @@ def main():
     cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     merged_dataset, _ = get_aa_properties(merged_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     overlap_dataset, _ = get_aa_properties(overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-
+    upsampled_overlap_dataset, _ = get_aa_properties(upsampled_overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+    upsampled_no_overlap_dataset, _ = get_aa_properties(upsampled_no_overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
     # Defining mut cols
     mcs = []
     cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity',
@@ -132,7 +136,9 @@ def main():
                 'prime': prime_dataset,
                 'cp_merged': cp_dataset,
                 'cpn_merged': cpn_dataset,
-                'merged_no_overlap': merged_dataset}
+                'merged_no_overlap': merged_dataset,
+                'merged_upsampled_overlap': upsampled_overlap_dataset,
+                'merged_upsampled_no_overlap': upsampled_no_overlap_dataset}
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
     train_dataset = trainmap[args['trainset']]
@@ -220,13 +226,13 @@ def main():
     _, kcv_preds = evaluate_trained_models_sklearn(train_dataset, trained_models, ics_dict, train_dataset,
                                                    encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=True)
 
-    if 'merged' in args['trainset']:
+    if 'merged' in args['trainset'] or 'upsampled' in args['trainset']:
         for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb','overlap'],
                                ['KCV', 'CEDAR', 'PRIME', 'NEPDB','overlap']):
             if c in kcv_preds.columns:
                 preds = kcv_preds.query(f'{c}')
                 if c == 'in_prime':
-                    preds = preds.query('not in_cedar')
+                    preds = preds.query('not in_cedar').drop_duplicates()
                 p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                 preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                              columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
