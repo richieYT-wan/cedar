@@ -29,6 +29,6 @@ python3 ./231018_mutexpr_merged_trainsets.py -icsdir \${ICSDIR} -ncores 2 -outdi
 " > "231018_redo_cdt_${CONDITION}_trainset_${TRAINSET}_index_${INDEX}_input-type_${INPUTTYPE}.sh"
 
 chmod +x "231018_redo_cdt_${CONDITION}_trainset_${TRAINSET}_index_${INDEX}_input-type_${INPUTTYPE}.sh"
-qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=2:thinnode,mem=8888mb,walltime=$WALLTIME "./231018_redo_cdt_${CONDITION}_trainset_${TRAINSET}_index_${INDEX}_input-type_${INPUTTYPE}.sh"
+qsub -W group_list=vaccine -A vaccine -m e -l nodes=1:ppn=3:thinnode,mem=12gb,walltime=$WALLTIME "./231018_redo_cdt_${CONDITION}_trainset_${TRAINSET}_index_${INDEX}_input-type_${INPUTTYPE}.sh"
 
 rm "./231018_redo_cdt_${CONDITION}_trainset_${TRAINSET}_index_${INDEX}_input-type_${INPUTTYPE}.sh"
