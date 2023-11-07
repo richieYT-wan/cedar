@@ -57,6 +57,8 @@ def args_parser():
                         default='../output/231018_redo_merged/')
     parser.add_argument('-ncores', type=int, default=40,
                         help='N cores to use in parallel, by default will be multiprocesing.cpu_count() * 3/4')
+    parser.add_argument('-nonepdb', type=int, default=0,
+                        help='1 to disable running nepdb bootstrap')
     return parser.parse_args()
 
 
@@ -71,7 +73,8 @@ def main():
     baselines = os.path.join(args['datadir'], 'baselines/')
     baseline_df = pd.concat([pd.read_csv(f'{baselines}{x}') for x in os.listdir(baselines)])
     evalset_reorder = ['KCV', 'CEDAR', 'PRIME', 'NEPDB', 'new_NEPDB']
-
+    if args['nonepdb']==1 :
+        evalset_reorder = ['KCV','CEDAR','PRIME']
     files = [x for x in os.listdir(args["datadir"]) if x.endswith('.csv')]
     # This will be a list of lists initially, then concat along axis = 1 for each evalset
     res_list = []
