@@ -103,34 +103,6 @@ def main():
     upsampled_overlap_dataset = pd.read_csv(f'{args["datadir"]}231107_merged_prime_upsampled_with_cedar_overlap.csv')
     upsampled_no_overlap_dataset = pd.read_csv(f'{args["datadir"]}231107_merged_prime_upsampled_without_cedar_overlap.csv')
 
-    # if not args['wc']:
-    #     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
-
-    # Define various stuff depending on the input columns
-    scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'
-    prefix = 'fullpep_' if scol == 'Peptide' else 'icore_'
-    rankcol = 'trueHLA_EL_rank' if args['input_type'] == 'Peptide' else 'EL_rank_mut'
-    # Get the PC props
-    cedar_dataset, _ = get_aa_properties(cedar_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    prime_dataset, _ = get_aa_properties(prime_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    nepdb_dataset, _ = get_aa_properties(nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    new_nepdb_dataset, _ = get_aa_properties(new_nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    cp_dataset, _ = get_aa_properties(cp_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    merged_dataset, _ = get_aa_properties(merged_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    overlap_dataset, _ = get_aa_properties(overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    upsampled_overlap_dataset, _ = get_aa_properties(upsampled_overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    upsampled_no_overlap_dataset, _ = get_aa_properties(upsampled_no_overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
-    # Defining mut cols
-    mcs = []
-    cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity',
-             f'{prefix}isoelectric_point','icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
-             'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
-
-    for L in range(0, len(cols_) + 1):
-        for mc in itertools.combinations(cols_, L):
-            mcs.append(list(mc))
-
     # Setting trainset
     trainmap = {'cedar': cedar_dataset,
                 'prime': prime_dataset,
@@ -142,6 +114,27 @@ def main():
 
     assert (args['trainset'].lower() in trainmap.keys()), f'please input -trainset as either one of {trainmap.keys()}'
     train_dataset = trainmap[args['trainset']]
+
+    # if not args['wc']:
+    #     baseline = pkl_load(f'{args["outdir"]}baseline_bootstrapped.pkl')
+
+    # Define various stuff depending on the input columns
+    scol = 'Peptide' if args['input_type'] == 'Peptide' else 'icore_mut'
+    prefix = 'fullpep_' if scol == 'Peptide' else ''
+    rankcol = 'trueHLA_EL_rank' if args['input_type'] == 'Peptide' else 'EL_rank_mut'
+    # Get the PC props
+    aa_cols = ['aliphatic_index', 'boman', 'hydrophobicity',
+               'isoelectric_point', 'VHSE1', 'VHSE3', 'VHSE7', 'VHSE8']
+    # Defining mut cols
+    mcs = []
+    cols_ = [f'{prefix}aliphatic_index', f'{prefix}boman', f'{prefix}hydrophobicity',
+             f'{prefix}isoelectric_point', 'icore_dissimilarity_score', 'icore_blsm_mut_score', 'ratio_rank',
+             'EL_rank_wt_aligned', 'foreignness_score', 'Total_Gene_TPM']
+
+    for L in range(0, len(cols_) + 1):
+        for mc in itertools.combinations(cols_, L):
+            mcs.append(list(mc))
+
     assert not (args['key'] is None and args['mc_index'] is None), 'Both mutcol index and mutcol key are None! one of the two should be used'
     # DEFINING KWARGS
     encoding_kwargs = {'max_len': 12,
@@ -195,7 +188,21 @@ def main():
 
         if 'KL' in args["condition"]:
             encoding_kwargs['threshold'] = 0.200
-
+    if any([x in mut_cols for x in aa_cols]) and all([x not in df.columns for df in
+                                                      [cedar_dataset, prime_dataset, nepdb_dataset, new_nepdb_dataset,
+                                                       train_dataset] for x in aa_cols]):
+        cedar_dataset, _ = get_aa_properties(cedar_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        prime_dataset, _ = get_aa_properties(prime_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        nepdb_dataset, _ = get_aa_properties(nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        new_nepdb_dataset, _ = get_aa_properties(new_nepdb_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        cp_dataset, _ = get_aa_properties(cp_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        cpn_dataset, _ = get_aa_properties(cpn_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        merged_dataset, _ = get_aa_properties(merged_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        overlap_dataset, _ = get_aa_properties(overlap_dataset, seq_col=scol, do_vhse=False, prefix=prefix)
+        upsampled_overlap_dataset, _ = get_aa_properties(upsampled_overlap_dataset, seq_col=scol, do_vhse=False,
+                                                         prefix=prefix)
+        upsampled_no_overlap_dataset, _ = get_aa_properties(upsampled_no_overlap_dataset, seq_col=scol, do_vhse=False,
+                                                            prefix=prefix)
     encoding_kwargs['encoding'] = 'onehot'
     encoding_kwargs['blosum_matrix'] = None
     # Doing only Inverted Shannon, Mask, None
@@ -225,14 +232,14 @@ def main():
 
     _, kcv_preds = evaluate_trained_models_sklearn(train_dataset, trained_models, ics_dict, train_dataset,
                                                    encoding_kwargs, False, True, min(10, args['ncores']), kcv_eval=True)
-
+    print(len(kcv_preds))
     if 'merged' in args['trainset'] or 'upsampled' in args['trainset']:
         for c, evalname in zip(['flag', 'in_cedar', 'in_prime', 'in_nepdb','overlap'],
                                ['KCV', 'CEDAR', 'PRIME', 'NEPDB','overlap']):
             if c in kcv_preds.columns:
                 preds = kcv_preds.query(f'{c}')
                 if c == 'in_prime':
-                    preds = preds.query('not in_cedar').drop_duplicates()
+                    preds = preds.query('not in_cedar')
                 p_col = 'pred' if 'pred' in preds.columns else 'mean_pred'
                 preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                              columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut', 'EL_rank_wt_aligned'] + mut_cols + [p_col])
@@ -268,6 +275,7 @@ def main():
                                           'EL_rank_wt_aligned'] + mut_cols + [p_col])
                     bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
                                                               key, f'new_{evalname}', n_rounds=10000, n_jobs=args['ncores'])
+
     # bad behaviour but whatever I just want to retrain a prime model here
     elif args['trainset']=="prime":
         for evalset, evalname in zip([prime_dataset, cedar_dataset, nepdb_dataset,

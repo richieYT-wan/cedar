@@ -261,6 +261,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
         test_results
         predictions_df
     """
+    test_dataframe['tmp_id'] = [f'{i:04}' for i in range(len(test_dataframe))]
     encoding_kwargs = assert_encoding_kwargs(encoding_kwargs, mode_eval=True)
     # Wrapper and parallel evaluation
     eval_wrapper_ = partial(parallel_eval_wrapper, test_dataframe=test_dataframe, ics_dict=ics_dict, kcv_eval=kcv_eval,
@@ -288,15 +289,7 @@ def evaluate_trained_models_sklearn(test_dataframe, models_dict, ics_dict,
                                                    predictions_df['pred'].values)
     # Either concatenated, or mean predictions
     else:
-        # obj_cols = [x for x,y in zip(predictions_df.dtypes.index, predictions_df.dtypes.values) if y=='object']
-        # cols = [encoding_kwargs['seq_col'], encoding_kwargs['hla_col'], encoding_kwargs['target_col']]
         predictions_df = predictions_df.groupby([x for x in predictions_df.columns if x !='pred']).agg(mean_pred=('pred', 'mean')).reset_index()
-        #
-        # mean_preds = predictions_df.groupby(test_dataframe.columns).agg(mean_pred=('pred', 'mean'))
-        # predictions_df = test_dataframe.merge(mean_preds, left_on=test_dataframe.columns,
-        #                                       right_on=test_dataframe.columns,
-        #                                       suffixes=[None, None])
-    # print('there', len(predictions_df))
 
     if only_concat and concatenated:
         keys_del = [k for k in test_results if k != 'concatenated']
