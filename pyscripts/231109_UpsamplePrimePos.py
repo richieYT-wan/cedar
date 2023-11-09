@@ -114,7 +114,7 @@ def main():
     conditions_list = {'KL-Mask': (False, 'KL-Mask', ics_kl, True)}
     invert, ic_name, ics_dict, mask = conditions_list['KL-Mask']
     # megaloops for encoding-weighting
-    mut_cols = ['hydrophobicity', 'blsm_mut_score', 'ratio_rank']
+    mut_cols = ['hydrophobicity', 'icore_blsm_mut_score', 'ratio_rank']
     encoding_kwargs['mut_col'] = mut_cols
     key = '-'.join(mut_cols).replace(' ', '-')
 
