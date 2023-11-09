@@ -29,7 +29,7 @@ N_CORES = 39
 
 
 def final_bootstrap_wrapper(preds_df, args, filename,
-                            ic_name, key, evalset,
+                            ic_name, replacement, upsample, key, evalset,
                             n_rounds=10000, n_jobs=36):
     scores = preds_df.pred.values if 'pred' in preds_df.columns else preds_df['mean_pred'].values
     targets = preds_df.agg_label.values if 'agg_label' in preds_df.columns else preds_df['Immunogenicity'].values
@@ -38,7 +38,9 @@ def final_bootstrap_wrapper(preds_df, args, filename,
                                      n_jobs=n_jobs, add_roc=False, reduced=True)
     bootstrapped_df['encoding'] = 'onehot'
     bootstrapped_df['weight'] = ic_name
-    bootstrapped_df['input_type'] = args['input_type']
+    bootstrapped_df['input_type'] = 'icore_mut'
+    bootstrapped_df['with_replacement'] = replacement
+    bootstrapped_df['n_upsample'] = upsample
     bootstrapped_df['key'] = key
     bootstrapped_df['evalset'] = evalset.upper()
 
@@ -57,6 +59,7 @@ def args_parser():
                         help='Path to directory containing the pre-partitioned data')
     parser.add_argument('-outdir', type=str,
                         default='../output/231109_Upsample_Prime_Positives/')
+    parser.add_argument('-replace', type=str2bool, default=False)
     parser.add_argument('-trainset', type=str, default='cp_merged')
     parser.add_argument('-icsdir', type=str, default='../data/ic_dicts/',
                         help='Path containing the pre-computed ICs dicts.')
@@ -122,10 +125,14 @@ def main():
     encoding_kwargs['invert'] = invert
     encoding_kwargs['mask'] = mask
 
-    for upsample in range(5, 21):
-        train_dataset = pd.concat(
-            [cp_dataset, cp_dataset.query('in_prime and not in_cedar and agg_label==1').sample(frac=upsample, replace=False)])
-        filename = f'MergedPrimeUpsamplePos_n_{upsample:02}_onehot_KL-Mask_{key}'
+    for upsample in tqdm(range(5, 21), desc='ups'):
+        if args['replace']:
+            train_dataset = pd.concat([cp_dataset,
+                                       cp_dataset.query('in_prime and not in_cedar and agg_label==1').sample(frac=upsample, replace=True)])
+        else:
+            train_dataset = pd.concat([cp_dataset]+[cp_dataset.query('in_prime and not in_cedar and agg_label==1')]*upsample)
+
+        filename = f'MergedPrimeUpsamplePos_n_{upsample:02}_replacement{args["replace"]}_onehot_KL-Mask_{key}'
         # Using the same model and hyperparameters
         model = RandomForestClassifier(n_jobs=1, min_samples_leaf=7, n_estimators=300,
                                        max_depth=8, ccp_alpha=9.945e-6)
@@ -156,7 +163,7 @@ def main():
                 preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                              columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
                                       'EL_rank_wt_aligned'] + mut_cols + [p_col])
-                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name, args['replace'], upsample,
                                                           key, evalname, n_rounds=10000, n_jobs=args['ncores'])
             else:
                 if evalname == "NEPDB":
@@ -167,7 +174,7 @@ def main():
                     preds.to_csv(f'{args["outdir"]}raw/{evalname}_preds_{filename}.csv', index=False,
                                  columns=['HLA', 'Peptide', 'agg_label', 'icore_mut', 'icore_wt_aligned', 'EL_rank_mut',
                                           'EL_rank_wt_aligned'] + mut_cols + [p_col])
-                    bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name,
+                    bootstrapped_df = final_bootstrap_wrapper(preds, args, filename, ic_name, args['replace'], upsample,
                                                               key, evalname, n_rounds=10000, n_jobs=args['ncores'])
 
     end = dt.now()
