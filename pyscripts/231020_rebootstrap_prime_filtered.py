@@ -105,7 +105,7 @@ def main():
     baseline_wrapper = partial(compare_baseline, baseline=baseline_df)
     bdf_files = [x for x in os.listdir(args["outdir"]) if x.endswith('.csv')]
     res_list = []
-    for evalset in tqdm(['CEDAR', 'PRIME'], desc='evalset', position=0, leave=True):
+    for evalset in tqdm(['KCV','CEDAR', 'PRIME', 'NEPDB'], desc='evalset', position=0, leave=True):
         filtered_files = list(filter(lambda x: evalset in x and x.startswith(evalset), bdf_files))
         if len(list(filtered_files)) == 0: continue
         output = Parallel(n_jobs=args['ncores'])(
