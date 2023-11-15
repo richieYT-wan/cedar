@@ -50,16 +50,21 @@ def bootstrap_pipeline(filename, args, ref):
 
 
 def compare_baseline(df, baseline):
-    evalset = df.evalset.unique()[0]
-    b = baseline.query('evalset==@evalset')
-    if len(b) == 0:
-        pval_icore = 1
-        pval_pep = 1
-    else:
+    try:
+        evalset = df.evalset.unique()[0]
+        b = baseline.query('evalset==@evalset')
+    except:
+        raise ValueError(df, type(df), df.evalset.unique()
+    try:
         baseline_icore = b.query('input_type=="icore_mut"')
-        baseline_pep = b.query('input_type=="Peptide"')
         pval_icore, sig_icore = get_pval_wrapper(df, baseline_icore, 'auc')
+    except:
+        pval_icore=10000
+    try:
+        baseline_pep = b.query('input_type=="Peptide"')
         pval_pep, sig_pep = get_pval_wrapper(df, baseline_pep, 'auc')
+    except:
+        pval_pep = 10000
     gb = df.groupby(['weight', 'key']).agg(mean_auc=('auc', 'mean'), mean_auc01=('auc_01', 'mean'))
     gb['pval_icore'] = pval_icore
     gb['pval_pep'] = pval_pep
