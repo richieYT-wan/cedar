@@ -23,8 +23,10 @@ N_CORES = 39
 
 
 def get_cdt(basename):
+    print(basename)
     basename = basename.split('onehot_')[1].split('.csv')[0]
     weight, key = basename.split('_icore_mut_')
+    
     return weight, key
 
 
@@ -35,7 +37,7 @@ def get_in_ref(peptide, hla, ref):
 def bootstrap_pipeline(filename, args, ref):
     basename = os.path.basename(filename)
     weight, key = get_cdt(basename)
-    if os.path.exists(f'{args["outdir"]}PRIME_bootstrapped_df_cedar_onehot_{weight}_icore_mut_{key}.csv'):
+    if os.path.exists(f'{args["outdir"]}PRIME_bootstrapped_df_cpn_merged_onehot_{weight}_icore_mut_{key}.csv'):
         return None
     df = pd.read_csv(filename)
     df['in_nepdb'] = df.apply(lambda x: get_in_ref(x['Peptide'], x['HLA'], ref=ref), axis=1)
@@ -43,7 +45,7 @@ def bootstrap_pipeline(filename, args, ref):
     pcol = 'pred' if 'pred' in df.columns else 'mean_pred'
     bdf = bootstrap_eval(df[pcol].values, df['agg_label'].values, 10000, 40, True, False, True) \
         .assign(evalset='PRIME', input_type='icore_mut', weight=weight, key=key)
-    bdf.to_csv(f'{args["outdir"]}PRIME_bootstrapped_df_cedar_onehot_{weight}_icore_mut_{key}.csv')
+    bdf.to_csv(f'{args["outdir"]}PRIME_bootstrapped_df_cpn_merged_onehot_{weight}_icore_mut_{key}.csv')
     return None
 
 
@@ -90,7 +92,7 @@ def main():
     mkdirs(args['outdir'])
     baselines = os.path.join(args['datadir'], 'baselines/')
     baseline_df = pd.concat([pd.read_csv(f'{baselines}{x}') for x in os.listdir(baselines)])
-    nepdb = pd.read_csv(f'{args["datadir"]}NEPDB_preds_cedar_onehot_None_icore_mut_only_rank.csv')
+    nepdb = pd.read_csv(f'{args["datadir"]}NEPDB_preds_cpn_merged_onehot_None_icore_mut_only_rank.csv')
     files = [f'{args["datadir"]}{x}' for x in os.listdir(args["datadir"]) if x.endswith('.csv') and 'PRIME' in x]
     # This will be a list of lists initially, then concat along axis = 1 for each evalset
     print('Doing BDFs')
@@ -98,7 +100,7 @@ def main():
     # output = Parallel(n_jobs=4)(
     #     delayed(bs_wrapper)(filename=x) for x in
     #     tqdm(files, desc='files', position=1, leave=False))
-    for f in files:
+    for f in reversed(files):
         bootstrap_pipeline(f, args, nepdb)
 
     print('Doing baseline comparisons')
