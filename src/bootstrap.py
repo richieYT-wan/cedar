@@ -216,7 +216,7 @@ def plot_pval(axis, pval, sig, x0, x1, y, h=0.015, color='k', fontsize=12, fontw
         # label = f'{sig}, p={pval:.1e}'
         label = f'{sig}, p<1e-4'
     else:
-        label = f'{sig}, p={round(pval, pvstr.rfind(pvstr.lstrip("0.")))}'
+        label = f'{sig}, p={pval:.4f}'
     # Drawing Pval */ns rectangles
     # x1, x2 = 0, 1
     # y, h, col = df['similarity'].max() + 0.015, 0.015, 'k'
