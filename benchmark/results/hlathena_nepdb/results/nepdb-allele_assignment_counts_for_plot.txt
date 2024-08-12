@@ -1,0 +1,2 @@
+A1	A2	B1	B2	multi_wo_C	C1	C2	multi_w_C	unknown
+NA	NA	NA	NA	0.0208333333333333	NA	NA	0	0.8375
